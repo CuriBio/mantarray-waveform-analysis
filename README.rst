@@ -1,15 +1,6 @@
-IMPORTANT: before using this template to create a repo that will be published to PyPI, check that the desired name of the repo is available on PyPI.
-
 After creating a copy of this template, change the name of the package in `setup.py`, `setup.cfg`, `pytest.ini`, `MANIFEST.in`, `codebuild_formation.yaml` and the subfolder within the `src` directory.  In the Readme, change the all the `python-github-template` in links to point to the new repo name.
-Before CodeBuild can automatically publish to PyPI, the package must be registered using command `twine register`: https://twine.readthedocs.io/en/latest/#twine-register
 
 Steps to create repo:
-   - Log in as Curi-Bio-CI
-   - Select python-github-template as template
-   - Check box that says `include all branches`
-   - Set repo to public
-   - Publish repo
-   - To stop error messages about `master` and `development` branches not sharing any history, clone the repo, checkout development and run `git rebase -i origin/master` then `git push -f`
    - In Actions -> Dev: click Run workflow. Wait until workflow finishes
    - In Settings -> Security & analysis: enable Dependabot security updates
    - In Setting -> Options, under Merge Button:
