@@ -5,16 +5,21 @@ from setuptools import setup
 
 
 setup(
-    name="change_this_to_name_of_package",
-    version="0.1",
-    description="CREATE A DESCRIPTION",
-    url="https://github.com/CuriBio/CHANGE_THIS_TO_NAME_OF_REPO",
+    name="mantarray_waveform_analysis",
+    version="0.2",
+    description="Tools for analyzing waveforms produced by a Mantarray Instrument",
+    url="https://github.com/CuriBio/mantarray-waveform-analysis",
     author="Curi Bio",
     author_email="contact@curibio.com",
     license="MIT",
     packages=find_packages("src"),
     package_dir={"": "src"},
-    install_requires=[],
+    install_requires=[
+        "numpy>=1.17.3",
+        "scipy>=1.4.1",
+        "nptyping>=1.2.0",
+        "attrs>=19.3.0",
+    ],
     zip_safe=False,
     include_package_data=True,
     classifiers=[
