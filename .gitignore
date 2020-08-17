@@ -40,7 +40,6 @@ prof/
 downloads/
 pipeline_outputs/
 *.gz
-*.tsv
 *.csv
 
 
