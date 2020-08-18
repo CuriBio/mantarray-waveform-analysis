@@ -43,6 +43,9 @@ def test_compression_performance(new_A1):
     # after stopping linear regression:      82693642.5
     #                                        39733980.4
     # after switching to numpy sum:          45458017.3
+    # cythonize original rsquared code:      75517946
+    #                                        35390130
+    # fully converting rsquared to cython:    2518059
 
     _, _, _, _, noise_free_data = new_A1
     starting_time = time.perf_counter_ns()

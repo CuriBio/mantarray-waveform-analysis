@@ -4,6 +4,8 @@
 
 # Python
 *.py[cod]
+*.so
+*.c
 __pycache__/
 
 # Venv
@@ -11,6 +13,8 @@ __pycache__/
 venv/
 *.egg-info
 
+
+build/
 
 # sphinx html
 docs/build
