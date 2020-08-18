@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
-# Eli (8/18/20) ... not sure why cython doesn't default to compiling with Python 3...but apparently this is explicitly needed https://github.com/cython/cython/issues/2299
 #cython: language_level=3
 #cython: linetrace=True
+# Eli (8/18/20) ... not sure why cython doesn't default to compiling with Python 3...but apparently this is explicitly needed https://github.com/cython/cython/issues/2299
 """Compressions arrays of Mantarray GMR data ."""
 from typing import Any
 
