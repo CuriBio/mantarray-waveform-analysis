@@ -15,6 +15,7 @@ venv/
 
 
 build/
+dist/
 
 # sphinx html
 docs/build
