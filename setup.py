@@ -2,9 +2,44 @@
 """Setup configuration."""
 import os
 
-from Cython.Build import cythonize
+from setuptools import Extension
 from setuptools import find_packages
 from setuptools import setup
+
+try:
+    from Cython.Build import cythonize
+except ImportError:
+    USE_CYTHON = False
+else:
+    USE_CYTHON = True
+
+# cmdclass = {}
+# ext_modules = []
+
+# if use_cython:
+#     ext_modules += [
+#         Extension("mypackage.mycythonmodule", ["cython/mycythonmodule.pyx"]),
+#     ]
+#     cmdclass.update({'build_ext': build_ext})
+# else:
+#     ext_modules += [
+#         Extension("mypackage.mycythonmodule", ["cython/mycythonmodule.c"]),
+#     ]
+
+
+ext = ".pyx" if USE_CYTHON else ".c"
+# os.path.join("src", "mantarray_waveform_analysis", "compression_cy.pyx")
+extensions = [
+    Extension(
+        "mantarray_waveform_analysis.compression_cy",
+        [os.path.join("src", "mantarray_waveform_analysis", "compression_cy") + ext],
+    )
+]
+
+if USE_CYTHON:
+    # from Cython.Build import cythonize
+
+    extensions = cythonize(extensions)
 
 
 setup(
@@ -35,10 +70,11 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Topic :: Scientific/Engineering",
     ],
-    ext_modules=cythonize(
-        [
-            os.path.join("src", "mantarray_waveform_analysis", "compression_cy.pyx"),
-        ],  # make sure to have installed the Python dev module: sudo apt-get install python3.7-dev
-        annotate=False,
-    ),  # set to True when optimizing the code to enable generation of the html annotation file
+    ext_modules=extensions
+    # cythonize(
+    #     [
+    #         os.path.join("src", "mantarray_waveform_analysis", "compression_cy.pyx"),
+    #     ],  # make sure to have installed the Python dev module: sudo apt-get install python3.7-dev
+    #     annotate=False,
+    # ),  # set to True when optimizing the code to enable generation of the html annotation file
 )

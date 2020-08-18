@@ -2,6 +2,8 @@ recursive-include mantarray_waveform_analysis **
 include LICENSE
 include *rst
 include *py
+recursive-include src *.pyx
+recursive-include src *.c
 global-exclude *.txt
 global-exclude src/pylintrc
 global-exclude .flake8
