@@ -155,15 +155,15 @@ def test_maiden_voyage_data_auc(maiden_voyage_data):
 
     # test data_metrics aggregate dictionary
     assert window_dict[AUC_UUID]["n"] == 11
-    assert window_dict[AUC_UUID]["mean"] == 26042829121
-    assert window_dict[AUC_UUID]["std"] == 1890944885
-    assert window_dict[AUC_UUID]["min"] == 22778633628
-    assert window_dict[AUC_UUID]["max"] == 28953333906
+    assert window_dict[AUC_UUID]["mean"] == 26042825654
+    assert window_dict[AUC_UUID]["std"] == 1890947206
+    assert window_dict[AUC_UUID]["min"] == 22778626414
+    assert window_dict[AUC_UUID]["max"] == 28953330400
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[77000][AUC_UUID] == 27209375212
-    assert per_beat_dict[170000][AUC_UUID] == 28953333906
-    assert per_beat_dict[263000][AUC_UUID] == 24541063774
+    assert per_beat_dict[77000][AUC_UUID] == 27209339472
+    assert per_beat_dict[170000][AUC_UUID] == 28953330400
+    assert per_beat_dict[263000][AUC_UUID] == 24541074616
 
 
 def test_maiden_voyage_data_twitch_widths(maiden_voyage_data):
@@ -267,12 +267,12 @@ def test_new_A1_amplitude(new_A1):
     # test data_metrics aggregate dictionary
     assert window_dict[AMPLITUDE_UUID]["n"] == 12
     assert window_dict[AMPLITUDE_UUID]["mean"] == 97887
-    assert window_dict[AMPLITUDE_UUID]["std"] == 1993
+    assert window_dict[AMPLITUDE_UUID]["std"] == 1994
     assert window_dict[AMPLITUDE_UUID]["min"] == 94961
-    assert window_dict[AMPLITUDE_UUID]["max"] == 102159
+    assert window_dict[AMPLITUDE_UUID]["max"] == 102160
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[105000][AMPLITUDE_UUID] == 102159
+    assert per_beat_dict[105000][AMPLITUDE_UUID] == 102160
     assert per_beat_dict[186000][AMPLITUDE_UUID] == 98768
     assert per_beat_dict[266000][AMPLITUDE_UUID] == 97879
 
@@ -286,15 +286,15 @@ def test_new_A1_auc(new_A1):
 
     # test data_metrics aggregate dictionary
     assert window_dict[AUC_UUID]["n"] == 12
-    assert window_dict[AUC_UUID]["mean"] == 2565504261
-    assert window_dict[AUC_UUID]["std"] == 65869124
-    assert window_dict[AUC_UUID]["min"] == 2465789418
-    assert window_dict[AUC_UUID]["max"] == 2695170612
+    assert window_dict[AUC_UUID]["mean"] == 2565501317
+    assert window_dict[AUC_UUID]["std"] == 65875566
+    assert window_dict[AUC_UUID]["min"] == 2465815783
+    assert window_dict[AUC_UUID]["max"] == 2695186993
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[105000][AUC_UUID] == 2695170612
-    assert per_beat_dict[186000][AUC_UUID] == 2577932134
-    assert per_beat_dict[266000][AUC_UUID] == 2566184048
+    assert per_beat_dict[105000][AUC_UUID] == 2695186993
+    assert per_beat_dict[186000][AUC_UUID] == 2577929650
+    assert per_beat_dict[266000][AUC_UUID] == 2566166876
 
 
 def test_new_A1_twitch_widths(new_A1):
@@ -398,15 +398,15 @@ def test_new_A2_amplitude(new_A2):
 
     # test data_metrics aggregate dictionary
     assert window_dict[AMPLITUDE_UUID]["n"] == 11
-    assert window_dict[AMPLITUDE_UUID]["mean"] == 91576
+    assert window_dict[AMPLITUDE_UUID]["mean"] == 91575
     assert window_dict[AMPLITUDE_UUID]["std"] == 1872
-    assert window_dict[AMPLITUDE_UUID]["min"] == 88541
-    assert window_dict[AMPLITUDE_UUID]["max"] == 94583
+    assert window_dict[AMPLITUDE_UUID]["min"] == 88540
+    assert window_dict[AMPLITUDE_UUID]["max"] == 94582
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[104000][AMPLITUDE_UUID] == 90034
-    assert per_beat_dict[185000][AMPLITUDE_UUID] == 93547
-    assert per_beat_dict[262000][AMPLITUDE_UUID] == 94583
+    assert per_beat_dict[104000][AMPLITUDE_UUID] == 90032
+    assert per_beat_dict[185000][AMPLITUDE_UUID] == 93546
+    assert per_beat_dict[262000][AMPLITUDE_UUID] == 94582
 
 
 def test_new_A2_auc(new_A2):
@@ -418,15 +418,15 @@ def test_new_A2_auc(new_A2):
 
     # test data_metrics aggregate dictionary
     assert window_dict[AUC_UUID]["n"] == 11
-    assert window_dict[AUC_UUID]["mean"] == 2381135373
-    assert window_dict[AUC_UUID]["std"] == 57692350
-    assert window_dict[AUC_UUID]["min"] == 2278734037
-    assert window_dict[AUC_UUID]["max"] == 2491134876
+    assert window_dict[AUC_UUID]["mean"] == 2381105946
+    assert window_dict[AUC_UUID]["std"] == 57695543
+    assert window_dict[AUC_UUID]["min"] == 2278700128
+    assert window_dict[AUC_UUID]["max"] == 2491116534
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[104000][AUC_UUID] == 2372614155
-    assert per_beat_dict[185000][AUC_UUID] == 2393152678
-    assert per_beat_dict[262000][AUC_UUID] == 2491134876
+    assert per_beat_dict[104000][AUC_UUID] == 2372569325
+    assert per_beat_dict[185000][AUC_UUID] == 2393128485
+    assert per_beat_dict[262000][AUC_UUID] == 2491116534
 
 
 def test_new_A2_twitch_widths(new_A2):
@@ -549,15 +549,15 @@ def test_new_A3_auc(new_A3):
 
     # test data_metrics aggregate dictionary
     assert window_dict[AUC_UUID]["n"] == 12
-    assert window_dict[AUC_UUID]["mean"] == 2023742808
-    assert window_dict[AUC_UUID]["std"] == 47641340
-    assert window_dict[AUC_UUID]["min"] == 1969429673
-    assert window_dict[AUC_UUID]["max"] == 2127972146
+    assert window_dict[AUC_UUID]["mean"] == 2023734283
+    assert window_dict[AUC_UUID]["std"] == 47637846
+    assert window_dict[AUC_UUID]["min"] == 1969422330
+    assert window_dict[AUC_UUID]["max"] == 2127945742
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[108000][AUC_UUID] == 2127972146
-    assert per_beat_dict[193000][AUC_UUID] == 2006425706
-    assert per_beat_dict[266000][AUC_UUID] == 2037515623
+    assert per_beat_dict[108000][AUC_UUID] == 2127945742
+    assert per_beat_dict[193000][AUC_UUID] == 2006410385
+    assert per_beat_dict[266000][AUC_UUID] == 2037513470
 
 
 def test_new_A3_twitch_widths(new_A3):
@@ -661,15 +661,15 @@ def test_new_A4_amplitude(new_A4):
 
     # test data_metrics aggregate dictionary
     assert window_dict[AMPLITUDE_UUID]["n"] == 16
-    assert window_dict[AMPLITUDE_UUID]["mean"] == 127583
+    assert window_dict[AMPLITUDE_UUID]["mean"] == 127582
     assert window_dict[AMPLITUDE_UUID]["std"] == 3405
-    assert window_dict[AMPLITUDE_UUID]["min"] == 120823
-    assert window_dict[AMPLITUDE_UUID]["max"] == 132344
+    assert window_dict[AMPLITUDE_UUID]["min"] == 120822
+    assert window_dict[AMPLITUDE_UUID]["max"] == 132342
 
     # test data_metrics per beat dictionary
     assert per_beat_dict[81000][AMPLITUDE_UUID] == 128961
     assert per_beat_dict[137000][AMPLITUDE_UUID] == 132298
-    assert per_beat_dict[196000][AMPLITUDE_UUID] == 125759
+    assert per_beat_dict[196000][AMPLITUDE_UUID] == 125758
 
 
 def test_new_A4_auc(new_A4):
@@ -681,15 +681,15 @@ def test_new_A4_auc(new_A4):
 
     # test data_metrics aggregate dictionary
     assert window_dict[AUC_UUID]["n"] == 16
-    assert window_dict[AUC_UUID]["mean"] == 2834631743
-    assert window_dict[AUC_UUID]["std"] == 120717341
-    assert window_dict[AUC_UUID]["min"] == 2639460824
-    assert window_dict[AUC_UUID]["max"] == 3032386646
+    assert window_dict[AUC_UUID]["mean"] == 2834607993
+    assert window_dict[AUC_UUID]["std"] == 120712617
+    assert window_dict[AUC_UUID]["min"] == 2639451644
+    assert window_dict[AUC_UUID]["max"] == 3032354550
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[81000][AUC_UUID] == 2798486844
-    assert per_beat_dict[137000][AUC_UUID] == 3032386646
-    assert per_beat_dict[196000][AUC_UUID] == 2851895189
+    assert per_beat_dict[81000][AUC_UUID] == 2798452491
+    assert per_beat_dict[137000][AUC_UUID] == 3032354550
+    assert per_beat_dict[196000][AUC_UUID] == 2851858711
 
 
 def test_new_A4_twitch_widths(new_A4):
@@ -803,12 +803,12 @@ def test_new_A5_amplitude(new_A5):
     assert window_dict[AMPLITUDE_UUID]["n"] == 17
     assert window_dict[AMPLITUDE_UUID]["mean"] == 53213
     assert window_dict[AMPLITUDE_UUID]["std"] == 1189
-    assert window_dict[AMPLITUDE_UUID]["min"] == 51582
-    assert window_dict[AMPLITUDE_UUID]["max"] == 56040
+    assert window_dict[AMPLITUDE_UUID]["min"] == 51583
+    assert window_dict[AMPLITUDE_UUID]["max"] == 56041
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[80000][AMPLITUDE_UUID] == 51879
-    assert per_beat_dict[138000][AMPLITUDE_UUID] == 51582
+    assert per_beat_dict[80000][AMPLITUDE_UUID] == 51880
+    assert per_beat_dict[138000][AMPLITUDE_UUID] == 51583
     assert per_beat_dict[197000][AMPLITUDE_UUID] == 54132
 
 
@@ -821,15 +821,15 @@ def test_new_A5_auc(new_A5):
 
     # test data_metrics aggregate dictionary
     assert window_dict[AUC_UUID]["n"] == 17
-    assert window_dict[AUC_UUID]["mean"] == 1152075794
-    assert window_dict[AUC_UUID]["std"] == 42595033
-    assert window_dict[AUC_UUID]["min"] == 1078044570
-    assert window_dict[AUC_UUID]["max"] == 1275633877
+    assert window_dict[AUC_UUID]["mean"] == 1152079255
+    assert window_dict[AUC_UUID]["std"] == 42592008
+    assert window_dict[AUC_UUID]["min"] == 1078065474
+    assert window_dict[AUC_UUID]["max"] == 1275639254
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[80000][AUC_UUID] == 1148297870
-    assert per_beat_dict[138000][AUC_UUID] == 1133384235
-    assert per_beat_dict[197000][AUC_UUID] == 1152377663
+    assert per_beat_dict[80000][AUC_UUID] == 1148295745
+    assert per_beat_dict[138000][AUC_UUID] == 1133395220
+    assert per_beat_dict[197000][AUC_UUID] == 1152381221
 
 
 def test_new_A5_twitch_widths(new_A5):
@@ -945,7 +945,7 @@ def test_new_A6_amplitude(new_A6):
     assert window_dict[AMPLITUDE_UUID]["mean"] == 8462
     assert window_dict[AMPLITUDE_UUID]["std"] == 607
     assert window_dict[AMPLITUDE_UUID]["min"] == 7387
-    assert window_dict[AMPLITUDE_UUID]["max"] == 9520
+    assert window_dict[AMPLITUDE_UUID]["max"] == 9521
 
     # test data_metrics per beat dictionary
     assert per_beat_dict[88000][AMPLITUDE_UUID] == 9284
@@ -962,15 +962,15 @@ def test_new_A6_auc(new_A6):
 
     # test data_metrics aggregate dictionary
     assert window_dict[AUC_UUID]["n"] == 17
-    assert window_dict[AUC_UUID]["mean"] == 222102904
-    assert window_dict[AUC_UUID]["std"] == 25056302
-    assert window_dict[AUC_UUID]["min"] == 173375434
-    assert window_dict[AUC_UUID]["max"] == 270066889
+    assert window_dict[AUC_UUID]["mean"] == 222104007
+    assert window_dict[AUC_UUID]["std"] == 25056502
+    assert window_dict[AUC_UUID]["min"] == 173389855
+    assert window_dict[AUC_UUID]["max"] == 270065969
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[88000][AUC_UUID] == 270066889
-    assert per_beat_dict[148000][AUC_UUID] == 246401757
-    assert per_beat_dict[201000][AUC_UUID] == 216833502
+    assert per_beat_dict[88000][AUC_UUID] == 270065969
+    assert per_beat_dict[148000][AUC_UUID] == 246391194
+    assert per_beat_dict[201000][AUC_UUID] == 216812290
 
 
 def test_new_A6_twitch_widths(new_A6):

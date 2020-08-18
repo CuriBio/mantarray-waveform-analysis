@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 """Setup configuration."""
+import os
+
+from Cython.Build import cythonize
 from setuptools import find_packages
 from setuptools import setup
 
@@ -32,4 +35,10 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Topic :: Scientific/Engineering",
     ],
+    ext_modules=cythonize(
+        [
+            os.path.join("src", "mantarray_waveform_analysis", "compression_cy.pyx"),
+        ],  # make sure to have installed the Python dev module: sudo apt-get install python3.7-dev
+        annotate=False,
+    ),  # set to True when optimizing the code to enable generation of the html annotation file
 )
