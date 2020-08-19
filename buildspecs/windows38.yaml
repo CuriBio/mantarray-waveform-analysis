@@ -52,5 +52,5 @@ phases:
       - echo "Running test suite"
       - if ([int]$(Get-Variable PYTEST_RANDOMLY_SEED -valueOnly) -eq 0) { pytest -xsvv --full-ci --include-slow-tests } else { pytest -xsvv --full-ci --include-slow-tests --randomly-seed=$(Get-Variable PYTEST_RANDOMLY_SEED -valueOnly)}
       # Only run the following command if the PUBLISH_TO_PYPI environmental variable is set (i.e. =1) https://stackoverflow.com/questions/39619956/short-way-to-run-command-if-variable-is-set  (extra outer parentheses needed to make YAML parser happy)
-      - if ([int]$(Get-Variable SAVE_ARTIFACTS -valueOnly)) { echo 'Requested to publish to PyPi'; echo 'Need to do something' } else { echo 'Just a dry run, not publishing to PyPi.'}
+      - if ([int]$(Get-Variable PUBLISH_TO_PYPI -valueOnly)) { echo 'Requested to publish to PyPi'; echo 'Need to do something' } else { echo 'Just a dry run, not publishing to PyPi.'}
       - echo "Build completed on $(date)"
