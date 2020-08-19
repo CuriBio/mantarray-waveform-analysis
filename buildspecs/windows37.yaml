@@ -25,6 +25,8 @@ phases:
       - python -m venv venv
       - echo "Entering virtual environment"
       - venv\Scripts\Activate.ps1 # powershell command, creates an in-memory function 'deactivate' that is available
+      - echo "Ensure environment is empty"
+      - pip freeze
       - echo "Upgrading pip"
       - pip install pip==20.2.2 --upgrade
       - echo "Installing development/testing packages"
