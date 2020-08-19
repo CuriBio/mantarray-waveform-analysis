@@ -32,6 +32,11 @@ __fixtures__ = [
 ]
 
 
+def assert_percent_diff(actual, expected):
+    percent_diff = abs(actual - expected) / expected
+    assert percent_diff < 0.0006
+
+
 def _plot_data(time_series, noise_free_data, data, peakind, my_local_path_graphs):
     # plot and save results
     plt.figure()
@@ -114,16 +119,16 @@ def test_maiden_voyage_data_period(maiden_voyage_data):
     per_beat_dict, window_dict = peak_detection.data_metrics(peakind, noise_free_data)
 
     # test data_metrics aggregate dictionary
-    assert window_dict[TWITCH_PERIOD_UUID]["n"] == 10
-    assert window_dict[TWITCH_PERIOD_UUID]["mean"] == 80750
-    assert window_dict[TWITCH_PERIOD_UUID]["std"] == 23902
-    assert window_dict[TWITCH_PERIOD_UUID]["min"] == 45500
-    assert window_dict[TWITCH_PERIOD_UUID]["max"] == 119500
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["n"], 10)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["mean"], 80750)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["std"], 23902)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["min"], 45500)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["max"], 119500)
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[77000][TWITCH_PERIOD_UUID] == 93000
-    assert per_beat_dict[170000][TWITCH_PERIOD_UUID] == 93000
-    assert per_beat_dict[263000][TWITCH_PERIOD_UUID] == 80000
+    assert_percent_diff(per_beat_dict[77000][TWITCH_PERIOD_UUID], 93000)
+    assert_percent_diff(per_beat_dict[170000][TWITCH_PERIOD_UUID], 93000)
+    assert_percent_diff(per_beat_dict[263000][TWITCH_PERIOD_UUID], 80000)
 
 
 def test_maiden_voyage_data_amplitude(maiden_voyage_data):
@@ -134,16 +139,16 @@ def test_maiden_voyage_data_amplitude(maiden_voyage_data):
     per_beat_dict, window_dict = peak_detection.data_metrics(peakind, noise_free_data)
 
     # test data_metrics aggregate dictionary
-    assert window_dict[AMPLITUDE_UUID]["n"] == 11
-    assert window_dict[AMPLITUDE_UUID]["mean"] == 471835
-    assert window_dict[AMPLITUDE_UUID]["std"] == 36008
-    assert window_dict[AMPLITUDE_UUID]["min"] == 394534
-    assert window_dict[AMPLITUDE_UUID]["max"] == 516590
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["n"], 11)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["mean"], 471835)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["std"], 36008)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["min"], 394534)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["max"], 516590)
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[77000][AMPLITUDE_UUID] == 492263
-    assert per_beat_dict[170000][AMPLITUDE_UUID] == 516590
-    assert per_beat_dict[263000][AMPLITUDE_UUID] == 451850
+    assert_percent_diff(per_beat_dict[77000][AMPLITUDE_UUID], 492263)
+    assert_percent_diff(per_beat_dict[170000][AMPLITUDE_UUID], 516590)
+    assert_percent_diff(per_beat_dict[263000][AMPLITUDE_UUID], 451850)
 
 
 def test_maiden_voyage_data_auc(maiden_voyage_data):
@@ -154,16 +159,16 @@ def test_maiden_voyage_data_auc(maiden_voyage_data):
     per_beat_dict, window_dict = peak_detection.data_metrics(peakind, noise_free_data)
 
     # test data_metrics aggregate dictionary
-    assert window_dict[AUC_UUID]["n"] == 11
-    assert window_dict[AUC_UUID]["mean"] == 26042825654
-    assert window_dict[AUC_UUID]["std"] == 1890947206
-    assert window_dict[AUC_UUID]["min"] == 22778626414
-    assert window_dict[AUC_UUID]["max"] == 28953330400
+    assert_percent_diff(window_dict[AUC_UUID]["n"], 11)
+    assert_percent_diff(window_dict[AUC_UUID]["mean"], 26042829121)
+    assert_percent_diff(window_dict[AUC_UUID]["std"], 1890944885)
+    assert_percent_diff(window_dict[AUC_UUID]["min"], 22778633628)
+    assert_percent_diff(window_dict[AUC_UUID]["max"], 28953333906)
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[77000][AUC_UUID] == 27209339472
-    assert per_beat_dict[170000][AUC_UUID] == 28953330400
-    assert per_beat_dict[263000][AUC_UUID] == 24541074616
+    assert_percent_diff(per_beat_dict[77000][AUC_UUID], 27209375212)
+    assert_percent_diff(per_beat_dict[170000][AUC_UUID], 28953333906)
+    assert_percent_diff(per_beat_dict[263000][AUC_UUID], 24541063774)
 
 
 def test_maiden_voyage_data_twitch_widths(maiden_voyage_data):
@@ -179,9 +184,9 @@ def test_maiden_voyage_data_twitch_widths(maiden_voyage_data):
     # plot and save results
     _plot_twitch_widths(time_series, data, widths_dict, my_local_path_graphs)
 
-    assert widths_dict[77000][10][2] == 40500
-    assert widths_dict[170000][50][2] == 57500
-    assert widths_dict[263000][90][2] == 68500
+    assert_percent_diff(widths_dict[77000][10][2], 40500)
+    assert_percent_diff(widths_dict[170000][50][2], 57500)
+    assert_percent_diff(widths_dict[263000][90][2], 68500)
 
 
 def test_maiden_voyage_data_peak_detection(maiden_voyage_data):
@@ -245,16 +250,16 @@ def test_new_A1_period(new_A1):
     per_beat_dict, window_dict = peak_detection.data_metrics(peakind, noise_free_data)
 
     # test data_metrics aggregate dictionary
-    assert window_dict[TWITCH_PERIOD_UUID]["n"] == 11
-    assert window_dict[TWITCH_PERIOD_UUID]["mean"] == 80182
-    assert window_dict[TWITCH_PERIOD_UUID]["std"] == 1696
-    assert window_dict[TWITCH_PERIOD_UUID]["min"] == 78000
-    assert window_dict[TWITCH_PERIOD_UUID]["max"] == 84000
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["n"], 11)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["mean"], 80182)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["std"], 1696)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["min"], 78000)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["max"], 84000)
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[105000][TWITCH_PERIOD_UUID] == 81000
-    assert per_beat_dict[186000][TWITCH_PERIOD_UUID] == 80000
-    assert per_beat_dict[266000][TWITCH_PERIOD_UUID] == 78000
+    assert_percent_diff(per_beat_dict[105000][TWITCH_PERIOD_UUID], 81000)
+    assert_percent_diff(per_beat_dict[186000][TWITCH_PERIOD_UUID], 80000)
+    assert_percent_diff(per_beat_dict[266000][TWITCH_PERIOD_UUID], 78000)
 
 
 def test_new_A1_amplitude(new_A1):
@@ -265,16 +270,16 @@ def test_new_A1_amplitude(new_A1):
     per_beat_dict, window_dict = peak_detection.data_metrics(peakind, noise_free_data)
 
     # test data_metrics aggregate dictionary
-    assert window_dict[AMPLITUDE_UUID]["n"] == 12
-    assert window_dict[AMPLITUDE_UUID]["mean"] == 97887
-    assert window_dict[AMPLITUDE_UUID]["std"] == 1994
-    assert window_dict[AMPLITUDE_UUID]["min"] == 94961
-    assert window_dict[AMPLITUDE_UUID]["max"] == 102160
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["n"], 12)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["mean"], 97887)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["std"], 1993)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["min"], 94961)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["max"], 102159)
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[105000][AMPLITUDE_UUID] == 102160
-    assert per_beat_dict[186000][AMPLITUDE_UUID] == 98768
-    assert per_beat_dict[266000][AMPLITUDE_UUID] == 97879
+    assert_percent_diff(per_beat_dict[105000][AMPLITUDE_UUID], 102159)
+    assert_percent_diff(per_beat_dict[186000][AMPLITUDE_UUID], 98768)
+    assert_percent_diff(per_beat_dict[266000][AMPLITUDE_UUID], 97879)
 
 
 def test_new_A1_auc(new_A1):
@@ -285,16 +290,16 @@ def test_new_A1_auc(new_A1):
     per_beat_dict, window_dict = peak_detection.data_metrics(peakind, noise_free_data)
 
     # test data_metrics aggregate dictionary
-    assert window_dict[AUC_UUID]["n"] == 12
-    assert window_dict[AUC_UUID]["mean"] == 2565501317
-    assert window_dict[AUC_UUID]["std"] == 65875566
-    assert window_dict[AUC_UUID]["min"] == 2465815783
-    assert window_dict[AUC_UUID]["max"] == 2695186993
+    assert_percent_diff(window_dict[AUC_UUID]["n"], 12)
+    assert_percent_diff(window_dict[AUC_UUID]["mean"], 2565504261)
+    assert_percent_diff(window_dict[AUC_UUID]["std"], 65869124)
+    assert_percent_diff(window_dict[AUC_UUID]["min"], 2465789418)
+    assert_percent_diff(window_dict[AUC_UUID]["max"], 2695170612)
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[105000][AUC_UUID] == 2695186993
-    assert per_beat_dict[186000][AUC_UUID] == 2577929650
-    assert per_beat_dict[266000][AUC_UUID] == 2566166876
+    assert_percent_diff(per_beat_dict[105000][AUC_UUID], 2695170612)
+    assert_percent_diff(per_beat_dict[186000][AUC_UUID], 2577932134)
+    assert_percent_diff(per_beat_dict[266000][AUC_UUID], 2566184048)
 
 
 def test_new_A1_twitch_widths(new_A1):
@@ -310,9 +315,9 @@ def test_new_A1_twitch_widths(new_A1):
     # plot and save results
     _plot_twitch_widths(time_series, data, widths_dict, my_local_path_graphs)
 
-    assert widths_dict[105000][10][2] == 10000
-    assert widths_dict[186000][50][2] == 26000
-    assert widths_dict[266000][90][2] == 45000
+    assert_percent_diff(widths_dict[105000][10][2], 10000)
+    assert_percent_diff(widths_dict[186000][50][2], 26000)
+    assert_percent_diff(widths_dict[266000][90][2], 45000)
 
 
 def test_new_A1(new_A1):
@@ -377,16 +382,16 @@ def test_new_A2_period(new_A2):
     per_beat_dict, window_dict = peak_detection.data_metrics(peakind, noise_free_data)
 
     # test data_metrics aggregate dictionary
-    assert window_dict[TWITCH_PERIOD_UUID]["n"] == 10
-    assert window_dict[TWITCH_PERIOD_UUID]["mean"] == 80200
-    assert window_dict[TWITCH_PERIOD_UUID]["std"] == 2400
-    assert window_dict[TWITCH_PERIOD_UUID]["min"] == 77000
-    assert window_dict[TWITCH_PERIOD_UUID]["max"] == 85000
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["n"], 10)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["mean"], 80200)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["std"], 2400)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["min"], 77000)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["max"], 85000)
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[104000][TWITCH_PERIOD_UUID] == 81000
-    assert per_beat_dict[185000][TWITCH_PERIOD_UUID] == 77000
-    assert per_beat_dict[262000][TWITCH_PERIOD_UUID] == 85000
+    assert_percent_diff(per_beat_dict[104000][TWITCH_PERIOD_UUID], 81000)
+    assert_percent_diff(per_beat_dict[185000][TWITCH_PERIOD_UUID], 77000)
+    assert_percent_diff(per_beat_dict[262000][TWITCH_PERIOD_UUID], 85000)
 
 
 def test_new_A2_amplitude(new_A2):
@@ -397,16 +402,16 @@ def test_new_A2_amplitude(new_A2):
     per_beat_dict, window_dict = peak_detection.data_metrics(peakind, noise_free_data)
 
     # test data_metrics aggregate dictionary
-    assert window_dict[AMPLITUDE_UUID]["n"] == 11
-    assert window_dict[AMPLITUDE_UUID]["mean"] == 91575
-    assert window_dict[AMPLITUDE_UUID]["std"] == 1872
-    assert window_dict[AMPLITUDE_UUID]["min"] == 88540
-    assert window_dict[AMPLITUDE_UUID]["max"] == 94582
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["n"], 11)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["mean"], 91576)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["std"], 1872)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["min"], 88541)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["max"], 94583)
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[104000][AMPLITUDE_UUID] == 90032
-    assert per_beat_dict[185000][AMPLITUDE_UUID] == 93546
-    assert per_beat_dict[262000][AMPLITUDE_UUID] == 94582
+    assert_percent_diff(per_beat_dict[104000][AMPLITUDE_UUID], 90034)
+    assert_percent_diff(per_beat_dict[185000][AMPLITUDE_UUID], 93547)
+    assert_percent_diff(per_beat_dict[262000][AMPLITUDE_UUID], 94583)
 
 
 def test_new_A2_auc(new_A2):
@@ -417,16 +422,16 @@ def test_new_A2_auc(new_A2):
     per_beat_dict, window_dict = peak_detection.data_metrics(peakind, noise_free_data)
 
     # test data_metrics aggregate dictionary
-    assert window_dict[AUC_UUID]["n"] == 11
-    assert window_dict[AUC_UUID]["mean"] == 2381105946
-    assert window_dict[AUC_UUID]["std"] == 57695543
-    assert window_dict[AUC_UUID]["min"] == 2278700128
-    assert window_dict[AUC_UUID]["max"] == 2491116534
+    assert_percent_diff(window_dict[AUC_UUID]["n"], 11)
+    assert_percent_diff(window_dict[AUC_UUID]["mean"], 2381135373)
+    assert_percent_diff(window_dict[AUC_UUID]["std"], 57692350)
+    assert_percent_diff(window_dict[AUC_UUID]["min"], 2278734037)
+    assert_percent_diff(window_dict[AUC_UUID]["max"], 2491134876)
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[104000][AUC_UUID] == 2372569325
-    assert per_beat_dict[185000][AUC_UUID] == 2393128485
-    assert per_beat_dict[262000][AUC_UUID] == 2491116534
+    assert_percent_diff(per_beat_dict[104000][AUC_UUID], 2372614155)
+    assert_percent_diff(per_beat_dict[185000][AUC_UUID], 2393152678)
+    assert_percent_diff(per_beat_dict[262000][AUC_UUID], 2491134876)
 
 
 def test_new_A2_twitch_widths(new_A2):
@@ -442,9 +447,9 @@ def test_new_A2_twitch_widths(new_A2):
     # plot and save results
     _plot_twitch_widths(time_series, data, widths_dict, my_local_path_graphs)
 
-    assert widths_dict[104000][10][2] == 10000
-    assert widths_dict[185000][50][2] == 25000
-    assert widths_dict[262000][90][2] == 43000
+    assert_percent_diff(widths_dict[104000][10][2], 10000)
+    assert_percent_diff(widths_dict[185000][50][2], 25000)
+    assert_percent_diff(widths_dict[262000][90][2], 43000)
 
 
 def test_new_A2(new_A2):
@@ -508,16 +513,16 @@ def test_new_A3_period(new_A3):
     per_beat_dict, window_dict = peak_detection.data_metrics(peakind, noise_free_data)
 
     # test data_metrics aggregate dictionary
-    assert window_dict[TWITCH_PERIOD_UUID]["n"] == 11
-    assert window_dict[TWITCH_PERIOD_UUID]["mean"] == 80182
-    assert window_dict[TWITCH_PERIOD_UUID]["std"] == 4386
-    assert window_dict[TWITCH_PERIOD_UUID]["min"] == 73000
-    assert window_dict[TWITCH_PERIOD_UUID]["max"] == 85000
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["n"], 11)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["mean"], 80182)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["std"], 4386)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["min"], 73000)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["max"], 85000)
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[108000][TWITCH_PERIOD_UUID] == 85000
-    assert per_beat_dict[193000][TWITCH_PERIOD_UUID] == 73000
-    assert per_beat_dict[266000][TWITCH_PERIOD_UUID] == 85000
+    assert_percent_diff(per_beat_dict[108000][TWITCH_PERIOD_UUID], 85000)
+    assert_percent_diff(per_beat_dict[193000][TWITCH_PERIOD_UUID], 73000)
+    assert_percent_diff(per_beat_dict[266000][TWITCH_PERIOD_UUID], 85000)
 
 
 def test_new_A3_amplitude(new_A3):
@@ -528,16 +533,16 @@ def test_new_A3_amplitude(new_A3):
     per_beat_dict, window_dict = peak_detection.data_metrics(peakind, noise_free_data)
 
     # test data_metrics aggregate dictionary
-    assert window_dict[AMPLITUDE_UUID]["n"] == 12
-    assert window_dict[AMPLITUDE_UUID]["mean"] == 65018
-    assert window_dict[AMPLITUDE_UUID]["std"] == 2055
-    assert window_dict[AMPLITUDE_UUID]["min"] == 62540
-    assert window_dict[AMPLITUDE_UUID]["max"] == 68058
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["n"], 12)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["mean"], 65018)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["std"], 2055)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["min"], 62540)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["max"], 68058)
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[108000][AMPLITUDE_UUID] == 63705
-    assert per_beat_dict[193000][AMPLITUDE_UUID] == 67594
-    assert per_beat_dict[266000][AMPLITUDE_UUID] == 62540
+    assert_percent_diff(per_beat_dict[108000][AMPLITUDE_UUID], 63705)
+    assert_percent_diff(per_beat_dict[193000][AMPLITUDE_UUID], 67594)
+    assert_percent_diff(per_beat_dict[266000][AMPLITUDE_UUID], 62540)
 
 
 def test_new_A3_auc(new_A3):
@@ -548,16 +553,16 @@ def test_new_A3_auc(new_A3):
     per_beat_dict, window_dict = peak_detection.data_metrics(peakind, noise_free_data)
 
     # test data_metrics aggregate dictionary
-    assert window_dict[AUC_UUID]["n"] == 12
-    assert window_dict[AUC_UUID]["mean"] == 2023734283
-    assert window_dict[AUC_UUID]["std"] == 47637846
-    assert window_dict[AUC_UUID]["min"] == 1969422330
-    assert window_dict[AUC_UUID]["max"] == 2127945742
+    assert_percent_diff(window_dict[AUC_UUID]["n"], 12)
+    assert_percent_diff(window_dict[AUC_UUID]["mean"], 2023742808)
+    assert_percent_diff(window_dict[AUC_UUID]["std"], 47641340)
+    assert_percent_diff(window_dict[AUC_UUID]["min"], 1969429673)
+    assert_percent_diff(window_dict[AUC_UUID]["max"], 2127972146)
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[108000][AUC_UUID] == 2127945742
-    assert per_beat_dict[193000][AUC_UUID] == 2006410385
-    assert per_beat_dict[266000][AUC_UUID] == 2037513470
+    assert_percent_diff(per_beat_dict[108000][AUC_UUID], 2127972146)
+    assert_percent_diff(per_beat_dict[193000][AUC_UUID], 2006425706)
+    assert_percent_diff(per_beat_dict[266000][AUC_UUID], 2037515623)
 
 
 def test_new_A3_twitch_widths(new_A3):
@@ -573,9 +578,9 @@ def test_new_A3_twitch_widths(new_A3):
     # plot and save results
     _plot_twitch_widths(time_series, data, widths_dict, my_local_path_graphs)
 
-    assert widths_dict[108000][10][2] == 13000
-    assert widths_dict[193000][50][2] == 29000
-    assert widths_dict[266000][90][2] == 65000
+    assert_percent_diff(widths_dict[108000][10][2], 13000)
+    assert_percent_diff(widths_dict[193000][50][2], 29000)
+    assert_percent_diff(widths_dict[266000][90][2], 65000)
 
 
 def test_new_A3(new_A3):
@@ -640,16 +645,16 @@ def test_new_A4_period(new_A4):
     per_beat_dict, window_dict = peak_detection.data_metrics(peakind, noise_free_data)
 
     # test data_metrics aggregate dictionary
-    assert window_dict[TWITCH_PERIOD_UUID]["n"] == 15
-    assert window_dict[TWITCH_PERIOD_UUID]["mean"] == 57667
-    assert window_dict[TWITCH_PERIOD_UUID]["std"] == 1247
-    assert window_dict[TWITCH_PERIOD_UUID]["min"] == 56000
-    assert window_dict[TWITCH_PERIOD_UUID]["max"] == 59000
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["n"], 15)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["mean"], 57667)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["std"], 1247)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["min"], 56000)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["max"], 59000)
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[81000][TWITCH_PERIOD_UUID] == 56000
-    assert per_beat_dict[137000][TWITCH_PERIOD_UUID] == 59000
-    assert per_beat_dict[196000][TWITCH_PERIOD_UUID] == 59000
+    assert_percent_diff(per_beat_dict[81000][TWITCH_PERIOD_UUID], 56000)
+    assert_percent_diff(per_beat_dict[137000][TWITCH_PERIOD_UUID], 59000)
+    assert_percent_diff(per_beat_dict[196000][TWITCH_PERIOD_UUID], 59000)
 
 
 def test_new_A4_amplitude(new_A4):
@@ -660,16 +665,16 @@ def test_new_A4_amplitude(new_A4):
     per_beat_dict, window_dict = peak_detection.data_metrics(peakind, noise_free_data)
 
     # test data_metrics aggregate dictionary
-    assert window_dict[AMPLITUDE_UUID]["n"] == 16
-    assert window_dict[AMPLITUDE_UUID]["mean"] == 127582
-    assert window_dict[AMPLITUDE_UUID]["std"] == 3405
-    assert window_dict[AMPLITUDE_UUID]["min"] == 120822
-    assert window_dict[AMPLITUDE_UUID]["max"] == 132342
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["n"], 16)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["mean"], 127583)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["std"], 3405)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["min"], 120823)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["max"], 132344)
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[81000][AMPLITUDE_UUID] == 128961
-    assert per_beat_dict[137000][AMPLITUDE_UUID] == 132298
-    assert per_beat_dict[196000][AMPLITUDE_UUID] == 125758
+    assert_percent_diff(per_beat_dict[81000][AMPLITUDE_UUID], 128961)
+    assert_percent_diff(per_beat_dict[137000][AMPLITUDE_UUID], 132298)
+    assert_percent_diff(per_beat_dict[196000][AMPLITUDE_UUID], 125759)
 
 
 def test_new_A4_auc(new_A4):
@@ -680,16 +685,16 @@ def test_new_A4_auc(new_A4):
     per_beat_dict, window_dict = peak_detection.data_metrics(peakind, noise_free_data)
 
     # test data_metrics aggregate dictionary
-    assert window_dict[AUC_UUID]["n"] == 16
-    assert window_dict[AUC_UUID]["mean"] == 2834607993
-    assert window_dict[AUC_UUID]["std"] == 120712617
-    assert window_dict[AUC_UUID]["min"] == 2639451644
-    assert window_dict[AUC_UUID]["max"] == 3032354550
+    assert_percent_diff(window_dict[AUC_UUID]["n"], 16)
+    assert_percent_diff(window_dict[AUC_UUID]["mean"], 2834631743)
+    assert_percent_diff(window_dict[AUC_UUID]["std"], 120717341)
+    assert_percent_diff(window_dict[AUC_UUID]["min"], 2639460824)
+    assert_percent_diff(window_dict[AUC_UUID]["max"], 3032386646)
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[81000][AUC_UUID] == 2798452491
-    assert per_beat_dict[137000][AUC_UUID] == 3032354550
-    assert per_beat_dict[196000][AUC_UUID] == 2851858711
+    assert_percent_diff(per_beat_dict[81000][AUC_UUID], 2798486844)
+    assert_percent_diff(per_beat_dict[137000][AUC_UUID], 3032386646)
+    assert_percent_diff(per_beat_dict[196000][AUC_UUID], 2851895189)
 
 
 def test_new_A4_twitch_widths(new_A4):
@@ -705,9 +710,9 @@ def test_new_A4_twitch_widths(new_A4):
     # plot and save results
     _plot_twitch_widths(time_series, data, widths_dict, my_local_path_graphs)
 
-    assert widths_dict[81000][10][2] == 9000
-    assert widths_dict[137000][50][2] == 21000
-    assert widths_dict[196000][90][2] == 36000
+    assert_percent_diff(widths_dict[81000][10][2], 9000)
+    assert_percent_diff(widths_dict[137000][50][2], 21000)
+    assert_percent_diff(widths_dict[196000][90][2], 36000)
 
 
 def test_new_A4(new_A4):
@@ -780,16 +785,16 @@ def test_new_A5_period(new_A5):
     per_beat_dict, window_dict = peak_detection.data_metrics(peakind, noise_free_data)
 
     # test data_metrics aggregate dictionary
-    assert window_dict[TWITCH_PERIOD_UUID]["n"] == 16
-    assert window_dict[TWITCH_PERIOD_UUID]["mean"] == 57812
-    assert window_dict[TWITCH_PERIOD_UUID]["std"] == 1424
-    assert window_dict[TWITCH_PERIOD_UUID]["min"] == 55000
-    assert window_dict[TWITCH_PERIOD_UUID]["max"] == 59000
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["n"], 16)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["mean"], 57812)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["std"], 1424)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["min"], 55000)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["max"], 59000)
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[80000][TWITCH_PERIOD_UUID] == 58000
-    assert per_beat_dict[138000][TWITCH_PERIOD_UUID] == 59000
-    assert per_beat_dict[197000][TWITCH_PERIOD_UUID] == 58000
+    assert_percent_diff(per_beat_dict[80000][TWITCH_PERIOD_UUID], 58000)
+    assert_percent_diff(per_beat_dict[138000][TWITCH_PERIOD_UUID], 59000)
+    assert_percent_diff(per_beat_dict[197000][TWITCH_PERIOD_UUID], 58000)
 
 
 def test_new_A5_amplitude(new_A5):
@@ -800,16 +805,16 @@ def test_new_A5_amplitude(new_A5):
     per_beat_dict, window_dict = peak_detection.data_metrics(peakind, noise_free_data)
 
     # test data_metrics aggregate dictionary
-    assert window_dict[AMPLITUDE_UUID]["n"] == 17
-    assert window_dict[AMPLITUDE_UUID]["mean"] == 53213
-    assert window_dict[AMPLITUDE_UUID]["std"] == 1189
-    assert window_dict[AMPLITUDE_UUID]["min"] == 51583
-    assert window_dict[AMPLITUDE_UUID]["max"] == 56041
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["n"], 17)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["mean"], 53213)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["std"], 1189)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["min"], 51582)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["max"], 56040)
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[80000][AMPLITUDE_UUID] == 51880
-    assert per_beat_dict[138000][AMPLITUDE_UUID] == 51583
-    assert per_beat_dict[197000][AMPLITUDE_UUID] == 54132
+    assert_percent_diff(per_beat_dict[80000][AMPLITUDE_UUID], 51879)
+    assert_percent_diff(per_beat_dict[138000][AMPLITUDE_UUID], 51582)
+    assert_percent_diff(per_beat_dict[197000][AMPLITUDE_UUID], 54132)
 
 
 def test_new_A5_auc(new_A5):
@@ -820,16 +825,16 @@ def test_new_A5_auc(new_A5):
     per_beat_dict, window_dict = peak_detection.data_metrics(peakind, noise_free_data)
 
     # test data_metrics aggregate dictionary
-    assert window_dict[AUC_UUID]["n"] == 17
-    assert window_dict[AUC_UUID]["mean"] == 1152079255
-    assert window_dict[AUC_UUID]["std"] == 42592008
-    assert window_dict[AUC_UUID]["min"] == 1078065474
-    assert window_dict[AUC_UUID]["max"] == 1275639254
+    assert_percent_diff(window_dict[AUC_UUID]["n"], 17)
+    assert_percent_diff(window_dict[AUC_UUID]["mean"], 1152075794)
+    assert_percent_diff(window_dict[AUC_UUID]["std"], 42595033)
+    assert_percent_diff(window_dict[AUC_UUID]["min"], 1078044570)
+    assert_percent_diff(window_dict[AUC_UUID]["max"], 1275633877)
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[80000][AUC_UUID] == 1148295745
-    assert per_beat_dict[138000][AUC_UUID] == 1133395220
-    assert per_beat_dict[197000][AUC_UUID] == 1152381221
+    assert_percent_diff(per_beat_dict[80000][AUC_UUID], 1148297870)
+    assert_percent_diff(per_beat_dict[138000][AUC_UUID], 1133384235)
+    assert_percent_diff(per_beat_dict[197000][AUC_UUID], 1152377663)
 
 
 def test_new_A5_twitch_widths(new_A5):
@@ -845,9 +850,9 @@ def test_new_A5_twitch_widths(new_A5):
     # plot and save results
     _plot_twitch_widths(time_series, data, widths_dict, my_local_path_graphs)
 
-    assert widths_dict[80000][10][2] == 8000
-    assert widths_dict[138000][50][2] == 21000
-    assert widths_dict[197000][90][2] == 38000
+    assert_percent_diff(widths_dict[80000][10][2], 8000)
+    assert_percent_diff(widths_dict[138000][50][2], 21000)
+    assert_percent_diff(widths_dict[197000][90][2], 38000)
 
 
 def test_new_A5(new_A5):
@@ -921,16 +926,16 @@ def test_new_A6_period(new_A6):
     per_beat_dict, window_dict = peak_detection.data_metrics(peakind, noise_free_data)
 
     # test data_metrics aggregate dictionary
-    assert window_dict[TWITCH_PERIOD_UUID]["n"] == 16
-    assert window_dict[TWITCH_PERIOD_UUID]["mean"] == 57625
-    assert window_dict[TWITCH_PERIOD_UUID]["std"] == 4768
-    assert window_dict[TWITCH_PERIOD_UUID]["min"] == 48000
-    assert window_dict[TWITCH_PERIOD_UUID]["max"] == 66000
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["n"], 16)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["mean"], 57625)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["std"], 4768)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["min"], 48000)
+    assert_percent_diff(window_dict[TWITCH_PERIOD_UUID]["max"], 66000)
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[88000][TWITCH_PERIOD_UUID] == 60000
-    assert per_beat_dict[148000][TWITCH_PERIOD_UUID] == 53000
-    assert per_beat_dict[201000][TWITCH_PERIOD_UUID] == 54000
+    assert_percent_diff(per_beat_dict[88000][TWITCH_PERIOD_UUID], 60000)
+    assert_percent_diff(per_beat_dict[148000][TWITCH_PERIOD_UUID], 53000)
+    assert_percent_diff(per_beat_dict[201000][TWITCH_PERIOD_UUID], 54000)
 
 
 def test_new_A6_amplitude(new_A6):
@@ -941,16 +946,16 @@ def test_new_A6_amplitude(new_A6):
     per_beat_dict, window_dict = peak_detection.data_metrics(peakind, noise_free_data)
 
     # test data_metrics aggregate dictionary
-    assert window_dict[AMPLITUDE_UUID]["n"] == 17
-    assert window_dict[AMPLITUDE_UUID]["mean"] == 8462
-    assert window_dict[AMPLITUDE_UUID]["std"] == 607
-    assert window_dict[AMPLITUDE_UUID]["min"] == 7387
-    assert window_dict[AMPLITUDE_UUID]["max"] == 9521
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["n"], 17)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["mean"], 8462)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["std"], 607)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["min"], 7387)
+    assert_percent_diff(window_dict[AMPLITUDE_UUID]["max"], 9520)
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[88000][AMPLITUDE_UUID] == 9284
-    assert per_beat_dict[148000][AMPLITUDE_UUID] == 8548
-    assert per_beat_dict[201000][AMPLITUDE_UUID] == 8570
+    assert_percent_diff(per_beat_dict[88000][AMPLITUDE_UUID], 9284)
+    assert_percent_diff(per_beat_dict[148000][AMPLITUDE_UUID], 8548)
+    assert_percent_diff(per_beat_dict[201000][AMPLITUDE_UUID], 8570)
 
 
 def test_new_A6_auc(new_A6):
@@ -961,16 +966,16 @@ def test_new_A6_auc(new_A6):
     per_beat_dict, window_dict = peak_detection.data_metrics(peakind, noise_free_data)
 
     # test data_metrics aggregate dictionary
-    assert window_dict[AUC_UUID]["n"] == 17
-    assert window_dict[AUC_UUID]["mean"] == 222104007
-    assert window_dict[AUC_UUID]["std"] == 25056502
-    assert window_dict[AUC_UUID]["min"] == 173389855
-    assert window_dict[AUC_UUID]["max"] == 270065969
+    assert_percent_diff(window_dict[AUC_UUID]["n"], 17)
+    assert_percent_diff(window_dict[AUC_UUID]["mean"], 222102904)
+    assert_percent_diff(window_dict[AUC_UUID]["std"], 25056302)
+    assert_percent_diff(window_dict[AUC_UUID]["min"], 173375434)
+    assert_percent_diff(window_dict[AUC_UUID]["max"], 270066889)
 
     # test data_metrics per beat dictionary
-    assert per_beat_dict[88000][AUC_UUID] == 270065969
-    assert per_beat_dict[148000][AUC_UUID] == 246391194
-    assert per_beat_dict[201000][AUC_UUID] == 216812290
+    assert_percent_diff(per_beat_dict[88000][AUC_UUID], 270066889)
+    assert_percent_diff(per_beat_dict[148000][AUC_UUID], 246401757)
+    assert_percent_diff(per_beat_dict[201000][AUC_UUID], 216833502)
 
 
 def test_new_A6_twitch_widths(new_A6):
@@ -986,9 +991,9 @@ def test_new_A6_twitch_widths(new_A6):
     # plot and save results
     _plot_twitch_widths(time_series, data, widths_dict, my_local_path_graphs)
 
-    assert widths_dict[88000][10][2] == 12000
-    assert widths_dict[148000][50][2] == 32000
-    assert widths_dict[201000][90][2] == 55000
+    assert_percent_diff(widths_dict[88000][10][2], 12000)
+    assert_percent_diff(widths_dict[148000][50][2], 32000)
+    assert_percent_diff(widths_dict[201000][90][2], 55000)
 
 
 def test_new_A6(new_A6):
