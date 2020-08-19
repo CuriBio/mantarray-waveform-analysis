@@ -116,7 +116,7 @@ Resources:
         Fn::Join:
           - "--"
           - - Ref: "AWS::StackName"
-            - "linux37"
+            - "linux38"
       ServiceRole:
         Ref: "CodeBuildRole"
       Source:
