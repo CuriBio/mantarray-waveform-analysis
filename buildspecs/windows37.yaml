@@ -20,7 +20,8 @@ phases:
       # In CodeBuild, sometimes a direct SHA is grabbed rather than a branch, so the 'name' of the branch is listed as: (no branch)
       #   So can't use traditional grep to just check that the name of the current branch is 'master', have to explicitly check the SHAs
       #- SHA_OF_LOCAL_COMMIT=$(git branch -av | grep "*" | grep -oP " \s+\K\w+")
-      - git checkout master
+      # - git checkout master
+      - git checkout cython
       - echo "Creating virtual environment for Python"
       - python -m venv venv
       - echo "Entering virtual environment"
@@ -52,5 +53,11 @@ phases:
       - echo "Running test suite"
       - if ([int]$(Get-Variable PYTEST_RANDOMLY_SEED -valueOnly) -eq 0) { pytest -xsvv --full-ci --include-slow-tests } else { pytest -xsvv --full-ci --include-slow-tests --randomly-seed=$(Get-Variable PYTEST_RANDOMLY_SEED -valueOnly)}
       # Only run the following command if the PUBLISH_TO_PYPI environmental variable is set (i.e. =1) https://stackoverflow.com/questions/39619956/short-way-to-run-command-if-variable-is-set  (extra outer parentheses needed to make YAML parser happy)
+      - echo "ENTERING TEMPORARY TEST"
+      - echo "Creating wheel"
+      - python setup.py bdist_wheel
+      - echo "Testing upload"
+      - twine upload --repository testpypi dist/*
+      - echo "TEMPORARY TEST COMPLETE"
       - if ([int]$(Get-Variable PUBLISH_TO_PYPI -valueOnly)) { echo 'Requested to publish to PyPi'; echo 'Need to do something' } else { echo 'Just a dry run, not publishing to PyPi.'}
       - echo "Build completed on $(date)"
