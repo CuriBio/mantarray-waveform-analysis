@@ -10,22 +10,23 @@ env:
 phases:
   install:
     runtime-versions:
-      python: 3.7
+      python: 3.8
     commands:
       - python --version
       - echo "Git Branch information:"
       - git branch -av
-      - SHA_OF_REMOTE_MASTER=$(git branch -av | grep remotes/origin/master | grep -oP "master\s+\K\w+")
+      - echo "THERE IS NO WAY FIGURED OUT YET IN WINDOWS TO CONFIRM THAT THE GIT COMMIT IS THE MASTER BRANCH"
+      #- SHA_OF_REMOTE_MASTER=$(git branch -av | grep remotes/origin/master | grep -oP "master\s+\K\w+")
       # In CodeBuild, sometimes a direct SHA is grabbed rather than a branch, so the 'name' of the branch is listed as: (no branch)
       #   So can't use traditional grep to just check that the name of the current branch is 'master', have to explicitly check the SHAs
-      - SHA_OF_LOCAL_COMMIT=$(git branch -av | grep "*" | grep -oP " \s+\K\w+")
+      #- SHA_OF_LOCAL_COMMIT=$(git branch -av | grep "*" | grep -oP " \s+\K\w+")
       - git checkout master
       - echo "Creating virtual environment for Python"
       - python -m venv venv
       - echo "Entering virtual environment"
-      - . venv/bin/activate
+      - venv\Scripts\Activate.ps1 # powershell command, creates an in-memory function 'deactivate' that is available
       - echo "Upgrading pip"
-      - pip install pip==20.0.2 --upgrade
+      - pip install pip==20.2.2 --upgrade
       - echo "Installing development/testing packages"
       - pip install -r requirements-dev.txt --upgrade
       - pip install -r docs/requirements.txt --upgrade
@@ -38,19 +39,16 @@ phases:
   pre_build:
     commands:
       - echo "Running pre-commit hooks on all the files"
-      - pre-commit run -a
+      - $env:SKIP = 'git-dirty,python-safety-dependencies-check'; pre-commit run -a
       - prerelease --no-input
       - echo "Building Sphinx documentation"
-      - SPHINXOPTS="-W" make --directory=docs html # the -W flag treats warnings as errors to cause build failures
+      - make --directory=docs html
 
   build:
     commands:
       - echo "Build started on $(date)"
       - echo "Running test suite"
-      - pytest -xsvv
+      - if ([int]$(Get-Variable PYTEST_RANDOMLY_SEED -valueOnly) -eq 0) { pytest -xsvv --full-ci --include-slow-tests } else { pytest -xsvv --full-ci --include-slow-tests --randomly-seed=$(Get-Variable PYTEST_RANDOMLY_SEED -valueOnly)}
       # Only run the following command if the PUBLISH_TO_PYPI environmental variable is set (i.e. =1) https://stackoverflow.com/questions/39619956/short-way-to-run-command-if-variable-is-set  (extra outer parentheses needed to make YAML parser happy)
-      # Grab the version from the setup.py file using a grep "look-behind" https://stackoverflow.com/questions/30776265/how-to-grep-for-value-in-a-key-value-store-from-plain-text
-      # If this is attempted on any branch other than master, it should fail because the role only has permission to push to the master branch
-      # Colon (or maybe semi-colon) is causing issue with CodeBuild YAML parser, so needed to wrap whole command in single quote
-      - 'if [ "$PUBLISH_TO_PYPI" = "1" ] ; then if [ "$SHA_OF_LOCAL_COMMIT" = "$SHA_OF_REMOTE_MASTER" ]; then echo "Current branch matches SHA of remote master ($SHA_OF_REMOTE_MASTER) so publishing is allowed"; else echo "Current branch is not master. SHA of current commit is $SHA_OF_LOCAL_COMMIT but SHA of remote master is $SHA_OF_REMOTE_MASTER" && exit 1; fi && echo "Publishing to PyPI" && python3 setup.py sdist && git tag "$(grep -Po "(?<=    version=\")[0-9.]+" setup.py)" && echo "Tag applied, attempting to push" && git push --tags && twine upload dist/* ; fi'
+      - if ([int]$(Get-Variable SAVE_ARTIFACTS -valueOnly)) { echo 'Requested to publish to PyPi'; echo 'Need to do something' } else { echo 'Just a dry run, not publishing to PyPi.'}
       - echo "Build completed on $(date)"
