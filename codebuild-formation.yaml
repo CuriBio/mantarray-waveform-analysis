@@ -146,7 +146,7 @@ Resources:
             - Ref: "AWS::StackName"
       Environment:
         ComputeType: BUILD_GENERAL1_MEDIUM
-        Image: aws/codebuild/windows-base:2.0-20.05.05 #aws/codebuild/windows-base:2019-1.0
+        Image: aws/codebuild/windows-base:2.0-20.05.05
         Type: WINDOWS_CONTAINER
         EnvironmentVariables:
           - Name: PUBLISH_TO_PYPI
@@ -191,7 +191,7 @@ Resources:
       Environment:
         ComputeType: BUILD_GENERAL1_MEDIUM
         Image: aws/codebuild/windows-base:2019-1.0
-        Type: WINDOWS_CONTAINER
+        Type: WINDOWS_SERVER_2019_CONTAINER
         EnvironmentVariables:
           - Name: PUBLISH_TO_PYPI
             Type: PLAINTEXT
