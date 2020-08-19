@@ -19,8 +19,7 @@ phases:
       # In CodeBuild, sometimes a direct SHA is grabbed rather than a branch, so the 'name' of the branch is listed as: (no branch)
       #   So can't use traditional grep to just check that the name of the current branch is 'master', have to explicitly check the SHAs
       - SHA_OF_LOCAL_COMMIT=$(git branch -av | grep "*" | grep -oP " \s+\K\w+")
-      # - git checkout master
-      - git checkout cython
+      - git checkout master
       - echo "Creating virtual environment for Python"
       - python -m venv venv
       - echo "Entering virtual environment"
@@ -53,14 +52,5 @@ phases:
       # Grab the version from the setup.py file using a grep "look-behind" https://stackoverflow.com/questions/30776265/how-to-grep-for-value-in-a-key-value-store-from-plain-text
       # If this is attempted on any branch other than master, it should fail because the role only has permission to push to the master branch
       # Colon (or maybe semi-colon) is causing issue with CodeBuild YAML parser, so needed to wrap whole command in single quote
-      - echo "ENTERING TEMPORARY TEST"
-      - echo "Creating wheel"
-      - python3 setup.py bdist_wheel
-      - echo "Testing file rename"
-      - cp ./dist/mantarray_waveform_analysis-0.3-cp38-cp38-linux_x86_64.whl ./dist/mantarray_waveform_analysis-0.3-cp38-cp38-manylinux1_x86_64.whl
-      - rm ./dist/mantarray_waveform_analysis-0.3-cp38-cp38-linux_x86_64.whl
-      - echo "Testing upload"
-      - twine upload --repository testpypi dist/*
-      - echo "TEMPORARY TEST COMPLETE"
-      - 'if [ "$PUBLISH_TO_PYPI" = "1" ] ; then if [ "$SHA_OF_LOCAL_COMMIT" = "$SHA_OF_REMOTE_MASTER" ]; then echo "Current branch matches SHA of remote master ($SHA_OF_REMOTE_MASTER) so publishing is allowed"; else echo "Current branch is not master. SHA of current commit is $SHA_OF_LOCAL_COMMIT but SHA of remote master is $SHA_OF_REMOTE_MASTER" && exit 1; fi && echo "Publishing to PyPI" && python3 setup.py sdist && git tag "$(grep -Po "(?<=    version=\")[0-9.]+" setup.py)" && echo "Tag applied, attempting to push" && git push --tags && echo "Changing wheel name to trick PyPI and then uploading" && cp ./dist/mantarray_waveform_analysis-0.2-cp37-cp37m-linux_x86_64.whl ./dist/mantarray_waveform_analysis-0.2-cp37-cp37m-manylinux1_x86_64.whl && rm ./dist/mantarray_waveform_analysis-0.2-cp37-cp37m-linux_x86_64.whl && twine upload dist/* ; fi'
+      - 'if [ "$PUBLISH_TO_PYPI" = "1" ] ; then if [ "$SHA_OF_LOCAL_COMMIT" = "$SHA_OF_REMOTE_MASTER" ]; then echo "Current branch matches SHA of remote master ($SHA_OF_REMOTE_MASTER) so publishing is allowed"; else echo "Current branch is not master. SHA of current commit is $SHA_OF_LOCAL_COMMIT but SHA of remote master is $SHA_OF_REMOTE_MASTER" && exit 1; fi && echo "Publishing to PyPI" && python3 setup.py sdist && git tag "$(grep -Po "(?<=    version=\")[0-9.]+" setup.py)" && echo "Tag applied, attempting to push" && git push --tags && echo "Changing wheel name to trick PyPI and then uploading" && cp ./dist/mantarray_waveform_analysis-0.3-cp38-cp38-linux_x86_64.whl ./dist/mantarray_waveform_analysis-0.3-cp38-cp38-manylinux1_x86_64.whl && rm ./dist/mantarray_waveform_analysis-0.3-cp38-cp38-linux_x86_64.whl && twine upload dist/* ; fi'
       - echo "Build completed on $(date)"
