@@ -28,7 +28,7 @@ phases:
       - echo "Ensure environment is empty"
       - pip freeze
       - echo "Upgrading pip"
-      - pip install pip==20.2.2 --upgrade
+      # - pip install pip==20.2.2 --upgrade # Eli (8/19/20): upgrading pip is giving weird permission errors
       - echo "Installing development/testing packages"
       - pip install -r requirements-dev.txt --upgrade
       - pip install -r docs/requirements.txt --upgrade
