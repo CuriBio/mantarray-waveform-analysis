@@ -52,43 +52,6 @@ def rsquared(int [:] x_values, int [:] y_values):
     return 1 - ss_res / ss_tot
 
 
-
-
-    # based on https://stackoverflow.com/questions/893657/how-do-i-calculate-r-squared-using-python-and-numpy
-    ss_res = 0
-    ss_tot = 0
-    y_bar = np.mean(y_values)
-
-    ss_res = np.sum(((x_values * slope + intercept) - y_values) ** 2)
-    ss_tot = np.sum((y_values - y_bar) ** 2)
-
-    return 1 - ss_res / ss_tot
-
-
-
-    # based on https://stackoverflow.com/questions/893657/how-do-i-calculate-r-squared-using-python-and-numpy
-    ss_res = 0
-    ss_tot = 0
-    cdef int y_sum,num_values,i
-    y_sum=0
-    num_values=y_values.shape[0]
-    ss_res=0
-    for i in range(num_values):
-        y_sum += y_values[i]
-        ss_res += (x_values[i] * slope + intercept - y_values[i]) ** 2
-    y_bar = y_sum / num_values
-
-    ss_tot = 0
-    for i in range(num_values):
-        ss_tot += (y_values[i] - y_bar) ** 2
-
-    return 1 - ss_res / ss_tot
-
-
-
-
-
-
 def compress_filtered_gmr(data: NDArray[(2, Any), int]) -> NDArray[(2, Any), int]:
     """Compress the data to allow for better plotting in the desktop app.
 
