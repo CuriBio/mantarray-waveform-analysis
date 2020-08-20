@@ -1,4 +1,6 @@
-# -*- coding: utf-8 -*-
+#cython: language_level=3
+#cython: linetrace=True
+# Eli (8/18/20) ... not sure why cython doesn't default to compiling with Python 3...but apparently this is explicitly needed https://github.com/cython/cython/issues/2299
 """Compressions arrays of Mantarray GMR data ."""
 from typing import Any
 
@@ -7,8 +9,7 @@ import numpy as np
 
 R_SQUARE_CUTOFF = 0.95
 
-
-def rsquared(x_values: NDArray[int], y_values: NDArray[int]) -> float:
+def rsquared(int [:] x_values, int [:] y_values):
     """Return R^2 where x and y are array-like.
 
     Instead of doing a full linear regression, the compression process drops all points in between the first and the last, so R^2 residuals are calculated based off of the line between the first and last points.
@@ -21,6 +22,10 @@ def rsquared(x_values: NDArray[int], y_values: NDArray[int]) -> float:
     Returns:
         the R^2 value of the given dataset
     """
+    cdef int x_0, x_1, y_0, y_1
+    cdef float slope, intercept, ss_res, ss_tot, y_bar
+
+
     x_0 = x_values[0]
     x_1 = x_values[-1]
     y_0 = y_values[0]
@@ -31,10 +36,18 @@ def rsquared(x_values: NDArray[int], y_values: NDArray[int]) -> float:
     # based on https://stackoverflow.com/questions/893657/how-do-i-calculate-r-squared-using-python-and-numpy
     ss_res = 0
     ss_tot = 0
-    y_bar = np.mean(y_values)
+    cdef int y_sum,num_values,i
+    y_sum=0
+    num_values=y_values.shape[0]
+    ss_res=0
+    for i in range(num_values):
+        y_sum += y_values[i]
+        ss_res += (x_values[i] * slope + intercept - y_values[i]) ** 2
+    y_bar = y_sum / num_values
 
-    ss_res = np.sum(((x_values * slope + intercept) - y_values) ** 2)
-    ss_tot = np.sum((y_values - y_bar) ** 2)
+    ss_tot = 0
+    for i in range(num_values):
+        ss_tot += (y_values[i] - y_bar) ** 2
 
     return 1 - ss_res / ss_tot
 
@@ -57,6 +70,9 @@ def compress_filtered_gmr(data: NDArray[(2, Any), int]) -> NDArray[(2, Any), int
 
     # loop through values in time and filtered_gmr to determine what to compress
     left_idx = 0
+    cdef int [:] subset_time
+    cdef int [:] subset_filtered_gmr
+
     while left_idx < (len(time) - 2):
         right_idx = left_idx + 3  # create an initial subset of length 3
 

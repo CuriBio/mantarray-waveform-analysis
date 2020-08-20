@@ -154,7 +154,10 @@ def noise_filtering(
         numer_poly, denom_poly, noisy_data[1, :]
     )
 
-    noise_free_data: NDArray[(2, Any), int] = np.vstack((time, clean_signal))
+    rounded_data = np.rint(clean_signal).astype(np.int32)
+    noise_free_data: NDArray[(2, Any), int] = np.vstack(
+        (time, rounded_data.astype(np.int32))
+    )
 
     return noise_free_data, sampling_rate
 

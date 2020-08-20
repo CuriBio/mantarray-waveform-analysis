@@ -44,7 +44,7 @@ Resources:
         - Ref: "CodeBuildRole"
     Type: AWS::IAM::Policy
 
-  CodeBuildProject:
+  Linux37CodeBuildProject:
     DependsOn:
       - CodeBuildPolicy
     Properties:
@@ -54,7 +54,7 @@ Resources:
       Description:
         Fn::Join:
           - ""
-          - - "CodeBuild Project for "
+          - - "Linux Python 3.7 CodeBuild Project for "
             - Ref: "AWS::StackName"
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
@@ -64,16 +64,22 @@ Resources:
           - Name: PUBLISH_TO_PYPI
             Type: PLAINTEXT
             Value: "0"
+          - Name: PYTEST_RANDOMLY_SEED
+            Type: PLAINTEXT
+            Value: ""
 
       Name:
-        Ref: "AWS::StackName"
+        Fn::Join:
+          - "--"
+          - - Ref: "AWS::StackName"
+            - "linux37"
       ServiceRole:
         Ref: "CodeBuildRole"
       Source:
         Auth:
           Type: "OAUTH"
         GitCloneDepth: 1
-
+        BuildSpec: "buildspecs/linux37.yaml"
         ReportBuildStatus: True
         Location: "https://github.com/CuriBio/mantarray-waveform-analysis/"
         Type: GITHUB
@@ -81,6 +87,139 @@ Resources:
       QueuedTimeoutInMinutes: 10
       TimeoutInMinutes: 30
     Type: AWS::CodeBuild::Project
+
+  Linux38CodeBuildProject:
+    DependsOn:
+      - CodeBuildPolicy
+    Properties:
+      Artifacts:
+        Type: NO_ARTIFACTS
+      BadgeEnabled: true
+      Description:
+        Fn::Join:
+          - ""
+          - - "Linux Python 3.8 CodeBuild Project for "
+            - Ref: "AWS::StackName"
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/standard:4.0-20.06.15
+        Type: LINUX_CONTAINER
+        EnvironmentVariables:
+          - Name: PUBLISH_TO_PYPI
+            Type: PLAINTEXT
+            Value: "0"
+          - Name: PYTEST_RANDOMLY_SEED
+            Type: PLAINTEXT
+            Value: ""
+
+      Name:
+        Fn::Join:
+          - "--"
+          - - Ref: "AWS::StackName"
+            - "linux38"
+      ServiceRole:
+        Ref: "CodeBuildRole"
+      Source:
+        Auth:
+          Type: "OAUTH"
+        GitCloneDepth: 1
+        BuildSpec: "buildspecs/linux38.yaml"
+        ReportBuildStatus: True
+        Location: "https://github.com/CuriBio/mantarray-waveform-analysis/"
+        Type: GITHUB
+
+      QueuedTimeoutInMinutes: 10
+      TimeoutInMinutes: 30
+    Type: AWS::CodeBuild::Project
+
+  Windows37CodeBuildProject:
+    DependsOn:
+      - CodeBuildPolicy
+    Properties:
+      Artifacts:
+        Type: NO_ARTIFACTS
+      BadgeEnabled: true
+      Description:
+        Fn::Join:
+          - ""
+          - - "Windows Python 3.7 CodeBuild Project for "
+            - Ref: "AWS::StackName"
+      Environment:
+        ComputeType: BUILD_GENERAL1_MEDIUM
+        Image: aws/codebuild/windows-base:2.0-20.05.05
+        Type: WINDOWS_CONTAINER
+        EnvironmentVariables:
+          - Name: PUBLISH_TO_PYPI
+            Type: PLAINTEXT
+            Value: "0"
+          - Name: PYTEST_RANDOMLY_SEED
+            Type: PLAINTEXT
+            Value: ""
+
+      Name:
+        Fn::Join:
+          - "--"
+          - - Ref: "AWS::StackName"
+            - "windows37"
+      ServiceRole:
+        Ref: "CodeBuildRole"
+      Source:
+        Auth:
+          Type: "OAUTH"
+        GitCloneDepth: 1
+        BuildSpec: "buildspecs/windows37.yaml"
+        ReportBuildStatus: True
+        Location: "https://github.com/CuriBio/mantarray-waveform-analysis/"
+        Type: GITHUB
+
+      QueuedTimeoutInMinutes: 10
+      TimeoutInMinutes: 30
+    Type: AWS::CodeBuild::Project
+
+  Windows38CodeBuildProject:
+    DependsOn:
+      - CodeBuildPolicy
+    Properties:
+      Artifacts:
+        Type: NO_ARTIFACTS
+      BadgeEnabled: true
+      Description:
+        Fn::Join:
+          - ""
+          - - "Windows Python 3.8 CodeBuild Project for "
+            - Ref: "AWS::StackName"
+      Environment:
+        ComputeType: BUILD_GENERAL1_MEDIUM
+        Image: aws/codebuild/windows-base:2019-1.0
+        Type: WINDOWS_SERVER_2019_CONTAINER
+        EnvironmentVariables:
+          - Name: PUBLISH_TO_PYPI
+            Type: PLAINTEXT
+            Value: "0"
+          - Name: PYTEST_RANDOMLY_SEED
+            Type: PLAINTEXT
+            Value: ""
+
+      Name:
+        Fn::Join:
+          - "--"
+          - - Ref: "AWS::StackName"
+            - "windows38"
+      ServiceRole:
+        Ref: "CodeBuildRole"
+      Source:
+        Auth:
+          Type: "OAUTH"
+        GitCloneDepth: 1
+        BuildSpec: "buildspecs/windows38.yaml"
+        ReportBuildStatus: True
+        Location: "https://github.com/CuriBio/mantarray-waveform-analysis/"
+        Type: GITHUB
+
+      QueuedTimeoutInMinutes: 10
+      TimeoutInMinutes: 30
+    Type: AWS::CodeBuild::Project
+
 
   CodeBuildRole:
     Description: Creating service role in IAM for AWS CodeBuild
