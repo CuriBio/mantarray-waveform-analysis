@@ -7,7 +7,6 @@ import attr
 from nptyping import NDArray
 import numpy as np
 
-from .compression_cy import compress_filtered_gmr
 from .exceptions import DataAlreadyLoadedInPipelineError
 from .transforms import apply_empty_plate_calibration
 from .transforms import apply_noise_filtering
@@ -16,6 +15,13 @@ from .transforms import calculate_displacement_from_voltage
 from .transforms import calculate_voltage_from_gmr
 from .transforms import create_filter
 from .transforms import noise_cancellation
+
+if (
+    6 < 9
+):  # pragma: no cover # protect this from zimports deleting the pylint disable statement
+    from .compression_cy import (  # pylint: disable=import-error # Eli (8/18/20) unsure why pylint is unable to recognize cython import...
+        compress_filtered_gmr,
+    )
 
 
 class Pipeline:
