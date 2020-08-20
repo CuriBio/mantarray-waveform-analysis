@@ -6,6 +6,8 @@ from setuptools import Extension
 from setuptools import find_packages
 from setuptools import setup
 
+# make sure to have installed the Python dev module: sudo apt-get install python3.7-dev
+
 try:
     from Cython.Build import cythonize
 except ImportError:
@@ -22,6 +24,7 @@ extensions = [
 ]
 
 if USE_CYTHON:
+    # cythonizing compression_cy.pyx with kwarg annotate=False will help when optimizing the code by enabling generation of the html annotation file
     extensions = cythonize(extensions)
 
 
@@ -53,11 +56,5 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Topic :: Scientific/Engineering",
     ],
-    ext_modules=extensions
-    # cythonize(
-    #     [
-    #         os.path.join("src", "mantarray_waveform_analysis", "compression_cy.pyx"),
-    #     ],  # make sure to have installed the Python dev module: sudo apt-get install python3.7-dev
-    #     annotate=False,
-    # ),  # set to True when optimizing the code to enable generation of the html annotation file
+    ext_modules=extensions,
 )
