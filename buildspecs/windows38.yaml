@@ -20,8 +20,7 @@ phases:
       # In CodeBuild, sometimes a direct SHA is grabbed rather than a branch, so the 'name' of the branch is listed as: (no branch)
       #   So can't use traditional grep to just check that the name of the current branch is 'master', have to explicitly check the SHAs
       #- SHA_OF_LOCAL_COMMIT=$(git branch -av | grep "*" | grep -oP " \s+\K\w+")
-      # - git checkout master
-      - git checkout cython
+      - git checkout master
       - echo "Creating virtual environment for Python"
       - python -m venv venv
       - echo "Entering virtual environment"
