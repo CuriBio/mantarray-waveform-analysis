@@ -9,7 +9,6 @@ import numpy as np
 
 R_SQUARE_CUTOFF = 0.95
 
-#def rsquared(x_values: NDArray[int], y_values: NDArray[int]) -> float:
 def rsquared(int [:] x_values, int [:] y_values):
     """Return R^2 where x and y are array-like.
 
@@ -45,13 +44,10 @@ def rsquared(int [:] x_values, int [:] y_values):
         y_sum += y_values[i]
         ss_res += (x_values[i] * slope + intercept - y_values[i]) ** 2
     y_bar = y_sum / num_values
-    #y_bar = np.mean(y_values)
 
-    #ss_res = np.sum(((x_values * slope + intercept) - y_values) ** 2)
     ss_tot = 0
     for i in range(num_values):
         ss_tot += (y_values[i] - y_bar) ** 2
-    #ss_tot = np.sum((y_values - y_bar) ** 2)
 
     return 1 - ss_res / ss_tot
 
@@ -81,13 +77,10 @@ def rsquared(int [:] x_values, int [:] y_values):
         y_sum += y_values[i]
         ss_res += (x_values[i] * slope + intercept - y_values[i]) ** 2
     y_bar = y_sum / num_values
-    #y_bar = np.mean(y_values)
 
-    #ss_res = np.sum(((x_values * slope + intercept) - y_values) ** 2)
     ss_tot = 0
     for i in range(num_values):
         ss_tot += (y_values[i] - y_bar) ** 2
-    #ss_tot = np.sum((y_values - y_bar) ** 2)
 
     return 1 - ss_res / ss_tot
 

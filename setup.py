@@ -13,22 +13,7 @@ except ImportError:
 else:
     USE_CYTHON = True
 
-# cmdclass = {}
-# ext_modules = []
-
-# if use_cython:
-#     ext_modules += [
-#         Extension("mypackage.mycythonmodule", ["cython/mycythonmodule.pyx"]),
-#     ]
-#     cmdclass.update({'build_ext': build_ext})
-# else:
-#     ext_modules += [
-#         Extension("mypackage.mycythonmodule", ["cython/mycythonmodule.c"]),
-#     ]
-
-
 ext = ".pyx" if USE_CYTHON else ".c"
-# os.path.join("src", "mantarray_waveform_analysis", "compression_cy.pyx")
 extensions = [
     Extension(
         "mantarray_waveform_analysis.compression_cy",
@@ -37,8 +22,6 @@ extensions = [
 ]
 
 if USE_CYTHON:
-    # from Cython.Build import cythonize
-
     extensions = cythonize(extensions)
 
 
