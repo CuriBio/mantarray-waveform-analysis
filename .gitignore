@@ -4,9 +4,12 @@
 
 # Python
 *.py[cod]
+__pycache__/
+
+# Cython
 *.so
 *.c
-__pycache__/
+*.html
 
 # Venv
 .venv/
