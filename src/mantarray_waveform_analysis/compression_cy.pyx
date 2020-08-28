@@ -52,7 +52,7 @@ cpdef float rsquared(int [:] x_values, int [:] y_values):
     return 1 - ss_res / ss_tot
 
 
-def compress_filtered_gmr(data: NDArray[(2, Any), int]) -> NDArray[(2, Any), int]:
+def compress_filtered_gmr(int [:,:] data) -> NDArray[(2, Any), int]:
     """Compress the data to allow for better plotting in the desktop app.
 
     Args:
@@ -62,17 +62,18 @@ def compress_filtered_gmr(data: NDArray[(2, Any), int]) -> NDArray[(2, Any), int
         a 2D array containing slightly less points than the original data
     """
     # split time and GMR readings into individual arrays
-    time: NDArray[int] = data[0, :]
-    filtered_gmr: NDArray[int] = data[1, :]
+    cdef int [:] time = data[0, :]
+    cdef int [:] filtered_gmr = data[1, :]
 
     # create a boolean array of indicies that will be kept
     what_to_keep = [True] * len(time)
 
     # loop through values in time and filtered_gmr to determine what to compress
-    left_idx = 0
+    cdef int left_idx, right_idx
     cdef int [:] subset_time
     cdef int [:] subset_filtered_gmr
 
+    left_idx = 0
     while left_idx < (len(time) - 2):
         right_idx = left_idx + 3  # create an initial subset of length 3
 
