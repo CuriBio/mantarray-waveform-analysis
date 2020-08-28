@@ -9,7 +9,7 @@ import numpy as np
 
 R_SQUARE_CUTOFF = 0.95
 
-def rsquared(int [:] x_values, int [:] y_values):
+cpdef float rsquared(int [:] x_values, int [:] y_values):
     """Return R^2 where x and y are array-like.
 
     Instead of doing a full linear regression, the compression process drops all points in between the first and the last, so R^2 residuals are calculated based off of the line between the first and last points.
@@ -34,9 +34,7 @@ def rsquared(int [:] x_values, int [:] y_values):
     intercept = -slope * x_1 + y_1
 
     # based on https://stackoverflow.com/questions/893657/how-do-i-calculate-r-squared-using-python-and-numpy
-    ss_res = 0
-    ss_tot = 0
-    cdef int y_sum,num_values,i
+    cdef int y_sum, num_values, i
     y_sum=0
     num_values=y_values.shape[0]
     ss_res=0
@@ -49,6 +47,8 @@ def rsquared(int [:] x_values, int [:] y_values):
     for i in range(num_values):
         ss_tot += (y_values[i] - y_bar) ** 2
 
+    if ss_tot == 0:
+        return 1
     return 1 - ss_res / ss_tot
 
 

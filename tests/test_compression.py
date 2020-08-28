@@ -36,6 +36,11 @@ __fixtures__ = [
 ]
 
 
+def test_compression__does_not_raise_error_with_horizontal_line():
+    flat_data = np.array([list(range(100)), [10 for _ in range(100)]], dtype=np.int32)
+    compress_filtered_gmr(flat_data)
+
+
 def test_compression_performance(new_A1):
     # data creation, noise cancellation, peak detection
     #  expected time:                        10416666.666666666
@@ -46,6 +51,7 @@ def test_compression_performance(new_A1):
     # cythonize original rsquared code:      75517946
     #                                        35390130
     # fully converting rsquared to cython:    2518059
+    # adding cpdef to rsquared:               1723097
 
     _, _, _, _, noise_free_data = new_A1
     starting_time = time.perf_counter_ns()

@@ -24,8 +24,8 @@ extensions = [
 ]
 
 if USE_CYTHON:
-    # cythonizing compression_cy.pyx with kwarg annotate=False will help when optimizing the code by enabling generation of the html annotation file
-    extensions = cythonize(extensions)
+    # cythonizing compression_cy.pyx with kwarg annotate=True will help when optimizing the code by enabling generation of the html annotation file
+    extensions = cythonize(extensions, annotate=True)
 
 
 setup(
