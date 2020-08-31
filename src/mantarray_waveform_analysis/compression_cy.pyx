@@ -85,7 +85,6 @@ def compress_filtered_gmr(int [:,:] data) -> NDArray[(2, Any), int]:
         r_squared = rsquared(subset_time, subset_filtered_gmr)
 
         if r_squared > R_SQUARE_CUTOFF:
-            # what_to_keep[left_idx + 1] = True
             while r_squared > R_SQUARE_CUTOFF and right_idx < time_len:
                 what_to_keep[right_idx - 2] = False
                 # add another point into the subset
@@ -95,13 +94,13 @@ def compress_filtered_gmr(int [:,:] data) -> NDArray[(2, Any), int]:
 
                 # re-calculate the new r_squared
                 r_squared = rsquared(subset_time, subset_filtered_gmr)
+            if r_squared > R_SQUARE_CUTOFF and right_idx == time_len:
+                what_to_keep[right_idx - 2] = False
 
             left_idx = right_idx - 1
 
         else:
             left_idx += 1
-        print("left_idx:", left_idx, "right_idx", right_idx)
-        print("what_to_keep:", what_to_keep)
 
     # compress the arrays
     compressed_time = np.compress(what_to_keep, time)
