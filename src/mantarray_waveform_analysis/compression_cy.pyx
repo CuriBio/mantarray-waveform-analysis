@@ -47,7 +47,7 @@ cpdef float rsquared(int [:] x_values, int [:] y_values):
     for i in range(num_values):
         ss_tot += (y_values[i] - y_bar) ** 2
 
-    if ss_tot == 0:
+    if ss_tot == 0:  # Tanner (8/31/20): If a flat, horizontal line is passed to this function, ss_tot will equal 0, so we must handle this edge case to avoid Div By Zero Errors
         return 1
     return 1 - ss_res / ss_tot
 
