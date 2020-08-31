@@ -48,7 +48,7 @@ cpdef float rsquared(int [:] x_values, int [:] y_values):
         ss_tot += (y_values[i] - y_bar) ** 2
 
     if ss_tot == 0:  # Tanner (8/31/20): If a flat, horizontal line is passed to this function, ss_tot will equal 0, so we must handle this edge case to avoid Div By Zero Errors
-        return 1
+        return 1.0
     return 1 - ss_res / ss_tot
 
 
@@ -64,9 +64,10 @@ def compress_filtered_gmr(int [:,:] data) -> NDArray[(2, Any), int]:
     # split time and GMR readings into individual arrays
     cdef int [:] time = data[0, :]
     cdef int [:] filtered_gmr = data[1, :]
+    cdef int time_len = len(time)
 
     # create a boolean array of indicies that will be kept
-    what_to_keep = [True] * len(time)
+    what_to_keep = [True] * time_len
 
     # loop through values in time and filtered_gmr to determine what to compress
     cdef int left_idx, right_idx
@@ -74,23 +75,23 @@ def compress_filtered_gmr(int [:,:] data) -> NDArray[(2, Any), int]:
     cdef int [:] subset_filtered_gmr
 
     left_idx = 0
-    while left_idx < (len(time) - 2):
+    while left_idx < (time_len - 2):
         right_idx = left_idx + 3  # create an initial subset of length 3
 
-        subset_time = time[left_idx:(right_idx)]
-        subset_filtered_gmr = filtered_gmr[left_idx:(right_idx)]
+        subset_time = time[left_idx:right_idx]
+        subset_filtered_gmr = filtered_gmr[left_idx:right_idx]
 
         # calculate r_squared value of the initial length 3 subset
         r_squared = rsquared(subset_time, subset_filtered_gmr)
 
         if r_squared > R_SQUARE_CUTOFF:
             # what_to_keep[left_idx + 1] = True
-            while r_squared > R_SQUARE_CUTOFF and right_idx < (len(time) - 1):
+            while r_squared > R_SQUARE_CUTOFF and right_idx < time_len:
                 what_to_keep[right_idx - 2] = False
                 # add another point into the subset
                 right_idx += 1
-                subset_time = time[left_idx:(right_idx)]
-                subset_filtered_gmr = filtered_gmr[left_idx:(right_idx)]
+                subset_time = time[left_idx:right_idx]
+                subset_filtered_gmr = filtered_gmr[left_idx:right_idx]
 
                 # re-calculate the new r_squared
                 r_squared = rsquared(subset_time, subset_filtered_gmr)
@@ -99,6 +100,8 @@ def compress_filtered_gmr(int [:,:] data) -> NDArray[(2, Any), int]:
 
         else:
             left_idx += 1
+        print("left_idx:", left_idx, "right_idx", right_idx)
+        print("what_to_keep:", what_to_keep)
 
     # compress the arrays
     compressed_time = np.compress(what_to_keep, time)
