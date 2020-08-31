@@ -36,9 +36,11 @@ __fixtures__ = [
 ]
 
 
-def test_compression__does_not_raise_error_with_horizontal_line():
+def test_compression__removes_all_except_first_and_last_points_of_flat_horizontal_line():
+    expected = np.array([[0, 99], [10, 10]], dtype=np.int32)
     flat_data = np.array([list(range(100)), [10 for _ in range(100)]], dtype=np.int32)
-    compress_filtered_gmr(flat_data)
+    actual = compress_filtered_gmr(flat_data)
+    np.testing.assert_equal(actual, expected)
 
 
 def test_compression_performance(new_A1):
