@@ -36,6 +36,13 @@ __fixtures__ = [
 ]
 
 
+def test_compression__removes_all_except_first_and_last_points_of_flat_horizontal_line():
+    expected = np.array([[0, 99], [10, 10]], dtype=np.int32)
+    flat_data = np.array([list(range(100)), [10 for _ in range(100)]], dtype=np.int32)
+    actual = compress_filtered_gmr(flat_data)
+    np.testing.assert_equal(actual, expected)
+
+
 def test_compression_performance(new_A1):
     # data creation, noise cancellation, peak detection
     #  expected time:                        10416666.666666666
@@ -46,6 +53,8 @@ def test_compression_performance(new_A1):
     # cythonize original rsquared code:      75517946
     #                                        35390130
     # fully converting rsquared to cython:    2518059
+    # adding cpdef to rsquared:               1723097
+    # better C typing:                         190731
 
     _, _, _, _, noise_free_data = new_A1
     starting_time = time.perf_counter_ns()

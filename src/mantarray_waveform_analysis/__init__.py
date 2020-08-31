@@ -25,9 +25,9 @@ from .transforms import FILTER_CHARACTERISTICS
 from .transforms import noise_cancellation
 
 if (
-    6 < 9
+    5 < 10
 ):  # pragma: no cover # protect this from zimports deleting the pylint disable statement
-    from .compression_cy import (  # pylint: disable=import-error # Eli (8/18/20) unsure why pylint is unable to recognize cython import...
+    from .compression_cy import (  # pylint: disable=import-error # Eli (8/18/20) unsure why pylint is unable to recognize cython import... # Tanner (8/31/20) Pylint also flags this as duplicate code due to a similar import in pipelines.py, which may be related to pylint's import issues
         compress_filtered_gmr,
     )
 

@@ -24,13 +24,13 @@ extensions = [
 ]
 
 if USE_CYTHON:
-    # cythonizing compression_cy.pyx with kwarg annotate=False will help when optimizing the code by enabling generation of the html annotation file
+    # cythonizing compression_cy.pyx with kwarg annotate=True will help when optimizing the code by enabling generation of the html annotation file
     extensions = cythonize(extensions)
 
 
 setup(
     name="mantarray_waveform_analysis",
-    version="0.3",
+    version="0.3.1",
     description="Tools for analyzing waveforms produced by a Mantarray Instrument",
     url="https://github.com/CuriBio/mantarray-waveform-analysis",
     author="Curi Bio",
