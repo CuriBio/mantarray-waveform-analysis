@@ -4,9 +4,12 @@
 
 # Python
 *.py[cod]
+__pycache__/
+
+# Cython
 *.so
 *.c
-__pycache__/
+*.html
 
 # Venv
 .venv/
@@ -26,6 +29,7 @@ docs/build
 .coverage
 tests/**/snapshots/*_actual.png
 tests/**/snapshots/*_diff.png
+tests/pngs/*.png
 
 # test coverage
 tests/__coverage__

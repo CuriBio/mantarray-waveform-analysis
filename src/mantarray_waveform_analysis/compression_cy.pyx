@@ -7,9 +7,9 @@ from typing import Any
 from nptyping import NDArray
 import numpy as np
 
-R_SQUARE_CUTOFF = 0.95
+cdef float R_SQUARE_CUTOFF = 0.95
 
-def rsquared(int [:] x_values, int [:] y_values):
+cpdef float rsquared(int [:] x_values, int [:] y_values):
     """Return R^2 where x and y are array-like.
 
     Instead of doing a full linear regression, the compression process drops all points in between the first and the last, so R^2 residuals are calculated based off of the line between the first and last points.
@@ -34,9 +34,7 @@ def rsquared(int [:] x_values, int [:] y_values):
     intercept = -slope * x_1 + y_1
 
     # based on https://stackoverflow.com/questions/893657/how-do-i-calculate-r-squared-using-python-and-numpy
-    ss_res = 0
-    ss_tot = 0
-    cdef int y_sum,num_values,i
+    cdef int y_sum, num_values, i
     y_sum=0
     num_values=y_values.shape[0]
     ss_res=0
@@ -49,10 +47,12 @@ def rsquared(int [:] x_values, int [:] y_values):
     for i in range(num_values):
         ss_tot += (y_values[i] - y_bar) ** 2
 
+    if ss_tot == 0:  # Tanner (8/31/20): If a flat, horizontal line is passed to this function, ss_tot will equal 0, so we must handle this edge case to avoid Div By Zero Errors
+        return 1.0
     return 1 - ss_res / ss_tot
 
 
-def compress_filtered_gmr(data: NDArray[(2, Any), int]) -> NDArray[(2, Any), int]:
+def compress_filtered_gmr(int [:,:] data) -> NDArray[(2, Any), int]:
     """Compress the data to allow for better plotting in the desktop app.
 
     Args:
@@ -62,37 +62,40 @@ def compress_filtered_gmr(data: NDArray[(2, Any), int]) -> NDArray[(2, Any), int
         a 2D array containing slightly less points than the original data
     """
     # split time and GMR readings into individual arrays
-    time: NDArray[int] = data[0, :]
-    filtered_gmr: NDArray[int] = data[1, :]
+    cdef int [:] time = data[0, :]
+    cdef int [:] filtered_gmr = data[1, :]
+    cdef int time_len = len(time)
 
     # create a boolean array of indicies that will be kept
-    what_to_keep = [True] * len(time)
+    what_to_keep = [True] * time_len
 
     # loop through values in time and filtered_gmr to determine what to compress
-    left_idx = 0
+    cdef int left_idx, right_idx
     cdef int [:] subset_time
     cdef int [:] subset_filtered_gmr
 
-    while left_idx < (len(time) - 2):
+    left_idx = 0
+    while left_idx < time_len - 2:
         right_idx = left_idx + 3  # create an initial subset of length 3
 
-        subset_time = time[left_idx:(right_idx)]
-        subset_filtered_gmr = filtered_gmr[left_idx:(right_idx)]
+        subset_time = time[left_idx:right_idx]
+        subset_filtered_gmr = filtered_gmr[left_idx:right_idx]
 
         # calculate r_squared value of the initial length 3 subset
         r_squared = rsquared(subset_time, subset_filtered_gmr)
 
         if r_squared > R_SQUARE_CUTOFF:
-            # what_to_keep[left_idx + 1] = True
-            while r_squared > R_SQUARE_CUTOFF and right_idx < (len(time) - 1):
+            while r_squared > R_SQUARE_CUTOFF and right_idx < time_len:
                 what_to_keep[right_idx - 2] = False
                 # add another point into the subset
                 right_idx += 1
-                subset_time = time[left_idx:(right_idx)]
-                subset_filtered_gmr = filtered_gmr[left_idx:(right_idx)]
+                subset_time = time[left_idx:right_idx]
+                subset_filtered_gmr = filtered_gmr[left_idx:right_idx]
 
                 # re-calculate the new r_squared
                 r_squared = rsquared(subset_time, subset_filtered_gmr)
+            if r_squared > R_SQUARE_CUTOFF and right_idx == time_len:
+                what_to_keep[right_idx - 2] = False
 
             left_idx = right_idx - 1
 
@@ -104,14 +107,6 @@ def compress_filtered_gmr(data: NDArray[(2, Any), int]) -> NDArray[(2, Any), int
     compressed_filtered_gmr = np.compress(what_to_keep, filtered_gmr)
 
     # combine the arrays back into proper format
-    compressed_time = np.array(compressed_time, dtype=np.int32)
-    compressed_filtered_gmr = np.array(compressed_filtered_gmr, dtype=np.int32)
-
-    len_compress = len(compressed_time)
-
-    compressed_data = np.zeros((2, len_compress), dtype=np.int32)
-    for i in range(len_compress):
-        compressed_data[0, i] = compressed_time[i]
-        compressed_data[1, i] = compressed_filtered_gmr[i]
+    compressed_data = np.array([compressed_time, compressed_filtered_gmr], dtype=np.int32)
 
     return compressed_data
