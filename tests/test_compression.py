@@ -54,7 +54,7 @@ def test_compression_performance(new_A1):
     #                                        35390130
     # fully converting rsquared to cython:    2518059
     # adding cpdef to rsquared:               1723097
-    # better C typing:                         376540
+    # better C typing:                         190731
 
     _, _, _, _, noise_free_data = new_A1
     starting_time = time.perf_counter_ns()

@@ -7,7 +7,7 @@ from typing import Any
 from nptyping import NDArray
 import numpy as np
 
-R_SQUARE_CUTOFF = 0.95
+cdef float R_SQUARE_CUTOFF = 0.95
 
 cpdef float rsquared(int [:] x_values, int [:] y_values):
     """Return R^2 where x and y are array-like.
@@ -75,7 +75,7 @@ def compress_filtered_gmr(int [:,:] data) -> NDArray[(2, Any), int]:
     cdef int [:] subset_filtered_gmr
 
     left_idx = 0
-    while left_idx < (time_len - 2):
+    while left_idx < time_len - 2:
         right_idx = left_idx + 3  # create an initial subset of length 3
 
         subset_time = time[left_idx:right_idx]
@@ -107,14 +107,6 @@ def compress_filtered_gmr(int [:,:] data) -> NDArray[(2, Any), int]:
     compressed_filtered_gmr = np.compress(what_to_keep, filtered_gmr)
 
     # combine the arrays back into proper format
-    compressed_time = np.array(compressed_time, dtype=np.int32)
-    compressed_filtered_gmr = np.array(compressed_filtered_gmr, dtype=np.int32)
-
-    len_compress = len(compressed_time)
-
-    compressed_data = np.zeros((2, len_compress), dtype=np.int32)
-    for i in range(len_compress):
-        compressed_data[0, i] = compressed_time[i]
-        compressed_data[1, i] = compressed_filtered_gmr[i]
+    compressed_data = np.array([compressed_time, compressed_filtered_gmr], dtype=np.int32)
 
     return compressed_data
