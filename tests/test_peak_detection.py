@@ -337,7 +337,7 @@ def test_maiden_voyage_data_amplitude(maiden_voyage_data):
 def test_new_A1_twitch_widths(new_A1):
     pipeline, _ = new_A1
     filtered_data = pipeline.get_noise_filtered_gmr()
-    per_twitch_dict, _ = _get_data_metrics(new_A1)
+    per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A1)
 
     # plot and save results
     _plot_twitch_widths(
@@ -357,11 +357,16 @@ def test_new_A1_twitch_widths(new_A1):
         -167630,
     )
 
+    assert_percent_diff(aggregate_metrics_dict[WIDTH_UUID][20]["mean"], 15758)
+    assert_percent_diff(aggregate_metrics_dict[WIDTH_UUID][50]["std"], 422)
+    assert aggregate_metrics_dict[WIDTH_UUID][80]["min"] == 35534
+    assert aggregate_metrics_dict[WIDTH_UUID][90]["max"] == 46182
+
 
 def test_new_A2_twitch_widths(new_A2):
     pipeline, _ = new_A2
     filtered_data = pipeline.get_noise_filtered_gmr()
-    per_twitch_dict, _ = _get_data_metrics(new_A2)
+    per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A2)
 
     # plot and save results
     _plot_twitch_widths(
@@ -381,16 +386,16 @@ def test_new_A2_twitch_widths(new_A2):
         -14468,
     )
 
-    # assert_percent_diff(aggregate_metrics_dict[AMPLITUDE_UUID]["mean"], 477098)
-    # assert_percent_diff(aggregate_metrics_dict[AMPLITUDE_UUID]["std"], 40338)
-    # assert aggregate_metrics_dict[AMPLITUDE_UUID]["min"]== 416896
-    # assert aggregate_metrics_dict[AMPLITUDE_UUID]["max"]== 531133
+    assert_percent_diff(aggregate_metrics_dict[WIDTH_UUID][20]["mean"], 15343)
+    assert_percent_diff(aggregate_metrics_dict[WIDTH_UUID][50]["std"], 377)
+    assert aggregate_metrics_dict[WIDTH_UUID][80]["min"] == 35131
+    assert aggregate_metrics_dict[WIDTH_UUID][90]["max"] == 45237
 
 
 def test_new_A3_twitch_widths(new_A3):
     pipeline, _ = new_A3
     filtered_data = pipeline.get_noise_filtered_gmr()
-    per_twitch_dict, _ = _get_data_metrics(new_A3)
+    per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A3)
 
     # plot and save results
     _plot_twitch_widths(
@@ -410,11 +415,16 @@ def test_new_A3_twitch_widths(new_A3):
         258988,
     )
 
+    assert_percent_diff(aggregate_metrics_dict[WIDTH_UUID][20]["mean"], 18868)
+    assert_percent_diff(aggregate_metrics_dict[WIDTH_UUID][50]["std"], 449)
+    assert aggregate_metrics_dict[WIDTH_UUID][80]["min"] == 39533
+    assert aggregate_metrics_dict[WIDTH_UUID][90]["max"] == 68356
+
 
 def test_new_A4_twitch_widths(new_A4):
     pipeline, _ = new_A4
     filtered_data = pipeline.get_noise_filtered_gmr()
-    per_twitch_dict, _ = _get_data_metrics(new_A4)
+    per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A4)
 
     # plot and save results
     _plot_twitch_widths(
@@ -434,11 +444,16 @@ def test_new_A4_twitch_widths(new_A4):
         13350,
     )
 
+    assert_percent_diff(aggregate_metrics_dict[WIDTH_UUID][20]["mean"], 13092)
+    assert_percent_diff(aggregate_metrics_dict[WIDTH_UUID][50]["std"], 255)
+    assert aggregate_metrics_dict[WIDTH_UUID][80]["min"] == 29258
+    assert aggregate_metrics_dict[WIDTH_UUID][90]["max"] == 41550
+
 
 def test_new_A5_twitch_widths(new_A5):
     pipeline, _ = new_A5
     filtered_data = pipeline.get_noise_filtered_gmr()
-    per_twitch_dict, _ = _get_data_metrics(new_A5)
+    per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A5)
 
     # plot and save results
     _plot_twitch_widths(
@@ -458,11 +473,16 @@ def test_new_A5_twitch_widths(new_A5):
         96628,
     )
 
+    assert_percent_diff(aggregate_metrics_dict[WIDTH_UUID][20]["mean"], 11975)
+    assert_percent_diff(aggregate_metrics_dict[WIDTH_UUID][50]["std"], 430)
+    assert aggregate_metrics_dict[WIDTH_UUID][80]["min"] == 29683
+    assert aggregate_metrics_dict[WIDTH_UUID][90]["max"] == 44543
+
 
 def test_new_A6_twitch_widths(new_A6):
     pipeline, _ = new_A6
     filtered_data = pipeline.get_noise_filtered_gmr()
-    per_twitch_dict, _ = _get_data_metrics(new_A6)
+    per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A6)
 
     # plot and save results
     _plot_twitch_widths(
@@ -482,11 +502,16 @@ def test_new_A6_twitch_widths(new_A6):
         59651,
     )
 
+    assert_percent_diff(aggregate_metrics_dict[WIDTH_UUID][20]["mean"], 10211)
+    assert_percent_diff(aggregate_metrics_dict[WIDTH_UUID][50]["std"], 1969)
+    assert aggregate_metrics_dict[WIDTH_UUID][80]["min"] == 31854
+    assert aggregate_metrics_dict[WIDTH_UUID][90]["max"] == 57570
+
 
 def test_maiden_voyage_data_twitch_widths(maiden_voyage_data):
     pipeline, _ = maiden_voyage_data
     filtered_data = pipeline.get_noise_filtered_gmr()
-    per_twitch_dict, _ = _get_data_metrics(maiden_voyage_data)
+    per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(maiden_voyage_data)
 
     # plot and save results
     _plot_twitch_widths(
@@ -506,6 +531,11 @@ def test_maiden_voyage_data_twitch_widths(maiden_voyage_data):
         437648,
         562594,
     )
+
+    assert_percent_diff(aggregate_metrics_dict[WIDTH_UUID][20]["mean"], 16327)
+    assert_percent_diff(aggregate_metrics_dict[WIDTH_UUID][50]["std"], 467)
+    assert aggregate_metrics_dict[WIDTH_UUID][80]["min"] == 30252
+    assert aggregate_metrics_dict[WIDTH_UUID][90]["max"] == 66476
 
 
 def test_new_A1_auc(new_A1):

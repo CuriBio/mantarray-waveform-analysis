@@ -28,6 +28,8 @@ from .constants import WIDTH_UUID
 from .constants import WIDTH_VALUE_UUID
 from .exceptions import TwoPeaksInARowError
 
+TWITCH_WIDTH_PERCENTS = range(10, 95, 5)
+
 
 def peak_detector(
     filtered_gmr: NDArray[(2, Any), int], twitches_point_up: bool = True,
@@ -81,7 +83,7 @@ def peak_detector(
     return peak_indices, valley_indices
 
 
-def create_avg_dict(metric: NDArray[int]) -> Dict[str, int]:
+def create_avg_dict(metric: NDArray[int]) -> Dict[str, Union[float, int]]:
     """Calculate the average values of a specific metric.
 
     Args:
@@ -90,7 +92,7 @@ def create_avg_dict(metric: NDArray[int]) -> Dict[str, int]:
     Returns:
         a dictionary of the average statistics of that metric
     """
-    dictionary: Dict[str, int] = {}
+    dictionary: Dict[str, Union[float, int]] = dict()
 
     dictionary["n"] = len(metric)
     dictionary["mean"] = int(round(np.mean(metric)))
@@ -105,8 +107,11 @@ def data_metrics(
     peak_and_valley_indices: Tuple[NDArray[int], NDArray[int]],
     filtered_data: NDArray[(2, Any), int],
 ) -> Tuple[
-    Dict[int, Dict[UUID, int]],
-    Union[Dict[UUID, Dict[int, Dict[str, int]]], Dict[UUID, Dict[str, int]]],
+    Dict[int, Dict[UUID, Union[float, int]]],
+    Dict[
+        UUID,
+        Union[Dict[str, Union[float, int]], Dict[int, Dict[str, Union[float, int]]]],
+    ],
 ]:
     """Find all data metrics for individual twitches and averages.
 
@@ -116,16 +121,19 @@ def data_metrics(
 
     Returns:
         per_twitch_dict: a dictionary of individual peak metrics
-        aggregate_dict: a dictionary of entire metric statistics
+        aggregate_dict: a dictionary of entire metric statistics. Most metrics have the stats underneath the UUID, but for twitch widths, there is an additional dictionary where the percent of repolarization is the key
     """
     # create main dictionaries
-    main_twitch_dict: Dict[int, Dict[UUID, int]] = {}
-    aggregate_dict = {}
+    main_twitch_dict: Dict[int, Dict[UUID, Union[float, int]]] = dict()
+    aggregate_dict: Dict[
+        UUID,
+        Union[Dict[str, Union[float, int]], Dict[int, Dict[str, Union[float, int]]]],
+    ] = dict()
 
     # create dependent dicitonaries
-    period_averages_dict: Dict[str, int] = {}
-    amplitude_averages_dict: Dict[str, int] = {}
-    auc_averages_dict: Dict[str, int] = {}
+    period_averages_dict: Dict[str, Union[float, int]] = {}
+    amplitude_averages_dict: Dict[str, Union[float, int]] = {}
+    auc_averages_dict: Dict[str, Union[float, int]] = {}
 
     peak_indices, _ = peak_and_valley_indices  #: NDArray[int] = peakind[0]
 
@@ -156,13 +164,21 @@ def data_metrics(
 
     # find twitch widths
     widths = calculate_twitch_widths(twitch_indices, filtered_data)
+    width_stats_dict: Dict[int, Dict[str, Union[float, int]]] = dict()
 
-    # find aggregate values of amplitude data
-    # aggregate_dict[WIDTH_UUID] = Dict[int, Dict[str, Any]]  # amplitude_averages_dict
-    # amplitude_averages_dict = create_avg_dict(amplitudes)
+    for iter_percent in TWITCH_WIDTH_PERCENTS:
+        iter_list_of_width_values: List[Union[float, int]] = []
+        for iter_twitch in widths:
+            iter_width_value = iter_twitch[iter_percent][WIDTH_VALUE_UUID]
+            if not isinstance(iter_width_value, (float, int)):  # making mypy happy
+                raise NotImplementedError(
+                    f"The width value under key {WIDTH_VALUE_UUID} must be a float or an int. It was: {iter_width_value}"
+                )
+            iter_list_of_width_values.append(iter_width_value)
+        iter_stats_dict = create_avg_dict(iter_list_of_width_values)
+        width_stats_dict[iter_percent] = iter_stats_dict
 
-    # aggregate_dict[AMPLITUDE_UUID] = amplitude_averages_dict
-
+    aggregate_dict[WIDTH_UUID] = width_stats_dict
     # calculate auc
     auc_per_twitch: NDArray[int] = calculate_area_under_curve(
         twitch_indices, filtered_data, widths
@@ -370,7 +386,7 @@ def calculate_twitch_widths(
 
         rising_idx = iter_twitch_peak_idx - 1
         falling_idx = iter_twitch_peak_idx + 1
-        for iter_percent in range(10, 95, 5):
+        for iter_percent in TWITCH_WIDTH_PERCENTS:
             iter_percent_dict: Dict[UUID, Union[Tuple[int, int], int]] = dict()
             rising_threshold = peak_value - iter_percent / 100 * rising_amplitude
             falling_threshold = peak_value - iter_percent / 100 * falling_amplitude
