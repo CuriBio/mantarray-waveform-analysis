@@ -77,10 +77,10 @@ def _run_peak_detection(filename, sampling_rate_construct=100, flip_data=True):
 
 
 def _plot_data(peak_and_valley_indices, filtered_data, my_local_path_graphs):
-    time_series = filtered_data[0]
+    time_series = filtered_data[0, :]
     peak_indices, valley_indices = peak_and_valley_indices
     plt.figure()
-    plt.plot(time_series, filtered_data[1])
+    plt.plot(time_series, filtered_data[1, :], "b")
     plt.plot(
         time_series[peak_indices],
         filtered_data[1][peak_indices],
@@ -100,6 +100,7 @@ def _plot_data(peak_and_valley_indices, filtered_data, my_local_path_graphs):
     plt.legend(bbox_to_anchor=(0, -0.25), loc="lower center")
     plt.tight_layout()
     plt.savefig(my_local_path_graphs)
+    plt.close()
 
 
 def _get_data_metrics(well_fixture):

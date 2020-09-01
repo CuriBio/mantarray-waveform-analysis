@@ -28,8 +28,6 @@ from .constants import WIDTH_UUID
 from .constants import WIDTH_VALUE_UUID
 from .exceptions import TwoPeaksInARowError
 
-# SAMPLING_RESOLUTION = 10000
-
 
 def peak_detector(
     filtered_gmr: NDArray[(2, Any), int], twitches_point_up: bool = True,
@@ -78,115 +76,9 @@ def peak_detector(
         gmr_signal * valley_invertor_factor,
         width=minimum_required_samples_between_twitches / 2,
         distance=minimum_required_samples_between_twitches,
+        prominence=max_prominence / 22,
     )
     return peak_indices, valley_indices
-
-
-# def find_x(
-#     index: int,
-#     all_peak_valley_ind: NDArray[int],
-#     data: NDArray[(2, Any), int],
-#     peak_or_valley: str,
-# ) -> int:
-#     """Return an int value of the time at which the peak or valley occurs.
-
-#     Args:
-#         index: an int representing the index in all_peak_valley_ind that the peak or valley is
-#         all_peak_valley_ind: all the indicies of the peaks and valleys
-#         data: a 2D array of the original time and voltage data
-#         peak_or_valley: a string to determine if we are finding a peak or valley
-
-#     Returns:
-#         an int that represents the time of the peak or valley
-#     """
-#     if index == 0:
-#         subset = data[:, 0 : all_peak_valley_ind[index + 1]]
-#         if peak_or_valley == "max":
-#             max_val = np.max(subset[1, :])
-#         else:
-#             max_val = np.min(subset[1, :])
-#         x_val = np.where(subset[1, :] == max_val)[0][0]
-#         x_val = subset[:, x_val][0]
-#     elif index == (len(all_peak_valley_ind) - 1):
-#         subset = data[:, all_peak_valley_ind[index - 1] : -1]
-#         if peak_or_valley == "max":
-#             max_val = np.max(subset[1, :])
-#         else:
-#             max_val = np.min(subset[1, :])
-#         x_val = np.where(subset[1, :] == max_val)[0][0]
-#         x_val = subset[:, x_val][0]
-#     else:
-#         subset = data[
-#             :, all_peak_valley_ind[index - 1] : all_peak_valley_ind[index + 1],
-#         ]
-#         if peak_or_valley == "max":
-#             max_val = np.max(subset[1, :])
-#         else:
-#             max_val = np.min(subset[1, :])
-#         x_val = np.where(subset[1, :] == max_val)[0][0]
-#         x_val = subset[:, x_val][0]
-
-#     return int(x_val)
-
-
-# def noise_filtering(
-#     noisy_data: NDArray[(2, Any), int], sampling_rate: int
-# ) -> Tuple[NDArray[(2, Any), int], int]:
-#     """Remove noise from a signal using a butterworth filter.
-
-#     Args:
-#         noisy_data: a 2D array of the time and voltage data as it was recieved from file writer
-#         sampling_rate: an integer value of the sampling rate of the data in Hz
-
-#     Returns:
-#         noise_free_data: a 2D array of the time and voltage data after it has gone through noise cancellation
-#         sampling_rate: an integer value of the sampling rate of the data in Hz
-#     """
-#     time: NDArray[int] = noisy_data[0, :]
-#     cutoff = int(sampling_rate * 0.5)  # Cut-off frequency of the filter
-#     normalized_freq: float = cutoff / (sampling_rate * 2)  # nyquist criteria
-#     numer_poly, denom_poly = signal.butter(5, normalized_freq, "low")
-#     clean_signal: NDArray[int] = signal.filtfilt(
-#         numer_poly, denom_poly, noisy_data[1, :]
-#     )
-
-#     rounded_data = np.rint(clean_signal).astype(np.int32)
-#     noise_free_data: NDArray[(2, Any), int] = np.vstack(
-#         (time, rounded_data.astype(np.int32))
-#     )
-
-#     return noise_free_data, sampling_rate
-
-
-def time_voltage_dict_creation(
-    time: NDArray[1, int],
-    clean_signal: NDArray[(2, Any), int],
-    peak_valley_tuple: Tuple[int, int],
-) -> Tuple[Dict[int, int], Dict[int, int]]:
-    """Get time and voltage values using the index of peaks and valleys.
-
-    Args:
-        time: a 1D array of the time of the signal
-        clean_signal: a 1D array of the voltage after noise filtering
-        peak_valley_tuple: a tuple of the indices of the peaks and valleys
-
-    Returns:
-        time_voltage_dict_peaks: a dictionary of the time and voltage of each peak
-        time_voltage_dict_valleys: a dictionary of the time and voltage of each valley
-    """
-    peaks: NDArray[int] = peak_valley_tuple[0]
-    valleys: NDArray[int] = peak_valley_tuple[1]
-
-    time_voltage_dict_peaks: Dict[int, int] = {}
-    time_voltage_dict_valleys: Dict[int, int] = {}
-
-    for i in peaks:
-        time_voltage_dict_peaks.update({time[i]: clean_signal[i]})
-
-    for i in valleys:
-        time_voltage_dict_valleys.update({time[i]: clean_signal[i]})
-
-    return time_voltage_dict_peaks, time_voltage_dict_valleys
 
 
 def create_avg_dict(metric: NDArray[int]) -> Dict[str, int]:
@@ -246,7 +138,9 @@ def data_metrics(
     time_series = filtered_data[0, :]
 
     # find twitch periods
-    combined_twitch_periods = twitch_period(twitch_indices, peak_indices, filtered_data)
+    combined_twitch_periods = calculate_twitch_period(
+        twitch_indices, peak_indices, filtered_data
+    )
     # find aggregate values of period data
     period_averages_dict = create_avg_dict(combined_twitch_periods)
 
@@ -295,7 +189,7 @@ def data_metrics(
     return main_twitch_dict, aggregate_dict
 
 
-def twitch_period(
+def calculate_twitch_period(
     twitch_indices: NDArray[int],
     all_peak_indices: NDArray[int],
     filtered_data: NDArray[(2, Any), int],
@@ -374,41 +268,10 @@ def find_twitch_indices(
     return twitches
 
 
-# def twitches(
-#     peaks: NDArray[int], valleys: NDArray[int], noise_free_data: NDArray[(2, Any), int],
-# ) -> NDArray[int]:
-#     """Get time points of all the twitch peaks.
-
-#     Args:
-#         peaks: a 1D array of integers representing the indices of the peaks
-#         valleys: a 1D array of integers representing the indices of the valleys
-#         noise_free_data: a 2D array of the data after being noise cancelled
-
-#     Returns:
-#         a 1D array of integers representing the time points of all the twitches
-#     """
-#     time_points: NDArray[int] = []
-#     length_valley: int = len(valleys)
-#     length_peak: int = len(peaks)
-
-#     for i in range(length_valley - 1):
-#         for j in range(length_peak):
-#             if peaks[j] > valleys[i]:
-#                 if peaks[j] < valleys[i + 1]:
-#                     time_points.append(int(noise_free_data[0, :][peaks[j]]))
-
-#     return time_points
-
-
 def calculate_amplitudes(
     twitch_indices: Dict[int, Dict[UUID, Optional[int]]],
     filtered_data: NDArray[(2, Any), int],
 ) -> NDArray[int]:
-    # def calculate_amplitudes(
-    #     time_points: NDArray[int],
-    #     all_peak_valley_ind: NDArray[int],
-    #     noise_free_data: NDArray[(2, Any), int],
-    # ) -> NDArray[int]:
     """Get the amplitudes for all twitches.
 
     Args:
