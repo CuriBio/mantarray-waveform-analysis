@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Transforming arrays of Mantarray data throughout the analysis pipeline."""
 from typing import Any
+from typing import Optional
 import uuid
 
 import attr
@@ -114,14 +115,18 @@ class Pipeline:
         return self._fully_calibrated_gmr
 
     def get_noise_filtered_gmr(self) -> NDArray[(2, Any), int]:
+        """Return data after user-acceptable noise filtering."""
         try:
             return self._noise_filtered_gmr
         except AttributeError:
             pass
-        self._noise_filtered_gmr = apply_noise_filtering(
-            self.get_fully_calibrated_gmr(),
-            self._pipeline_template.get_filter_coefficients(),
-        )
+        if self._pipeline_template.noise_filter_uuid is None:
+            self._noise_filtered_gmr = self.get_fully_calibrated_gmr()
+        else:
+            self._noise_filtered_gmr = apply_noise_filtering(
+                self.get_fully_calibrated_gmr(),
+                self._pipeline_template.get_filter_coefficients(),
+            )
         return self._noise_filtered_gmr
 
     def get_compressed_gmr(self) -> NDArray[(2, Any), int]:
@@ -160,11 +165,27 @@ class PipelineTemplate:  # pylint: disable=too-few-public-methods # This is a si
         tissue_sampling_period: the sampling period for the tissues, in centimilliseconds
     """
 
-    noise_filter_uuid: uuid.UUID = attr.ib()
     tissue_sampling_period: int = attr.ib()
+    noise_filter_uuid: Optional[uuid.UUID] = attr.ib(default=None)
+    _filter_coefficients: NDArray[(Any, Any), float]
 
     def create_pipeline(self) -> Pipeline:
         return Pipeline(self)
 
     def get_filter_coefficients(self) -> NDArray[(Any, Any), float]:
-        return create_filter(self.noise_filter_uuid, self.tissue_sampling_period)
+        """Get the coefficients for the signal filter.
+
+        Creating a filter can take a non-trivial amount of time, so the
+        coefficients are cached after the first time they are generated
+        (since they are immutable within the template)
+        """
+        if self.noise_filter_uuid is None:
+            raise NotImplementedError("Cannot create a filter when no UUID is set.")
+        try:
+            return self._filter_coefficients
+        except AttributeError:
+            pass
+        self._filter_coefficients = create_filter(
+            self.noise_filter_uuid, self.tissue_sampling_period
+        )
+        return self._filter_coefficients

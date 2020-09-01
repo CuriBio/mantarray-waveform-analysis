@@ -6,7 +6,7 @@ from setuptools import Extension
 from setuptools import find_packages
 from setuptools import setup
 
-# make sure to have installed the Python dev module: sudo apt-get install python3.7-dev
+# In order to locally Cythonize files, make sure to have installed the Python dev module: sudo apt-get install python3.7-dev
 
 try:
     from Cython.Build import cythonize
@@ -25,12 +25,12 @@ extensions = [
 
 if USE_CYTHON:
     # cythonizing compression_cy.pyx with kwarg annotate=True will help when optimizing the code by enabling generation of the html annotation file
-    extensions = cythonize(extensions)
+    extensions = cythonize(extensions, annotate=False)
 
 
 setup(
     name="mantarray_waveform_analysis",
-    version="0.3.1",
+    version="0.4.0",
     description="Tools for analyzing waveforms produced by a Mantarray Instrument",
     url="https://github.com/CuriBio/mantarray-waveform-analysis",
     author="Curi Bio",
@@ -39,9 +39,9 @@ setup(
     packages=find_packages("src"),
     package_dir={"": "src"},
     install_requires=[
-        "numpy>=1.17.3",
-        "scipy>=1.4.1",
-        "nptyping>=1.2.0",
+        "numpy>=1.19.1",
+        "scipy>=1.5.2",
+        "nptyping>=1.3.0",
         "attrs>=19.3.0",
     ],
     zip_safe=False,
