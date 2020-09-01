@@ -167,11 +167,25 @@ class PipelineTemplate:  # pylint: disable=too-few-public-methods # This is a si
 
     tissue_sampling_period: int = attr.ib()
     noise_filter_uuid: Optional[uuid.UUID] = attr.ib(default=None)
+    _filter_coefficients: NDArray[(Any, Any), float]
 
     def create_pipeline(self) -> Pipeline:
         return Pipeline(self)
 
     def get_filter_coefficients(self) -> NDArray[(Any, Any), float]:
+        """Get the coefficients for the signal filter.
+
+        Creating a filter can take a non-trivial amount of time, so the
+        coefficients are cached after the first time they are generated
+        (since they are immutable within the template)
+        """
         if self.noise_filter_uuid is None:
             raise NotImplementedError("Cannot create a filter when no UUID is set.")
-        return create_filter(self.noise_filter_uuid, self.tissue_sampling_period)
+        try:
+            return self._filter_coefficients
+        except AttributeError:
+            pass
+        self._filter_coefficients = create_filter(
+            self.noise_filter_uuid, self.tissue_sampling_period
+        )
+        return self._filter_coefficients

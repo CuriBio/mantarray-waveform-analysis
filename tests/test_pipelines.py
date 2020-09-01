@@ -6,6 +6,7 @@ from mantarray_waveform_analysis import pipelines
 from mantarray_waveform_analysis import PipelineTemplate
 import numpy as np
 import pytest
+from scipy import signal
 
 from .fixtures_pipelines import fixture_generic_pipeline
 from .fixtures_pipelines import fixture_generic_pipeline_template
@@ -228,3 +229,15 @@ def test_Pipeline__get_noise_filtered_gmr__returns_same_data_if_no_filter_define
     calibrated_data = pipeline.get_fully_calibrated_gmr()
     filtered_data = pipeline.get_noise_filtered_gmr()
     assert filtered_data is calibrated_data
+
+
+def test_Pipeline__get_filter_coefficients__does_not_repeatedly_generate_new_filters_each_time(
+    mocker, generic_pipeline_template
+):
+    spied_bessel = mocker.spy(signal, "bessel")
+    original_coefficients = generic_pipeline_template.get_filter_coefficients()
+    assert spied_bessel.call_count == 1  # confirm pre-condition
+
+    new_coefficients = generic_pipeline_template.get_filter_coefficients()
+    assert spied_bessel.call_count == 1
+    assert new_coefficients is original_coefficients
