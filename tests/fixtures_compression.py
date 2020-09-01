@@ -1,16 +1,9 @@
 # -*- coding: utf-8 -*-
 """Data is from MA 13, Gordana Plate 2 on May 24, 2020."""
 
-import inspect
-import os
-
 import pytest
 
 from .fixtures_utils import _run_peak_detection
-
-PATH_OF_CURRENT_FILE = os.path.dirname((inspect.stack()[0][1]))
-
-CONVERSION_TO_INT = 100000
 
 
 @pytest.fixture(scope="session", name="new_A1")

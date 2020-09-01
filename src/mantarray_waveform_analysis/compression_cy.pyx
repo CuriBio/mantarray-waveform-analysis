@@ -7,18 +7,15 @@ from typing import Any
 from nptyping import NDArray
 import numpy as np
 
-cdef float R_SQUARE_CUTOFF = 0.95
+cdef float R_SQUARE_CUTOFF = 0.94
 
 cpdef float rsquared(int [:] x_values, int [:] y_values):
     """Return R^2 where x and y are array-like.
-
     Instead of doing a full linear regression, the compression process drops all points in between the first and the last, so R^2 residuals are calculated based off of the line between the first and last points.
     Typically the time and filtered GMR readings are supplied as the x and y axis values respectively.
-
     Args:
         x_values: 1D array of int values representing time
         y_values: 1D array of int values representing filtered GMR
-
     Returns:
         the R^2 value of the given dataset
     """
