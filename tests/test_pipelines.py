@@ -217,3 +217,14 @@ def test_Pipeline__get_noise_filtered_gmr__creates_and_uses_filter_supplied_by_t
     actual_filter_array = mocked_function_under_test.call_args_list[0][0][1]
     expected_filter_array = generic_pipeline_template.get_filter_coefficients()
     np.testing.assert_array_equal(actual_filter_array, expected_filter_array)
+
+
+def test_Pipeline__get_noise_filtered_gmr__returns_same_data_if_no_filter_defined(
+    raw_generic_well_a1, raw_generic_well_a2
+):
+    no_filter_pipeline_template = PipelineTemplate(tissue_sampling_period=1000)
+    pipeline = no_filter_pipeline_template.create_pipeline()
+    pipeline.load_raw_gmr_data(raw_generic_well_a1, raw_generic_well_a2)
+    calibrated_data = pipeline.get_fully_calibrated_gmr()
+    filtered_data = pipeline.get_noise_filtered_gmr()
+    assert filtered_data is calibrated_data

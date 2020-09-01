@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """Transforming arrays of Mantarray data throughout the analysis pipeline."""
 from typing import Any
+from typing import Optional
 import uuid
 
 import attr
@@ -114,14 +115,18 @@ class Pipeline:
         return self._fully_calibrated_gmr
 
     def get_noise_filtered_gmr(self) -> NDArray[(2, Any), int]:
+        """Return data after user-acceptable noise filtering."""
         try:
             return self._noise_filtered_gmr
         except AttributeError:
             pass
-        self._noise_filtered_gmr = apply_noise_filtering(
-            self.get_fully_calibrated_gmr(),
-            self._pipeline_template.get_filter_coefficients(),
-        )
+        if self._pipeline_template.noise_filter_uuid is None:
+            self._noise_filtered_gmr = self.get_fully_calibrated_gmr()
+        else:
+            self._noise_filtered_gmr = apply_noise_filtering(
+                self.get_fully_calibrated_gmr(),
+                self._pipeline_template.get_filter_coefficients(),
+            )
         return self._noise_filtered_gmr
 
     def get_compressed_gmr(self) -> NDArray[(2, Any), int]:
@@ -160,11 +165,13 @@ class PipelineTemplate:  # pylint: disable=too-few-public-methods # This is a si
         tissue_sampling_period: the sampling period for the tissues, in centimilliseconds
     """
 
-    noise_filter_uuid: uuid.UUID = attr.ib()
     tissue_sampling_period: int = attr.ib()
+    noise_filter_uuid: Optional[uuid.UUID] = attr.ib(default=None)
 
     def create_pipeline(self) -> Pipeline:
         return Pipeline(self)
 
     def get_filter_coefficients(self) -> NDArray[(Any, Any), float]:
+        if self.noise_filter_uuid is None:
+            raise NotImplementedError("Cannot create a filter when no UUID is set.")
         return create_filter(self.noise_filter_uuid, self.tissue_sampling_period)

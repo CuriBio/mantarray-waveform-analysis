@@ -1,14 +1,17 @@
 # -*- coding: utf-8 -*-
-import inspect
 import os
 import time
 
+from mantarray_waveform_analysis import AMPLITUDE_UUID
 from mantarray_waveform_analysis import AUC_UUID
 from mantarray_waveform_analysis import compress_filtered_gmr
 from mantarray_waveform_analysis import peak_detection
+from mantarray_waveform_analysis import peak_detector
+from mantarray_waveform_analysis import TWITCH_PERIOD_UUID
+from mantarray_waveform_analysis import WIDTH_UUID
+from mantarray_waveform_analysis import WIDTH_VALUE_UUID
 import matplotlib
-import matplotlib.pyplot as plt
-import numpy as np
+from stdlib_utils import get_current_file_abs_directory
 
 from .fixtures_compression import fixture_new_A1
 from .fixtures_compression import fixture_new_A2
@@ -16,24 +19,27 @@ from .fixtures_compression import fixture_new_A3
 from .fixtures_compression import fixture_new_A4
 from .fixtures_compression import fixture_new_A5
 from .fixtures_compression import fixture_new_A6
+from .fixtures_pipelines import fixture_generic_pipeline_template
+from .fixtures_utils import _get_data_metrics
+from .fixtures_utils import _plot_data
+from .fixtures_utils import assert_percent_diff
 from .fixtures_utils import PATH_TO_PNGS
-
+import numpy as np
 matplotlib.use("Agg")
+PATH_OF_CURRENT_FILE = get_current_file_abs_directory()
 
-PATH_OF_CURRENT_FILE = os.path.dirname((inspect.stack()[0][1]))
-
-COMPRESSION_ACCURACY = 0.30
+COMPRESSION_ACCURACY = 0.15
 
 COMPRESSION_FACTOR = 0.40
-
-__fixtures__ = [
+__fixtures__ = (
     fixture_new_A4,
     fixture_new_A1,
     fixture_new_A2,
     fixture_new_A3,
     fixture_new_A5,
     fixture_new_A6,
-]
+    fixture_generic_pipeline_template,
+)
 
 
 def test_compression__removes_all_except_first_and_last_points_of_flat_horizontal_line():
@@ -56,439 +62,332 @@ def test_compression_performance(new_A1):
     # adding cpdef to rsquared:               1723097
     # better C typing:                         190731
 
-    _, _, _, _, noise_free_data = new_A1
+    pipeline, _ = new_A1
+    filtered_data = pipeline.get_noise_filtered_gmr()
     starting_time = time.perf_counter_ns()
     num_iters = 15
     for _ in range(num_iters):
-        compress_filtered_gmr(noise_free_data)
+        compress_filtered_gmr(filtered_data)
 
     ending_time = time.perf_counter_ns()
     ns_per_iter = (ending_time - starting_time) / num_iters
     centimilliseconds_per_second = 100000
     seconds_of_data = (
-        noise_free_data[0, -1] - noise_free_data[0, 0]
+        filtered_data[0, -1] - filtered_data[0, 0]
     ) / centimilliseconds_per_second
 
-    expected_time_per_compression = seconds_of_data / 24 / 4 * 10 ** 9
+    expected_time_per_compression = seconds_of_data / 24 / 4 / 10 * 10 ** 9
     assert ns_per_iter < expected_time_per_compression
 
 
-def test_new_A1_compression(new_A1):
-    # data creation, noise cancellation, peak detection
-    _, _, peakind, original_sampling_rate, noise_free_data = new_A1
+def _get_info_for_compression(well_fixture, file_prefix, pipeline_template_with_filter):
+    pipeline, _ = well_fixture
+    pipeline_with_filter = pipeline_template_with_filter.create_pipeline()
+    unfiltered_data = pipeline.get_noise_filtered_gmr()
+    pipeline_with_filter.load_raw_gmr_data(unfiltered_data, unfiltered_data)
 
-    # determine data metrics of original data
-    per_beat_dict_original, window_dict_original = peak_detection.data_metrics(
-        peakind, noise_free_data
+    filtered_data = pipeline_with_filter.get_noise_filtered_gmr()
+    original_per_twitch_dict, original_aggregate_metrics_dict = _get_data_metrics(
+        well_fixture
     )
-    widths_dict_original = peak_detection.twitch_widths(peakind, noise_free_data)
+
+    original_num_samples = filtered_data.shape[1]
 
     # compress the data
-    compressed_data = compress_filtered_gmr(noise_free_data)
-    new_sample_rate = int(len(compressed_data[0, :]) / 10)
+    compressed_data = compress_filtered_gmr(filtered_data)
+    new_num_samples = compressed_data.shape[1]
 
-    # run compressed peak detection
-    peak_valley_tuple = peak_detection.compressed_peak_detector(
-        compressed_data, peakind, noise_free_data
+    compressed_peak_and_valley_indices = peak_detector(
+        compressed_data, twitches_point_up=False
+    )
+    _plot_data(
+        compressed_peak_and_valley_indices,
+        compressed_data,
+        os.path.join(PATH_TO_PNGS, f"{file_prefix}_compressed.png"),
+    )
+    (
+        compressed_per_twitch_dict,
+        compressed_aggregate_metrics_dict,
+    ) = peak_detection.data_metrics(compressed_peak_and_valley_indices, compressed_data)
+
+    return (
+        new_num_samples,
+        original_num_samples,
+        compressed_per_twitch_dict,
+        compressed_aggregate_metrics_dict,
+        original_per_twitch_dict,
+        original_aggregate_metrics_dict,
     )
 
-    # determine data metrics
-    per_beat_dict, window_dict = peak_detection.data_metrics(
-        peak_valley_tuple, compressed_data
-    )
 
-    # determine twitch widths
-    widths_dict = peak_detection.twitch_widths(peak_valley_tuple, compressed_data)
+def test_new_A1_compression(new_A1, generic_pipeline_template):
+    (
+        new_num_samples,
+        original_num_samples,
+        compressed_per_twitch_dict,
+        compressed_aggregate_metrics_dict,
+        original_per_twitch_dict,
+        original_aggregate_metrics_dict,
+    ) = _get_info_for_compression(new_A1, "new_A1", generic_pipeline_template)
 
-    compress_peakind = np.concatenate([peak_valley_tuple[0], peak_valley_tuple[1]])
-    compress_peakind.sort()
-
-    # creating local path for plotting
-    my_local_path_graphs = os.path.join(PATH_TO_PNGS, "new_A1_compressed.png")
-
-    # plot compressed data for visual inspection
-    plt.figure()
-    plt.plot(compressed_data[0], compressed_data[1])
-    plt.plot(
-        compressed_data[0][compress_peakind], compressed_data[1][compress_peakind], "ro"
-    )
-    plt.xlabel("Time (centimilliseconds)")
-    plt.ylabel("Voltage (V)")
-    plt.savefig(my_local_path_graphs)
-
-    # make sure sampling rate has been reduced by at least 75%
-    assert new_sample_rate <= (original_sampling_rate * COMPRESSION_FACTOR)
+    # make sure sampling rate has been reduced by appropriate amount
+    assert new_num_samples <= (original_num_samples * COMPRESSION_FACTOR)
 
     # make sure data metrics have not been altered heavily
-    assert (
-        np.absolute(
-            window_dict_original[AUC_UUID]["mean"] - window_dict[AUC_UUID]["mean"]
-        )
-        / window_dict_original[AUC_UUID]["mean"]
-    ) <= COMPRESSION_ACCURACY  # currently 6.7%
-    this_twitch_idx = 105000
-    assert (
-        np.absolute(
-            per_beat_dict_original[this_twitch_idx][AUC_UUID]
-            - per_beat_dict[this_twitch_idx][AUC_UUID]
-        )
-        / per_beat_dict_original[this_twitch_idx][AUC_UUID]
-    ) <= COMPRESSION_ACCURACY  # currently 1.2%
-
-    assert (
-        np.absolute(
-            widths_dict_original[this_twitch_idx][10][2] - widths_dict[105000][10][2]
-        )
-        / widths_dict_original[this_twitch_idx][10][2]
-    ) <= COMPRESSION_ACCURACY  # currently 5.6%
-
-
-def test_new_A2_compression(new_A2):
-    # data creation, noise cancellation, peak detection
-    _, _, peakind, original_sampling_rate, noise_free_data = new_A2
-
-    # determine data metrics of original data
-    per_beat_dict_original, window_dict_original = peak_detection.data_metrics(
-        peakind, noise_free_data
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict[AUC_UUID]["mean"],
+        original_aggregate_metrics_dict[AUC_UUID]["mean"],
+        threshold=COMPRESSION_ACCURACY,
     )
-    widths_dict_original = peak_detection.twitch_widths(peakind, noise_free_data)
-
-    # compress the data
-    compressed_data = compress_filtered_gmr(noise_free_data)
-    new_sample_rate = int(len(compressed_data[0, :]) / 10)
-
-    # run compressed peak detection
-    peak_valley_tuple = peak_detection.compressed_peak_detector(
-        compressed_data, peakind, noise_free_data
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict[AMPLITUDE_UUID]["mean"],
+        original_aggregate_metrics_dict[AMPLITUDE_UUID]["mean"],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict[TWITCH_PERIOD_UUID]["mean"],
+        original_aggregate_metrics_dict[TWITCH_PERIOD_UUID]["mean"],
+        threshold=COMPRESSION_ACCURACY,
     )
 
-    # determine data metrics
-    per_beat_dict, window_dict = peak_detection.data_metrics(
-        peak_valley_tuple, compressed_data
+    iter_twitch_timepoint = 105000
+    assert_percent_diff(
+        compressed_per_twitch_dict[104000][AUC_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][AUC_UUID],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_per_twitch_dict[104000][WIDTH_UUID][90][WIDTH_VALUE_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][
+            WIDTH_VALUE_UUID
+        ],
+        threshold=COMPRESSION_ACCURACY,
     )
 
-    # determine twitch widths
-    widths_dict = peak_detection.twitch_widths(peak_valley_tuple, compressed_data)
 
-    compress_peakind = np.concatenate([peak_valley_tuple[0], peak_valley_tuple[1]])
-    compress_peakind.sort()
+def test_new_A2_compression(new_A2, generic_pipeline_template):
+    (
+        new_num_samples,
+        original_num_samples,
+        compressed_per_twitch_dict,
+        compressed_aggregate_metrics_dict,
+        original_per_twitch_dict,
+        original_aggregate_metrics_dict,
+    ) = _get_info_for_compression(new_A2, "new_A2", generic_pipeline_template)
 
-    # creating local path for plotting
-    my_local_path_graphs = os.path.join(PATH_TO_PNGS, "new_A2_compressed.png")
-
-    # plot compressed data for visual inspection
-    plt.figure()
-    plt.plot(compressed_data[0], compressed_data[1], "o-b")
-    plt.plot(
-        compressed_data[0][compress_peakind], compressed_data[1][compress_peakind], "ro"
-    )
-    plt.xlabel("Time (centimilliseconds)")
-    plt.ylabel("Voltage (V)")
-    plt.savefig(my_local_path_graphs)
-
-    # make sure sampling rate has been reduced by at least 75%
-    assert new_sample_rate <= (original_sampling_rate * COMPRESSION_FACTOR)
+    # make sure sampling rate has been reduced by appropriate amount
+    assert new_num_samples <= (original_num_samples * COMPRESSION_FACTOR)
 
     # make sure data metrics have not been altered heavily
-    assert (
-        np.absolute(
-            window_dict_original[AUC_UUID]["mean"] - window_dict[AUC_UUID]["mean"]
-        )
-        / window_dict_original[AUC_UUID]["mean"]
-    ) < COMPRESSION_ACCURACY  # currently < 5%
-    this_twitch_idx = 104000
-    assert (
-        np.absolute(
-            per_beat_dict_original[this_twitch_idx][AUC_UUID]
-            - per_beat_dict[this_twitch_idx][AUC_UUID]
-        )
-        / per_beat_dict_original[this_twitch_idx][AUC_UUID]
-    ) < COMPRESSION_ACCURACY  # currently 12.5%
-
-    assert (
-        np.absolute(
-            widths_dict_original[this_twitch_idx][10][2] - widths_dict[104000][10][2]
-        )
-        / widths_dict_original[this_twitch_idx][10][2]
-    ) < COMPRESSION_ACCURACY  # currently 3.12%
-
-
-def test_new_A3_compression(new_A3):
-    # data creation, noise cancellation, peak detection
-    _, _, peakind, original_sampling_rate, noise_free_data = new_A3
-
-    # determine data metrics of original data
-    per_beat_dict_original, window_dict_original = peak_detection.data_metrics(
-        peakind, noise_free_data
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict[AUC_UUID]["mean"],
+        original_aggregate_metrics_dict[AUC_UUID]["mean"],
+        threshold=COMPRESSION_ACCURACY,
     )
-    widths_dict_original = peak_detection.twitch_widths(peakind, noise_free_data)
-
-    # compress the data
-    compressed_data = compress_filtered_gmr(noise_free_data)
-    new_sample_rate = int(len(compressed_data[0, :]) / 10)
-
-    # run compressed peak detection
-    peak_valley_tuple = peak_detection.compressed_peak_detector(
-        compressed_data, peakind, noise_free_data
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict[AMPLITUDE_UUID]["mean"],
+        original_aggregate_metrics_dict[AMPLITUDE_UUID]["mean"],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict[TWITCH_PERIOD_UUID]["mean"],
+        original_aggregate_metrics_dict[TWITCH_PERIOD_UUID]["mean"],
+        threshold=COMPRESSION_ACCURACY,
     )
 
-    # determine data metrics
-    per_beat_dict, window_dict = peak_detection.data_metrics(
-        peak_valley_tuple, compressed_data
+    iter_twitch_timepoint = 104000
+    assert_percent_diff(
+        compressed_per_twitch_dict[104000][AUC_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][AUC_UUID],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_per_twitch_dict[104000][WIDTH_UUID][90][WIDTH_VALUE_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][
+            WIDTH_VALUE_UUID
+        ],
+        threshold=COMPRESSION_ACCURACY,
     )
 
-    # determine twitch widths
-    widths_dict = peak_detection.twitch_widths(peak_valley_tuple, compressed_data)
 
-    compress_peakind = np.concatenate([peak_valley_tuple[0], peak_valley_tuple[1]])
-    compress_peakind.sort()
+def test_new_A3_compression(new_A3, generic_pipeline_template):
+    (
+        new_num_samples,
+        original_num_samples,
+        compressed_per_twitch_dict,
+        compressed_aggregate_metrics_dict,
+        original_per_twitch_dict,
+        original_aggregate_metrics_dict,
+    ) = _get_info_for_compression(new_A3, "new_A3", generic_pipeline_template)
 
-    # creating local path for plotting
-    my_local_path_graphs = os.path.join(PATH_TO_PNGS, "new_A3_compressed.png")
-
-    # plot compressed data for visual inspection
-    plt.figure()
-    plt.plot(compressed_data[0], compressed_data[1], "o-b")
-    plt.plot(
-        compressed_data[0][compress_peakind], compressed_data[1][compress_peakind], "ro"
-    )
-    plt.xlabel("Time (centimilliseconds)")
-    plt.ylabel("Voltage (V)")
-    plt.savefig(my_local_path_graphs)
-
-    # make sure sampling rate has been reduced by at least 75%
-    assert new_sample_rate <= (original_sampling_rate * COMPRESSION_FACTOR)
+    # make sure sampling rate has been reduced by appropriate amount
+    assert new_num_samples <= (original_num_samples * COMPRESSION_FACTOR)
 
     # make sure data metrics have not been altered heavily
-    assert (
-        np.absolute(
-            window_dict_original[AUC_UUID]["mean"] - window_dict[AUC_UUID]["mean"]
-        )
-        / window_dict_original[AUC_UUID]["mean"]
-    ) < COMPRESSION_ACCURACY
-    this_twitch_idx = 108000
-    assert (
-        np.absolute(
-            per_beat_dict_original[this_twitch_idx][AUC_UUID]
-            - per_beat_dict[109000][AUC_UUID]
-        )
-        / per_beat_dict_original[this_twitch_idx][AUC_UUID]
-    ) < COMPRESSION_ACCURACY
-
-    this_twitch_idx = 266000
-    assert (
-        np.absolute(
-            widths_dict_original[this_twitch_idx][10][2] - widths_dict[267000][10][2]
-        )
-        / widths_dict_original[this_twitch_idx][10][2]
-    ) < COMPRESSION_ACCURACY
-
-
-def test_new_A4_compression(new_A4):
-    # data creation, noise cancellation, peak detection
-    _, _, peakind, original_sampling_rate, noise_free_data = new_A4
-
-    # determine data metrics of original data
-    per_beat_dict_original, window_dict_original = peak_detection.data_metrics(
-        peakind, noise_free_data
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict[AUC_UUID]["mean"],
+        original_aggregate_metrics_dict[AUC_UUID]["mean"],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict[AMPLITUDE_UUID]["mean"],
+        original_aggregate_metrics_dict[AMPLITUDE_UUID]["mean"],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict[TWITCH_PERIOD_UUID]["mean"],
+        original_aggregate_metrics_dict[TWITCH_PERIOD_UUID]["mean"],
+        threshold=COMPRESSION_ACCURACY,
     )
 
-    # compress the data
-    compressed_data = compress_filtered_gmr(noise_free_data)
-    new_sample_rate = int(len(compressed_data[0, :]) / 10)
-
-    # run compressed peak detection
-    peak_valley_tuple = peak_detection.compressed_peak_detector(
-        compressed_data, peakind, noise_free_data
+    iter_twitch_timepoint = 108000
+    assert_percent_diff(
+        compressed_per_twitch_dict[109000][AUC_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][AUC_UUID],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_per_twitch_dict[109000][WIDTH_UUID][90][WIDTH_VALUE_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][
+            WIDTH_VALUE_UUID
+        ],
+        threshold=COMPRESSION_ACCURACY,
     )
 
-    # determine data metrics
-    per_beat_dict, window_dict = peak_detection.data_metrics(
-        peak_valley_tuple, compressed_data
-    )
 
-    # determine twitch widths
-    widths_dict = peak_detection.twitch_widths(peak_valley_tuple, compressed_data)
+def test_new_A4_compression(new_A4, generic_pipeline_template):
+    (
+        new_num_samples,
+        original_num_samples,
+        compressed_per_twitch_dict,
+        compressed_aggregate_metrics_dict,
+        original_per_twitch_dict,
+        original_aggregate_metrics_dict,
+    ) = _get_info_for_compression(new_A4, "new_A4", generic_pipeline_template)
 
-    compress_peakind = np.concatenate([peak_valley_tuple[0], peak_valley_tuple[1]])
-    compress_peakind.sort()
-
-    # creating local path for plotting
-    my_local_path_graphs = os.path.join(PATH_TO_PNGS, "new_A4_compressed.png")
-
-    # plot compressed data for visual inspection
-    plt.figure()
-    plt.plot(compressed_data[0], compressed_data[1])
-    plt.plot(
-        compressed_data[0][compress_peakind], compressed_data[1][compress_peakind], "ro"
-    )
-    plt.xlabel("Time (centimilliseconds)")
-    plt.ylabel("Voltage (V)")
-    plt.savefig(my_local_path_graphs)
-
-    # make sure sampling rate has been reduced by at least 75%
-    assert new_sample_rate <= (original_sampling_rate * COMPRESSION_FACTOR)
-
+    # make sure sampling rate has been reduced by appropriate amount
+    assert new_num_samples <= (original_num_samples * COMPRESSION_FACTOR)
     # make sure data metrics have not been altered heavily
-    assert (
-        np.absolute(
-            window_dict_original[AUC_UUID]["mean"] - window_dict[AUC_UUID]["mean"]
-        )
-        / window_dict_original[AUC_UUID]["mean"]
-    ) <= COMPRESSION_ACCURACY
-    this_twitch_idx = 81000
-    assert (
-        np.absolute(
-            per_beat_dict_original[this_twitch_idx][AUC_UUID]
-            - per_beat_dict[this_twitch_idx][AUC_UUID]
-        )
-        / per_beat_dict_original[this_twitch_idx][AUC_UUID]
-    ) <= COMPRESSION_ACCURACY
-    assert (
-        np.absolute(9000 - widths_dict[81000][10][2]) / 30000
-    ) <= COMPRESSION_ACCURACY
-
-
-def test_new_A5_compression(new_A5):
-    # data creation, noise cancellation, peak detection
-    _, _, peakind, original_sampling_rate, noise_free_data = new_A5
-
-    # determine data metrics of original data
-    per_beat_dict_original, window_dict_original = peak_detection.data_metrics(
-        peakind, noise_free_data
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict[AUC_UUID]["mean"],
+        original_aggregate_metrics_dict[AUC_UUID]["mean"],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict[AMPLITUDE_UUID]["mean"],
+        original_aggregate_metrics_dict[AMPLITUDE_UUID]["mean"],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict[TWITCH_PERIOD_UUID]["mean"],
+        original_aggregate_metrics_dict[TWITCH_PERIOD_UUID]["mean"],
+        threshold=COMPRESSION_ACCURACY,
     )
 
-    widths_dict_original = peak_detection.twitch_widths(peakind, noise_free_data)
-
-    # compress the data
-    compressed_data = compress_filtered_gmr(noise_free_data)
-    # print (noise_free_data.shape)
-    # print (compressed_data.shape)
-    new_sample_rate = int(len(compressed_data[0, :]) / 10)
-
-    # run compressed peak detection
-    peak_valley_tuple = peak_detection.compressed_peak_detector(
-        compressed_data, peakind, noise_free_data
+    iter_twitch_timepoint = 137000
+    assert_percent_diff(
+        compressed_per_twitch_dict[iter_twitch_timepoint][AUC_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][AUC_UUID],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][
+            WIDTH_VALUE_UUID
+        ],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][
+            WIDTH_VALUE_UUID
+        ],
+        threshold=COMPRESSION_ACCURACY,
     )
 
-    # determine data metrics
-    per_beat_dict, window_dict = peak_detection.data_metrics(
-        peak_valley_tuple, compressed_data
-    )
 
-    # determine twitch widths
-    widths_dict = peak_detection.twitch_widths(peak_valley_tuple, compressed_data)
+def test_new_A5_compression(new_A5, generic_pipeline_template):
+    (
+        new_num_samples,
+        original_num_samples,
+        compressed_per_twitch_dict,
+        compressed_aggregate_metrics_dict,
+        original_per_twitch_dict,
+        original_aggregate_metrics_dict,
+    ) = _get_info_for_compression(new_A5, "new_A5", generic_pipeline_template)
 
-    compress_peakind = np.concatenate([peak_valley_tuple[0], peak_valley_tuple[1]])
-    compress_peakind.sort()
-
-    # creating local path for plotting
-    my_local_path_graphs = os.path.join(PATH_TO_PNGS, "new_A5_compressed.png")
-
-    # plot compressed data for visual inspection
-    plt.figure()
-    plt.plot(compressed_data[0], compressed_data[1])
-    plt.plot(
-        compressed_data[0][compress_peakind], compressed_data[1][compress_peakind], "ro"
-    )
-    plt.xlabel("Time (centimilliseconds)")
-    plt.ylabel("Voltage (V)")
-    plt.savefig(my_local_path_graphs)
-
-    # make sure sampling rate has been reduced by at least 75%
-    assert new_sample_rate <= (original_sampling_rate * COMPRESSION_FACTOR)
-
+    # make sure sampling rate has been reduced by appropriate amount
+    assert new_num_samples <= (original_num_samples * COMPRESSION_FACTOR)
     # make sure data metrics have not been altered heavily
-    assert (
-        np.absolute(
-            window_dict_original[AUC_UUID]["mean"] - window_dict[AUC_UUID]["mean"]
-        )
-        / window_dict_original[AUC_UUID]["mean"]
-    ) < COMPRESSION_ACCURACY
-    this_twitch_idx = 80000
-    assert (
-        np.absolute(
-            per_beat_dict_original[this_twitch_idx][AUC_UUID]
-            - per_beat_dict[this_twitch_idx][AUC_UUID]
-        )
-        / per_beat_dict_original[this_twitch_idx][AUC_UUID]
-    ) < COMPRESSION_ACCURACY
-    assert (
-        np.absolute(
-            widths_dict_original[this_twitch_idx][10][2]
-            - widths_dict[this_twitch_idx][10][2]
-        )
-        / widths_dict_original[this_twitch_idx][10][2]
-    ) < COMPRESSION_ACCURACY
-
-
-def test_new_A6_compression(new_A6):
-    # data creation, noise cancellation, peak detection
-    _, _, peakind, original_sampling_rate, noise_free_data = new_A6
-
-    # determine data metrics of original data
-    per_beat_dict_original, window_dict_original = peak_detection.data_metrics(
-        peakind, noise_free_data
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict[AUC_UUID]["mean"],
+        original_aggregate_metrics_dict[AUC_UUID]["mean"],
+        threshold=COMPRESSION_ACCURACY,
     )
-    widths_dict_original = peak_detection.twitch_widths(peakind, noise_free_data)
-
-    # compress the data
-    compressed_data = compress_filtered_gmr(noise_free_data)
-    new_sample_rate = int(len(compressed_data[0, :]) / 10)
-
-    # run compressed peak detection
-    peak_valley_tuple = peak_detection.compressed_peak_detector(
-        compressed_data, peakind, noise_free_data
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict[AMPLITUDE_UUID]["mean"],
+        original_aggregate_metrics_dict[AMPLITUDE_UUID]["mean"],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict[TWITCH_PERIOD_UUID]["mean"],
+        original_aggregate_metrics_dict[TWITCH_PERIOD_UUID]["mean"],
+        threshold=COMPRESSION_ACCURACY,
     )
 
-    # determine data metrics of compressed data
-    per_beat_dict, window_dict = peak_detection.data_metrics(
-        peak_valley_tuple, compressed_data
+    iter_twitch_timepoint = 197000
+    assert_percent_diff(
+        compressed_per_twitch_dict[iter_twitch_timepoint][AUC_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][AUC_UUID],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][
+            WIDTH_VALUE_UUID
+        ],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][
+            WIDTH_VALUE_UUID
+        ],
+        threshold=COMPRESSION_ACCURACY,
     )
 
-    # determine twitch widths of compressed data
-    widths_dict = peak_detection.twitch_widths(peak_valley_tuple, compressed_data)
 
-    compress_peakind = np.concatenate([peak_valley_tuple[0], peak_valley_tuple[1]])
-    compress_peakind.sort()
+def nottest_new_A6_compression(new_A6, generic_pipeline_template):
+    (
+        new_num_samples,
+        original_num_samples,
+        compressed_per_twitch_dict,
+        compressed_aggregate_metrics_dict,
+        original_per_twitch_dict,
+        original_aggregate_metrics_dict,
+    ) = _get_info_for_compression(new_A6, "new_A6", generic_pipeline_template)
 
-    # creating local path for plotting
-    my_local_path_graphs = os.path.join(PATH_TO_PNGS, "new_A6_compressed.png")
-
-    # plot compressed data for visual inspection
-    plt.figure()
-    plt.plot(compressed_data[0], compressed_data[1])
-    plt.plot(
-        compressed_data[0][compress_peakind], compressed_data[1][compress_peakind], "ro"
-    )
-    plt.xlabel("Time (centimilliseconds)")
-    plt.ylabel("Voltage (V)")
-    plt.savefig(my_local_path_graphs)
-
-    # make sure sampling rate has been reduced by at least 75%
-    assert new_sample_rate <= (original_sampling_rate * COMPRESSION_FACTOR)
-
+    # make sure sampling rate has been reduced by appropriate amount
+    assert new_num_samples <= (original_num_samples * COMPRESSION_FACTOR)
     # make sure data metrics have not been altered heavily
-    assert (
-        np.absolute(
-            window_dict_original[AUC_UUID]["mean"] - window_dict[AUC_UUID]["mean"]
-        )
-        / window_dict_original[AUC_UUID]["mean"]
-    ) < COMPRESSION_ACCURACY
-    this_twitch_idx = 88000
-    assert (
-        np.absolute(
-            per_beat_dict_original[this_twitch_idx][AUC_UUID]
-            - per_beat_dict[this_twitch_idx][AUC_UUID]
-        )
-        / per_beat_dict_original[this_twitch_idx][AUC_UUID]
-    ) < COMPRESSION_ACCURACY
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict[AUC_UUID]["mean"],
+        original_aggregate_metrics_dict[AUC_UUID]["mean"],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict[AMPLITUDE_UUID]["mean"],
+        original_aggregate_metrics_dict[AMPLITUDE_UUID]["mean"],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict[TWITCH_PERIOD_UUID]["mean"],
+        original_aggregate_metrics_dict[TWITCH_PERIOD_UUID]["mean"],
+        threshold=COMPRESSION_ACCURACY,
+    )
 
-    this_twitch_idx = 201000
-    assert (
-        np.absolute(
-            widths_dict_original[this_twitch_idx][90][2]
-            - widths_dict[this_twitch_idx][90][2]
-        )
-        / widths_dict_original[this_twitch_idx][90][2]
-    ) < COMPRESSION_ACCURACY
+    iter_twitch_timepoint = 201000
+    assert_percent_diff(
+        compressed_per_twitch_dict[iter_twitch_timepoint][AUC_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][AUC_UUID],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][
+            WIDTH_VALUE_UUID
+        ],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][
+            WIDTH_VALUE_UUID
+        ],
+        threshold=COMPRESSION_ACCURACY,
+    )

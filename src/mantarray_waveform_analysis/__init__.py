@@ -8,11 +8,23 @@ from .constants import BESSEL_BANDPASS_UUID
 from .constants import BESSEL_LOWPASS_10_UUID
 from .constants import CENTIMILLISECONDS_PER_SECOND
 from .constants import MIDSCALE_CODE
+from .constants import PRIOR_PEAK_INDEX_UUID
+from .constants import PRIOR_VALLEY_INDEX_UUID
 from .constants import RAW_TO_SIGNED_CONVERSION_VALUE
+from .constants import SUBSEQUENT_PEAK_INDEX_UUID
+from .constants import SUBSEQUENT_VALLEY_INDEX_UUID
 from .constants import TWITCH_PERIOD_UUID
+from .constants import WIDTH_FALLING_COORDS_UUID
+from .constants import WIDTH_RISING_COORDS_UUID
+from .constants import WIDTH_UUID
+from .constants import WIDTH_VALUE_UUID
 from .exceptions import DataAlreadyLoadedInPipelineError
 from .exceptions import FilterCreationNotImplementedError
+from .exceptions import TwoPeaksInARowError
+from .exceptions import TwoValleysInARowError
 from .exceptions import UnrecognizedFilterUuidError
+from .peak_detection import find_twitch_indices
+from .peak_detection import peak_detector
 from .pipelines import Pipeline
 from .pipelines import PipelineTemplate
 from .transforms import apply_empty_plate_calibration
@@ -35,8 +47,16 @@ __all__ = [
     "transforms",
     "pipelines",
     "TWITCH_PERIOD_UUID",
+    "PRIOR_PEAK_INDEX_UUID",
+    "PRIOR_VALLEY_INDEX_UUID",
+    "SUBSEQUENT_PEAK_INDEX_UUID",
+    "SUBSEQUENT_VALLEY_INDEX_UUID",
     "AMPLITUDE_UUID",
     "AUC_UUID",
+    "WIDTH_UUID",
+    "WIDTH_VALUE_UUID",
+    "WIDTH_RISING_COORDS_UUID",
+    "WIDTH_FALLING_COORDS_UUID",
     "CENTIMILLISECONDS_PER_SECOND",
     "MIDSCALE_CODE",
     "RAW_TO_SIGNED_CONVERSION_VALUE",
@@ -48,6 +68,8 @@ __all__ = [
     "UnrecognizedFilterUuidError",
     "FilterCreationNotImplementedError",
     "DataAlreadyLoadedInPipelineError",
+    "TwoPeaksInARowError",
+    "TwoValleysInARowError",
     "BESSEL_BANDPASS_UUID",
     "BESSEL_LOWPASS_10_UUID",
     "FILTER_CHARACTERISTICS",
@@ -56,4 +78,6 @@ __all__ = [
     "calculate_displacement_from_voltage",
     "PipelineTemplate",
     "Pipeline",
+    "peak_detector",
+    "find_twitch_indices",
 ]
