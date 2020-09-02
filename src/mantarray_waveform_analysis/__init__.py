@@ -8,6 +8,7 @@ from .constants import BESSEL_BANDPASS_UUID
 from .constants import BESSEL_LOWPASS_10_UUID
 from .constants import CENTIMILLISECONDS_PER_SECOND
 from .constants import MIDSCALE_CODE
+from .constants import MIN_NUMBER_PEAKS
 from .constants import PRIOR_PEAK_INDEX_UUID
 from .constants import PRIOR_VALLEY_INDEX_UUID
 from .constants import RAW_TO_SIGNED_CONVERSION_VALUE
@@ -20,6 +21,7 @@ from .constants import WIDTH_UUID
 from .constants import WIDTH_VALUE_UUID
 from .exceptions import DataAlreadyLoadedInPipelineError
 from .exceptions import FilterCreationNotImplementedError
+from .exceptions import TooFewPeaksDetectedError
 from .exceptions import TwoPeaksInARowError
 from .exceptions import TwoValleysInARowError
 from .exceptions import UnrecognizedFilterUuidError
@@ -80,4 +82,6 @@ __all__ = [
     "Pipeline",
     "peak_detector",
     "find_twitch_indices",
+    "TooFewPeaksDetectedError",
+    "MIN_NUMBER_PEAKS",
 ]

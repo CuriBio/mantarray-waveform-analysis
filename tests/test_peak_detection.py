@@ -4,11 +4,13 @@ import os
 from mantarray_waveform_analysis import AMPLITUDE_UUID
 from mantarray_waveform_analysis import AUC_UUID
 from mantarray_waveform_analysis import find_twitch_indices
+from mantarray_waveform_analysis import MIN_NUMBER_PEAKS
 from mantarray_waveform_analysis import peak_detector
 from mantarray_waveform_analysis import PRIOR_PEAK_INDEX_UUID
 from mantarray_waveform_analysis import PRIOR_VALLEY_INDEX_UUID
 from mantarray_waveform_analysis import SUBSEQUENT_PEAK_INDEX_UUID
 from mantarray_waveform_analysis import SUBSEQUENT_VALLEY_INDEX_UUID
+from mantarray_waveform_analysis import TooFewPeaksDetectedError
 from mantarray_waveform_analysis import TWITCH_PERIOD_UUID
 from mantarray_waveform_analysis import TwoPeaksInARowError
 from mantarray_waveform_analysis import WIDTH_FALLING_COORDS_UUID
@@ -1012,6 +1014,14 @@ def test_maiden_voyage_data_peak_detection(maiden_voyage_data):
 
     assert np.array_equal(peak_indices, expected_peak_indices)
     assert np.array_equal(valley_indices, expected_valley_indices)
+
+
+def test_find_twitch_indices__raises_error_if_less_than_3_peaks_given():
+    with pytest.raises(
+        TooFewPeaksDetectedError,
+        match=rf"A minimum of {MIN_NUMBER_PEAKS} peaks is required to extract twitch metrics, however only 2 peak\(s\) were detected",
+    ):
+        find_twitch_indices((np.array([1, 2]), None), None)
 
 
 def test_find_twitch_indices__excludes_first_and_last_peak_when_no_outer_valleys(

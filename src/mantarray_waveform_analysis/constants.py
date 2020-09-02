@@ -26,3 +26,5 @@ RAW_TO_SIGNED_CONVERSION_VALUE = 2 ** 23  # subtract this value from raw hardwar
 # REFERENCE_VOLTAGE = 3.3
 
 # ADC_GAIN = 32
+
+MIN_NUMBER_PEAKS = 3

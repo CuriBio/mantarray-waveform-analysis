@@ -46,3 +46,7 @@ class TwoPeaksInARowError(PeakDetectionError):
             base_msg = f"Detected peak timepoints: {peak_timepoints}\nDetected valley timepoints: {valley_timepoints}\nData used in peak detection: {filtered_data}\n"
         prepend_msg = f"Two back-to-back features in a row were detected at timepoints: {back_to_back_points[0]} and {back_to_back_points[1]}\n"
         super().__init__(prepend_msg + base_msg)
+
+
+class TooFewPeaksDetectedError(PeakDetectionError):
+    pass
