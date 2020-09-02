@@ -45,6 +45,11 @@ def test_filter_characteristics():
             "order": 4,
             "low_pass_hz": 10,
         },
+        BESSEL_LOWPASS_30_UUID: {
+            "filter_type": "bessel",
+            "order": 4,
+            "low_pass_hz": 30,
+        },
     }
 
 
