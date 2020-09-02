@@ -17,6 +17,7 @@ from scipy import signal
 from .constants import AMPLITUDE_UUID
 from .constants import AUC_UUID
 from .constants import CENTIMILLISECONDS_PER_SECOND
+from .constants import MIN_NUMBER_PEAKS
 from .constants import PRIOR_PEAK_INDEX_UUID
 from .constants import PRIOR_VALLEY_INDEX_UUID
 from .constants import SUBSEQUENT_PEAK_INDEX_UUID
@@ -26,6 +27,7 @@ from .constants import WIDTH_FALLING_COORDS_UUID
 from .constants import WIDTH_RISING_COORDS_UUID
 from .constants import WIDTH_UUID
 from .constants import WIDTH_VALUE_UUID
+from .exceptions import TooFewPeaksDetectedError
 from .exceptions import TwoPeaksInARowError
 
 TWITCH_WIDTH_PERCENTS = range(10, 95, 5)
@@ -251,6 +253,10 @@ def find_twitch_indices(
         a 1D array of integers representing the time points of all the twitches
     """
     peak_indices, valley_indices = peak_and_valley_indices
+    if len(peak_indices) < MIN_NUMBER_PEAKS:
+        raise TooFewPeaksDetectedError(
+            f"A minimum of {MIN_NUMBER_PEAKS} peaks is required to extract twitch metrics, however only {len(peak_indices)} peak(s) were detected"
+        )
     twitches: Dict[int, Dict[UUID, Optional[int]]] = {}
     starts_with_peak = peak_indices[0] < valley_indices[0]
     # ends_with_peak = peak_indices[-1] > valley_indices[-1]
