@@ -12,6 +12,7 @@ from scipy import signal
 
 from .constants import BESSEL_BANDPASS_UUID
 from .constants import BESSEL_LOWPASS_10_UUID
+from .constants import BESSEL_LOWPASS_30_UUID
 from .constants import CENTIMILLISECONDS_PER_SECOND
 from .constants import RAW_TO_SIGNED_CONVERSION_VALUE
 from .exceptions import FilterCreationNotImplementedError
@@ -25,6 +26,7 @@ FILTER_CHARACTERISTICS: Dict[uuid.UUID, Dict[str, Union[str, float, int]]] = {
         "low_pass_hz": 10,
     },
     BESSEL_LOWPASS_10_UUID: {"filter_type": "bessel", "order": 4, "low_pass_hz": 10,},
+    BESSEL_LOWPASS_30_UUID: {"filter_type": "bessel", "order": 4, "low_pass_hz": 30,},
 }
 
 
