@@ -65,6 +65,7 @@ def test_compression_performance(new_A1):
     # fully converting rsquared to cython:    2518059
     # adding cpdef to rsquared:               1723097
     # better C typing:                         190731
+    # linetrace=False:                         181949.9
 
     pipeline, _ = new_A1
     filtered_data = pipeline.get_noise_filtered_gmr()
