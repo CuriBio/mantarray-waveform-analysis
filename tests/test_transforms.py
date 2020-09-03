@@ -8,6 +8,7 @@ from mantarray_waveform_analysis import apply_noise_filtering
 from mantarray_waveform_analysis import apply_sensitivity_calibration
 from mantarray_waveform_analysis import BESSEL_BANDPASS_UUID
 from mantarray_waveform_analysis import BESSEL_LOWPASS_10_UUID
+from mantarray_waveform_analysis import BESSEL_LOWPASS_30_UUID
 from mantarray_waveform_analysis import calculate_displacement_from_voltage
 from mantarray_waveform_analysis import calculate_voltage_from_gmr
 from mantarray_waveform_analysis import create_filter
@@ -111,6 +112,15 @@ def test_create_filter__raises_error_for_code_missing_to_generate_filter(mocker)
                 [1.0, 2.0, 1.0, 1.0, -1.140961, 0.4473],
             ],
             "bessel lowpass at 100 Hz / 1000 cms sampling, 10 Hz cutoff",
+        ),
+        (
+            BESSEL_LOWPASS_30_UUID,
+            160,
+            [
+                [3.357338e-04, 6.714677e-04, 3.357338e-04, 1.0, -1.511952, 0.5755379],
+                [1.0, 2.0, 1.0, 1.0, -1.589599, 0.6740787],
+            ],
+            "bessel lowpass at 625 Hz / 160 cms sampling, 30 Hz cutoff",
         ),
     ],
 )

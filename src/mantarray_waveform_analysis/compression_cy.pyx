@@ -1,5 +1,6 @@
-#cython: language_level=3
-#cython: linetrace=True
+# cython: language_level=3
+# Tanner (9/1/20): Make sure to set `linetrace=False` except when profiling cython code or creating annotation file. All performance tests should be timed without line tracing enabled. Cython files in this package can easily be recompiled with `pip install -e .`
+# cython: linetrace=False
 # Eli (8/18/20) ... not sure why cython doesn't default to compiling with Python 3...but apparently this is explicitly needed https://github.com/cython/cython/issues/2299
 """Compressions arrays of Mantarray GMR data ."""
 from typing import Any
@@ -9,7 +10,7 @@ import numpy as np
 
 cdef float R_SQUARE_CUTOFF = 0.94
 
-cpdef float rsquared(int [:] x_values, int [:] y_values):
+cpdef float rsquared(int[:] x_values, int[:] y_values):
     """Return R^2 where x and y are array-like.
     Instead of doing a full linear regression, the compression process drops all points in between the first and the last, so R^2 residuals are calculated based off of the line between the first and last points.
     Typically the time and filtered GMR readings are supplied as the x and y axis values respectively.
@@ -49,7 +50,7 @@ cpdef float rsquared(int [:] x_values, int [:] y_values):
     return 1 - ss_res / ss_tot
 
 
-def compress_filtered_gmr(int [:,:] data) -> NDArray[(2, Any), int]:
+def compress_filtered_gmr(int[:,:] data) -> NDArray[(2, Any), int]:
     """Compress the data to allow for better plotting in the desktop app.
 
     Args:
@@ -59,8 +60,8 @@ def compress_filtered_gmr(int [:,:] data) -> NDArray[(2, Any), int]:
         a 2D array containing slightly less points than the original data
     """
     # split time and GMR readings into individual arrays
-    cdef int [:] time = data[0, :]
-    cdef int [:] filtered_gmr = data[1, :]
+    cdef int[:] time = data[0, :]
+    cdef int[:] filtered_gmr = data[1, :]
     cdef int time_len = len(time)
 
     # create a boolean array of indicies that will be kept
@@ -68,8 +69,8 @@ def compress_filtered_gmr(int [:,:] data) -> NDArray[(2, Any), int]:
 
     # loop through values in time and filtered_gmr to determine what to compress
     cdef int left_idx, right_idx
-    cdef int [:] subset_time
-    cdef int [:] subset_filtered_gmr
+    cdef int[:] subset_time
+    cdef int[:] subset_filtered_gmr
 
     left_idx = 0
     while left_idx < time_len - 2:
