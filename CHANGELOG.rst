@@ -6,6 +6,7 @@ Changelog for Mantarray Waveform Analysis
 
 - Added Twitch Frequency metric.
 - Added peak detetection and metric calculation (for magnetic signal) to Pipeline.
+- Created alias of load_raw_magnetic_data to become more generic
 
 
 0.4.1 (2020-09-02)

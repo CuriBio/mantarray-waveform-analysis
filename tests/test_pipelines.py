@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from unittest.mock import ANY
+
 from mantarray_waveform_analysis import BESSEL_LOWPASS_10_UUID
 from mantarray_waveform_analysis import DataAlreadyLoadedInPipelineError
 from mantarray_waveform_analysis import Pipeline
@@ -170,6 +172,13 @@ def test_Pipeline__get_sensitivity_calibrated_reference_gmr__calls_correct_metho
             [lambda the_pipeline: the_pipeline.get_compressed_voltage()],
             "converting compressed voltage data to displacement",
         ),
+        (
+            "trampoline",
+            "peak_detector",
+            lambda the_pipeline: the_pipeline.get_peak_detection_results(),
+            [lambda the_pipeline: the_pipeline.get_noise_filtered_gmr()],
+            "detecting the peaks in the magnetic traces",
+        ),
     ],
 )
 def test_Pipeline__get_data_type__calls_correct_methods_to_perform_action__but_does_not_call_again_repeatedly(
@@ -241,3 +250,29 @@ def test_Pipeline__get_filter_coefficients__does_not_repeatedly_generate_new_fil
     new_coefficients = generic_pipeline_template.get_filter_coefficients()
     assert spied_bessel.call_count == 1
     assert new_coefficients is original_coefficients
+
+
+def test_Pipeline__get_peak_detection_info__passes_twitches_point_up_parameter_when_default_false(
+    mocker, raw_generic_well_a1
+):
+    pt = PipelineTemplate(100)
+    pipeline = pt.create_pipeline()
+    pipeline.load_raw_magnetic_data(raw_generic_well_a1, raw_generic_well_a1)
+    mocked_peak_detection = mocker.patch.object(
+        pipelines, "peak_detector", autospec=True
+    )
+    pipeline.get_peak_detection_results()
+    mocked_peak_detection.assert_called_once_with(ANY, twitches_point_up=False)
+
+
+def test_Pipeline__get_peak_detection_info__passes_twitches_point_up_parameter_when_true(
+    mocker, raw_generic_well_a1
+):
+    pt = PipelineTemplate(100, magnetic_twitches_point_up=True)
+    pipeline = pt.create_pipeline()
+    pipeline.load_raw_magnetic_data(raw_generic_well_a1, raw_generic_well_a1)
+    mocked_peak_detection = mocker.patch.object(
+        pipelines, "peak_detector", autospec=True
+    )
+    pipeline.get_peak_detection_results()
+    mocked_peak_detection.assert_called_once_with(ANY, twitches_point_up=True)

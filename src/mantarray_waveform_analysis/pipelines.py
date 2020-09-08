@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 """Transforming arrays of Mantarray data throughout the analysis pipeline."""
 from typing import Any
+from typing import List
 from typing import Optional
+from typing import Tuple
 import uuid
 
 import attr
@@ -9,6 +11,7 @@ from nptyping import NDArray
 import numpy as np
 
 from .exceptions import DataAlreadyLoadedInPipelineError
+from .peak_detection import peak_detector
 from .transforms import apply_empty_plate_calibration
 from .transforms import apply_noise_filtering
 from .transforms import apply_sensitivity_calibration
@@ -32,6 +35,7 @@ class Pipeline:
         pipeline_template: The PipelineTemplate instance that should be used to control the settings and operation of this analysis pipeline.
     """
 
+    # pylint:disable=too-many-instance-attributes # Eli (9/8/20): it's a pipeline with lots of stages
     def __init__(self, pipeline_template: "PipelineTemplate") -> None:
         self._pipeline_template = pipeline_template
         self._raw_tissue_gmr: NDArray[(2, Any), int]
@@ -44,28 +48,37 @@ class Pipeline:
         self._compressed_gmr: NDArray[(2, Any), int]
         self._compressed_voltage: NDArray[(2, Any), np.float32]
         self._compressed_displacement: NDArray[(2, Any), np.float32]
+        self._peak_detection_results: Tuple[List[int], List[int]]
 
     def get_template(self) -> "PipelineTemplate":
         return self._pipeline_template
+
+    def load_raw_magnetic_data(
+        self,
+        raw_tissue_magnetic_data: NDArray[(2, Any), int],
+        raw_reference_magnetic_data: NDArray[(2, Any), int],
+    ) -> None:
+        """Load the raw magnetic sensor numpy arrays into the pipeline.
+
+        Args:
+            raw_tissue_magnetic_data: 2D array of time (in centimilliseconds) and magnetic reading for the sensor under the tissue construct
+            raw_reference_magnetic_data: 2D array of time (in centimilliseconds) and magnetic reading for the sensor nearby the tissue construct
+        """
+        try:
+            self._raw_tissue_gmr
+        except AttributeError:
+            self._raw_tissue_gmr = raw_tissue_magnetic_data
+            self._raw_reference_gmr = raw_reference_magnetic_data
+            return
+        raise DataAlreadyLoadedInPipelineError()
 
     def load_raw_gmr_data(
         self,
         raw_tissue_gmr: NDArray[(2, Any), int],
         raw_reference_gmr: NDArray[(2, Any), int],
     ) -> None:
-        """Load the raw GMR numpy arrays into the pipeline.
-
-        Args:
-            raw_tissue_gmr: 2D array of time (in centimilliseconds) and GMR reading for the sensor under the tissue construct
-            raw_reference_gmr: 2D array of time (in centimilliseconds) and GMR reading for the sensor nearby the tissue construct
-        """
-        try:
-            self._raw_tissue_gmr
-        except AttributeError:
-            self._raw_tissue_gmr = raw_tissue_gmr
-            self._raw_reference_gmr = raw_reference_gmr
-            return
-        raise DataAlreadyLoadedInPipelineError()
+        """Call magnetic data using this deprecated alias."""
+        return self.load_raw_magnetic_data(raw_tissue_gmr, raw_reference_gmr)
 
     def get_raw_tissue_gmr(self) -> NDArray[(2, Any), int]:
         return self._raw_tissue_gmr
@@ -129,6 +142,18 @@ class Pipeline:
             )
         return self._noise_filtered_gmr
 
+    def get_peak_detection_results(self) -> Tuple[List[int], List[int]]:
+        """Return peak detection results on noise filtered magnetic data."""
+        try:
+            return self._peak_detection_results
+        except AttributeError:
+            pass
+        self._peak_detection_results = peak_detector(
+            self.get_noise_filtered_gmr(),
+            twitches_point_up=self._pipeline_template.magnetic_twitches_point_up,
+        )
+        return self._peak_detection_results
+
     def get_compressed_gmr(self) -> NDArray[(2, Any), int]:
         try:
             return self._compressed_gmr
@@ -167,6 +192,7 @@ class PipelineTemplate:  # pylint: disable=too-few-public-methods # This is a si
 
     tissue_sampling_period: int = attr.ib()
     noise_filter_uuid: Optional[uuid.UUID] = attr.ib(default=None)
+    magnetic_twitches_point_up: bool = attr.ib(default=False)
     _filter_coefficients: NDArray[(Any, Any), float]
 
     def create_pipeline(self) -> Pipeline:
