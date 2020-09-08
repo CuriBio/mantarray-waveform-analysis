@@ -15,6 +15,7 @@ from mantarray_waveform_analysis import PRIOR_VALLEY_INDEX_UUID
 from mantarray_waveform_analysis import RAW_TO_SIGNED_CONVERSION_VALUE
 from mantarray_waveform_analysis import SUBSEQUENT_PEAK_INDEX_UUID
 from mantarray_waveform_analysis import SUBSEQUENT_VALLEY_INDEX_UUID
+from mantarray_waveform_analysis import TWITCH_FREQUENCY_UUID
 from mantarray_waveform_analysis import TWITCH_PERIOD_UUID
 from mantarray_waveform_analysis import WIDTH_FALLING_COORDS_UUID
 from mantarray_waveform_analysis import WIDTH_RISING_COORDS_UUID
@@ -55,6 +56,7 @@ def test_filter_characteristics():
 
 def test_data_metric_uuids():
     assert TWITCH_PERIOD_UUID == uuid.UUID("6e0cd81c-7861-4c49-ba14-87b2739d65fb")
+    assert TWITCH_FREQUENCY_UUID == uuid.UUID("472d0707-ff87-4198-9374-c28900bb216c")
     assert AMPLITUDE_UUID == uuid.UUID("89cf1105-a015-434f-b527-4169b9400e26")
     assert AUC_UUID == uuid.UUID("e7b9a6e4-c43d-4e8b-af7e-51742e252030")
     assert WIDTH_UUID == uuid.UUID("c4c60d55-017a-4783-9600-f19606de26f3")

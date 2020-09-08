@@ -22,6 +22,7 @@ from .constants import PRIOR_PEAK_INDEX_UUID
 from .constants import PRIOR_VALLEY_INDEX_UUID
 from .constants import SUBSEQUENT_PEAK_INDEX_UUID
 from .constants import SUBSEQUENT_VALLEY_INDEX_UUID
+from .constants import TWITCH_FREQUENCY_UUID
 from .constants import TWITCH_PERIOD_UUID
 from .constants import WIDTH_FALLING_COORDS_UUID
 from .constants import WIDTH_RISING_COORDS_UUID
@@ -85,7 +86,9 @@ def peak_detector(
     return peak_indices, valley_indices
 
 
-def create_avg_dict(metric: NDArray[int]) -> Dict[str, Union[float, int]]:
+def create_avg_dict(
+    metric: NDArray[int], round_to_int: bool = True
+) -> Dict[str, Union[float, int]]:
     """Calculate the average values of a specific metric.
 
     Args:
@@ -97,10 +100,13 @@ def create_avg_dict(metric: NDArray[int]) -> Dict[str, Union[float, int]]:
     dictionary: Dict[str, Union[float, int]] = dict()
 
     dictionary["n"] = len(metric)
-    dictionary["mean"] = int(round(np.mean(metric)))
-    dictionary["std"] = int(round(np.std(metric)))
-    dictionary["min"] = int(np.min(metric))
-    dictionary["max"] = int(np.max(metric))
+    dictionary["mean"] = np.mean(metric)
+    dictionary["std"] = np.std(metric)
+    dictionary["min"] = np.min(metric)
+    dictionary["max"] = np.max(metric)
+    if round_to_int:
+        for iter_key in ("mean", "std", "min", "max"):
+            dictionary[iter_key] = int(round(dictionary[iter_key]))
 
     return dictionary
 
@@ -114,7 +120,7 @@ def data_metrics(
         UUID,
         Union[Dict[str, Union[float, int]], Dict[int, Dict[str, Union[float, int]]]],
     ],
-]:
+]:  # pylint:disable=too-many-locals # Eli (9/8/20): there are a lot of metrics to calculate that need local variables
     """Find all data metrics for individual twitches and averages.
 
     Args:
@@ -137,13 +143,11 @@ def data_metrics(
     amplitude_averages_dict: Dict[str, Union[float, int]] = {}
     auc_averages_dict: Dict[str, Union[float, int]] = {}
 
-    peak_indices, _ = peak_and_valley_indices  #: NDArray[int] = peakind[0]
+    peak_indices, _ = peak_and_valley_indices
 
     # find twitch time points
 
-    twitch_indices: NDArray[int] = find_twitch_indices(
-        peak_and_valley_indices, filtered_data
-    )
+    twitch_indices = find_twitch_indices(peak_and_valley_indices, filtered_data)
     num_twitches = len(twitch_indices)
     time_series = filtered_data[0, :]
 
@@ -151,10 +155,16 @@ def data_metrics(
     combined_twitch_periods = calculate_twitch_period(
         twitch_indices, peak_indices, filtered_data
     )
+
+    twitch_frequencies = 1 / (
+        combined_twitch_periods.astype(np.float) / CENTIMILLISECONDS_PER_SECOND
+    )
+    frequency_averages_dict = create_avg_dict(twitch_frequencies, round_to_int=False)
     # find aggregate values of period data
     period_averages_dict = create_avg_dict(combined_twitch_periods)
 
     aggregate_dict[TWITCH_PERIOD_UUID] = period_averages_dict
+    aggregate_dict[TWITCH_FREQUENCY_UUID] = frequency_averages_dict
 
     # find twitch amplitudes
     amplitudes: NDArray[int] = calculate_amplitudes(twitch_indices, filtered_data)
@@ -200,6 +210,7 @@ def data_metrics(
                     AMPLITUDE_UUID: amplitudes[i],
                     WIDTH_UUID: widths[i],
                     AUC_UUID: auc_per_twitch[i],
+                    TWITCH_FREQUENCY_UUID: twitch_frequencies[i],
                 }
             }
         )

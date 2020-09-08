@@ -1,10 +1,17 @@
 Changelog for Mantarray Waveform Analysis
 =========================================
 
+0.5.0 (2020-09-08)
+------------------
+
+- Added Twitch Frequency metric.
+- Added peak detetection and metric calculation (for magnetic signal) to Pipeline.
+
+
 0.4.1 (2020-09-02)
 ------------------
 
-- Added 30 Hz Bessel filter.
+- Added 30 Hz Low-Pass Bessel filter.
 - Added small speed upgrade to cython compression code.
 
 

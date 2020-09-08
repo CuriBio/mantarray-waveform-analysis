@@ -11,6 +11,7 @@ from mantarray_waveform_analysis import PRIOR_VALLEY_INDEX_UUID
 from mantarray_waveform_analysis import SUBSEQUENT_PEAK_INDEX_UUID
 from mantarray_waveform_analysis import SUBSEQUENT_VALLEY_INDEX_UUID
 from mantarray_waveform_analysis import TooFewPeaksDetectedError
+from mantarray_waveform_analysis import TWITCH_FREQUENCY_UUID
 from mantarray_waveform_analysis import TWITCH_PERIOD_UUID
 from mantarray_waveform_analysis import TwoPeaksInARowError
 from mantarray_waveform_analysis import WIDTH_FALLING_COORDS_UUID
@@ -21,6 +22,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 import pytest
+from pytest import approx
 
 from .fixtures_compression import fixture_new_A1
 from .fixtures_compression import fixture_new_A2
@@ -123,7 +125,7 @@ def test_new_A1_period(new_A1):
 
     # test data_metrics aggregate dictionary
     assert aggregate_metrics_dict[TWITCH_PERIOD_UUID]["n"] == 11
-    assert_percent_diff(aggregate_metrics_dict[TWITCH_PERIOD_UUID]["mean"], 80182)
+    assert aggregate_metrics_dict[TWITCH_PERIOD_UUID]["mean"] == approx(80182, rel=1e-5)
     assert_percent_diff(aggregate_metrics_dict[TWITCH_PERIOD_UUID]["std"], 1696)
     assert aggregate_metrics_dict[TWITCH_PERIOD_UUID]["min"] == 78000
     assert aggregate_metrics_dict[TWITCH_PERIOD_UUID]["max"] == 84000
@@ -131,6 +133,18 @@ def test_new_A1_period(new_A1):
     assert per_twitch_dict[105000][TWITCH_PERIOD_UUID] == 81000
     assert per_twitch_dict[186000][TWITCH_PERIOD_UUID] == 80000
     assert per_twitch_dict[266000][TWITCH_PERIOD_UUID] == 78000
+
+
+def test_new_A1_frequency(new_A1):
+    per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A1)
+
+    assert aggregate_metrics_dict[TWITCH_FREQUENCY_UUID]["mean"] == approx(
+        1.2477183310516644
+    )
+    assert aggregate_metrics_dict[TWITCH_FREQUENCY_UUID]["std"] == approx(
+        0.026146910973044845
+    )
+    assert per_twitch_dict[105000][TWITCH_FREQUENCY_UUID] == approx(1.2345679)
 
 
 def test_new_A2_period(new_A2):
