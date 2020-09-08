@@ -41,14 +41,14 @@ class Pipeline:
     # pylint:disable=too-many-instance-attributes # Eli (9/8/20): it's a pipeline with lots of stages
     def __init__(self, pipeline_template: "PipelineTemplate") -> None:
         self._pipeline_template = pipeline_template
-        self._raw_tissue_gmr: NDArray[(2, Any), int]
-        self._raw_reference_gmr: NDArray[(2, Any), int]
+        self._raw_tissue_magnetic_data: NDArray[(2, Any), int]
+        self._raw_reference_magnetic_data: NDArray[(2, Any), int]
         self._sensitivity_calibrated_tissue_gmr: NDArray[(2, Any), int]
         self._sensitivity_calibrated_reference_gmr: NDArray[(2, Any), int]
-        self._noise_cancelled_gmr: NDArray[(2, Any), int]
-        self._fully_calibrated_gmr: NDArray[(2, Any), int]
-        self._noise_filtered_gmr: NDArray[(2, Any), int]
-        self._compressed_gmr: NDArray[(2, Any), int]
+        self._noise_cancelled_magnetic_data: NDArray[(2, Any), int]
+        self._fully_calibrated_magnetic_data: NDArray[(2, Any), int]
+        self._noise_filtered_magnetic_data: NDArray[(2, Any), int]
+        self._compressed_magnetic_data: NDArray[(2, Any), int]
         self._compressed_voltage: NDArray[(2, Any), np.float32]
         self._compressed_displacement: NDArray[(2, Any), np.float32]
         self._peak_detection_results: Tuple[List[int], List[int]]
@@ -78,10 +78,10 @@ class Pipeline:
             raw_reference_magnetic_data: 2D array of time (in centimilliseconds) and magnetic reading for the sensor nearby the tissue construct
         """
         try:
-            self._raw_tissue_gmr
+            self._raw_tissue_magnetic_data
         except AttributeError:
-            self._raw_tissue_gmr = raw_tissue_magnetic_data
-            self._raw_reference_gmr = raw_reference_magnetic_data
+            self._raw_tissue_magnetic_data = raw_tissue_magnetic_data
+            self._raw_reference_magnetic_data = raw_reference_magnetic_data
             return
         raise DataAlreadyLoadedInPipelineError()
 
@@ -93,11 +93,11 @@ class Pipeline:
         """Call magnetic data using this deprecated alias."""
         return self.load_raw_magnetic_data(raw_tissue_gmr, raw_reference_gmr)
 
-    def get_raw_tissue_gmr(self) -> NDArray[(2, Any), int]:
-        return self._raw_tissue_gmr
+    def get_raw_tissue_magnetic_data(self) -> NDArray[(2, Any), int]:
+        return self._raw_tissue_magnetic_data
 
-    def get_raw_reference_gmr(self) -> NDArray[(2, Any), int]:
-        return self._raw_reference_gmr
+    def get_raw_reference_magnetic_data(self) -> NDArray[(2, Any), int]:
+        return self._raw_reference_magnetic_data
 
     def get_sensitivity_calibrated_tissue_gmr(self) -> NDArray[(2, Any), int]:
         try:
@@ -105,7 +105,7 @@ class Pipeline:
         except AttributeError:
             pass
         self._sensitivity_calibrated_tissue_gmr = apply_sensitivity_calibration(
-            self._raw_tissue_gmr
+            self._raw_tissue_magnetic_data
         )
         return self._sensitivity_calibrated_tissue_gmr
 
@@ -115,45 +115,48 @@ class Pipeline:
         except AttributeError:
             pass
         self._sensitivity_calibrated_reference_gmr = apply_sensitivity_calibration(
-            self._raw_reference_gmr
+            self._raw_reference_magnetic_data
         )
         return self._sensitivity_calibrated_reference_gmr
 
     def get_noise_cancelled_gmr(self) -> NDArray[(2, Any), int]:
         try:
-            return self._noise_cancelled_gmr
+            return self._noise_cancelled_magnetic_data
         except AttributeError:
             pass
-        self._noise_cancelled_gmr = noise_cancellation(
+        self._noise_cancelled_magnetic_data = noise_cancellation(
             self.get_sensitivity_calibrated_tissue_gmr(),
             self.get_sensitivity_calibrated_reference_gmr(),
         )
-        return self._noise_cancelled_gmr
+        return self._noise_cancelled_magnetic_data
 
     def get_fully_calibrated_gmr(self) -> NDArray[(2, Any), int]:
         try:
-            return self._fully_calibrated_gmr
+            return self._fully_calibrated_magnetic_data
         except AttributeError:
             pass
-        self._fully_calibrated_gmr = apply_empty_plate_calibration(
+        self._fully_calibrated_magnetic_data = apply_empty_plate_calibration(
             self.get_noise_cancelled_gmr()
         )
-        return self._fully_calibrated_gmr
+        return self._fully_calibrated_magnetic_data
 
     def get_noise_filtered_gmr(self) -> NDArray[(2, Any), int]:
+        return self.get_noise_filtered_magnetic_data()
+
+    def get_noise_filtered_magnetic_data(self) -> NDArray[(2, Any), int]:
         """Return data after user-acceptable noise filtering."""
         try:
-            return self._noise_filtered_gmr
+            return self._noise_filtered_magnetic_data
         except AttributeError:
             pass
         if self._pipeline_template.noise_filter_uuid is None:
-            self._noise_filtered_gmr = self.get_fully_calibrated_gmr()
+            self._noise_filtered_magnetic_data = self.get_fully_calibrated_gmr()
         else:
-            self._noise_filtered_gmr = apply_noise_filtering(
+            self._noise_filtered_magnetic_data = apply_noise_filtering(
                 self.get_fully_calibrated_gmr(),
                 self._pipeline_template.get_filter_coefficients(),
             )
-        return self._noise_filtered_gmr
+        return self._noise_filtered_magnetic_data
 
     def get_peak_detection_results(self) -> Tuple[List[int], List[int]]:
         """Return peak detection results on noise filtered magnetic data."""
@@ -162,7 +165,7 @@ class Pipeline:
         except AttributeError:
             pass
         self._peak_detection_results = peak_detector(
-            self.get_noise_filtered_gmr(),
+            self.get_noise_filtered_magnetic_data(),
             twitches_point_up=self._pipeline_template.magnetic_twitches_point_up,
         )
         return self._peak_detection_results
@@ -184,17 +187,22 @@ class Pipeline:
         except AttributeError:
             pass
         self._magnetic_data_metrics = data_metrics(
-            self.get_peak_detection_results(), self.get_noise_filtered_gmr()
+            self.get_peak_detection_results(), self.get_noise_filtered_magnetic_data()
         )
         return self._magnetic_data_metrics
 
     def get_compressed_gmr(self) -> NDArray[(2, Any), int]:
+        return self.get_compressed_magnetic_data()
+
+    def get_compressed_magnetic_data(self) -> NDArray[(2, Any), int]:
         try:
-            return self._compressed_gmr
+            return self._compressed_magnetic_data
         except AttributeError:
             pass
-        self._compressed_gmr = compress_filtered_gmr(self.get_noise_filtered_gmr())
-        return self._compressed_gmr
+        self._compressed_magnetic_data = compress_filtered_gmr(
+            self.get_noise_filtered_magnetic_data()
+        )
+        return self._compressed_magnetic_data
 
     def get_compressed_voltage(self) -> NDArray[(2, Any), np.float32]:
         try:

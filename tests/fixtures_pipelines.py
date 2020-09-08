@@ -32,5 +32,5 @@ def fixture_generic_pipeline(generic_pipeline_template):
 def fixture_loaded_generic_pipeline(
     generic_pipeline, raw_generic_well_a1, raw_generic_well_a2
 ):
-    generic_pipeline.load_raw_gmr_data(raw_generic_well_a1, raw_generic_well_a2)
+    generic_pipeline.load_raw_magnetic_data(raw_generic_well_a1, raw_generic_well_a2)
     yield generic_pipeline
