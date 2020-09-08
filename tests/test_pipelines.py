@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from unittest.mock import ANY
+
 from mantarray_waveform_analysis import BESSEL_LOWPASS_10_UUID
 from mantarray_waveform_analysis import DataAlreadyLoadedInPipelineError
 from mantarray_waveform_analysis import Pipeline
@@ -52,10 +54,10 @@ def test_Pipeline__load_raw_gmr_data__sets_data(
     loaded_generic_pipeline, raw_generic_well_a1, raw_generic_well_a2
 ):
     np.testing.assert_array_equal(
-        loaded_generic_pipeline.get_raw_tissue_gmr(), raw_generic_well_a1
+        loaded_generic_pipeline.get_raw_tissue_magnetic_data(), raw_generic_well_a1
     )
     np.testing.assert_array_equal(
-        loaded_generic_pipeline.get_raw_reference_gmr(), raw_generic_well_a2
+        loaded_generic_pipeline.get_raw_reference_magnetic_data(), raw_generic_well_a2
     )
 
 
@@ -63,7 +65,7 @@ def test_Pipeline__load_raw_gmr_data__raises_error_if_data_already_loaded(
     loaded_generic_pipeline, raw_generic_well_a1, raw_generic_well_a2
 ):
     with pytest.raises(DataAlreadyLoadedInPipelineError):
-        loaded_generic_pipeline.load_raw_gmr_data(
+        loaded_generic_pipeline.load_raw_magnetic_data(
             raw_generic_well_a1, raw_generic_well_a2
         )
 
@@ -145,22 +147,22 @@ def test_Pipeline__get_sensitivity_calibrated_reference_gmr__calls_correct_metho
         (
             "abcde",
             "apply_noise_filtering",
-            lambda the_pipeline: the_pipeline.get_noise_filtered_gmr(),
+            lambda the_pipeline: the_pipeline.get_noise_filtered_magnetic_data(),
             [lambda the_pipeline: the_pipeline.get_fully_calibrated_gmr()],
             "applying noise filtering",
         ),
         (
             "qed",
             "compress_filtered_gmr",
-            lambda the_pipeline: the_pipeline.get_compressed_gmr(),
-            [lambda the_pipeline: the_pipeline.get_noise_filtered_gmr()],
+            lambda the_pipeline: the_pipeline.get_compressed_magnetic_data(),
+            [lambda the_pipeline: the_pipeline.get_noise_filtered_magnetic_data()],
             "applying compression",
         ),
         (
             "wakka",
             "calculate_voltage_from_gmr",
             lambda the_pipeline: the_pipeline.get_compressed_voltage(),
-            [lambda the_pipeline: the_pipeline.get_compressed_gmr()],
+            [lambda the_pipeline: the_pipeline.get_compressed_magnetic_data()],
             "converting compressed GMR data to voltage",
         ),
         (
@@ -169,6 +171,23 @@ def test_Pipeline__get_sensitivity_calibrated_reference_gmr__calls_correct_metho
             lambda the_pipeline: the_pipeline.get_compressed_displacement(),
             [lambda the_pipeline: the_pipeline.get_compressed_voltage()],
             "converting compressed voltage data to displacement",
+        ),
+        (
+            "trampoline",
+            "peak_detector",
+            lambda the_pipeline: the_pipeline.get_peak_detection_results(),
+            [lambda the_pipeline: the_pipeline.get_noise_filtered_magnetic_data()],
+            "detecting the peaks in the magnetic traces",
+        ),
+        (
+            "airplane",
+            "data_metrics",
+            lambda the_pipeline: the_pipeline.get_magnetic_data_metrics(),
+            [
+                lambda the_pipeline: the_pipeline.get_peak_detection_results(),
+                lambda the_pipeline: the_pipeline.get_noise_filtered_magnetic_data(),
+            ],
+            "calculate data metrics on the traces from the raw magentic readings",
         ),
     ],
 )
@@ -189,15 +208,24 @@ def test_Pipeline__get_data_type__calls_correct_methods_to_perform_action__but_d
     # Eli (7/6/20): NumPy arrays don't play well with assert_called_once_with, so asserting things separately
     assert mocked_function_under_test.call_count == 1
     actual_array_arg = mocked_function_under_test.call_args_list[0][0][0]
-    np.testing.assert_array_equal(
-        actual_array_arg, list_of_lambdas_to_get_call_args[0](loaded_generic_pipeline),
-    )
+    expected_array_arg = list_of_lambdas_to_get_call_args[0](loaded_generic_pipeline)
+    if isinstance(expected_array_arg, np.ndarray):
+        np.testing.assert_array_equal(
+            actual_array_arg, expected_array_arg,
+        )
+    else:
+        assert actual_array_arg == expected_array_arg
     if len(list_of_lambdas_to_get_call_args) == 2:
         actual_array_arg = mocked_function_under_test.call_args_list[0][0][1]
-        np.testing.assert_array_equal(
-            actual_array_arg,
-            list_of_lambdas_to_get_call_args[1](loaded_generic_pipeline),
+        expected_array_arg = list_of_lambdas_to_get_call_args[1](
+            loaded_generic_pipeline
         )
+        if isinstance(expected_array_arg, np.ndarray):
+            np.testing.assert_array_equal(
+                actual_array_arg, expected_array_arg,
+            )
+        else:
+            assert actual_array_arg == expected_array_arg
 
     assert actual_return_1 == expected_return
 
@@ -212,7 +240,7 @@ def test_Pipeline__get_noise_filtered_gmr__creates_and_uses_filter_supplied_by_t
     mocked_function_under_test = mocker.patch.object(
         pipelines, "apply_noise_filtering", autospec=True,
     )
-    loaded_generic_pipeline.get_noise_filtered_gmr()
+    loaded_generic_pipeline.get_noise_filtered_magnetic_data()
     # Eli (7/6/20): NumPy arrays don't play well with assert_called_once_with, so asserting things separately
     assert mocked_function_under_test.call_count == 1
     actual_filter_array = mocked_function_under_test.call_args_list[0][0][1]
@@ -225,9 +253,9 @@ def test_Pipeline__get_noise_filtered_gmr__returns_same_data_if_no_filter_define
 ):
     no_filter_pipeline_template = PipelineTemplate(tissue_sampling_period=1000)
     pipeline = no_filter_pipeline_template.create_pipeline()
-    pipeline.load_raw_gmr_data(raw_generic_well_a1, raw_generic_well_a2)
+    pipeline.load_raw_magnetic_data(raw_generic_well_a1, raw_generic_well_a2)
     calibrated_data = pipeline.get_fully_calibrated_gmr()
-    filtered_data = pipeline.get_noise_filtered_gmr()
+    filtered_data = pipeline.get_noise_filtered_magnetic_data()
     assert filtered_data is calibrated_data
 
 
@@ -241,3 +269,29 @@ def test_Pipeline__get_filter_coefficients__does_not_repeatedly_generate_new_fil
     new_coefficients = generic_pipeline_template.get_filter_coefficients()
     assert spied_bessel.call_count == 1
     assert new_coefficients is original_coefficients
+
+
+def test_Pipeline__get_peak_detection_info__passes_twitches_point_up_parameter_when_default_false(
+    mocker, raw_generic_well_a1
+):
+    pt = PipelineTemplate(100)
+    pipeline = pt.create_pipeline()
+    pipeline.load_raw_magnetic_data(raw_generic_well_a1, raw_generic_well_a1)
+    mocked_peak_detection = mocker.patch.object(
+        pipelines, "peak_detector", autospec=True
+    )
+    pipeline.get_peak_detection_results()
+    mocked_peak_detection.assert_called_once_with(ANY, twitches_point_up=False)
+
+
+def test_Pipeline__get_peak_detection_info__passes_twitches_point_up_parameter_when_true(
+    mocker, raw_generic_well_a1
+):
+    pt = PipelineTemplate(100, magnetic_twitches_point_up=True)
+    pipeline = pt.create_pipeline()
+    pipeline.load_raw_magnetic_data(raw_generic_well_a1, raw_generic_well_a1)
+    mocked_peak_detection = mocker.patch.object(
+        pipelines, "peak_detector", autospec=True
+    )
+    pipeline.get_peak_detection_results()
+    mocked_peak_detection.assert_called_once_with(ANY, twitches_point_up=True)

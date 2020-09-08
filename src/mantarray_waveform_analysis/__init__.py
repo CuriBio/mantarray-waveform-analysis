@@ -15,6 +15,7 @@ from .constants import PRIOR_VALLEY_INDEX_UUID
 from .constants import RAW_TO_SIGNED_CONVERSION_VALUE
 from .constants import SUBSEQUENT_PEAK_INDEX_UUID
 from .constants import SUBSEQUENT_VALLEY_INDEX_UUID
+from .constants import TWITCH_FREQUENCY_UUID
 from .constants import TWITCH_PERIOD_UUID
 from .constants import WIDTH_FALLING_COORDS_UUID
 from .constants import WIDTH_RISING_COORDS_UUID
@@ -50,6 +51,7 @@ __all__ = [
     "transforms",
     "pipelines",
     "TWITCH_PERIOD_UUID",
+    "TWITCH_FREQUENCY_UUID",
     "PRIOR_PEAK_INDEX_UUID",
     "PRIOR_VALLEY_INDEX_UUID",
     "SUBSEQUENT_PEAK_INDEX_UUID",
