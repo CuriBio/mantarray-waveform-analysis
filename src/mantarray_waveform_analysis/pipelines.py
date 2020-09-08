@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
 """Transforming arrays of Mantarray data throughout the analysis pipeline."""
 from typing import Any
+from typing import Dict
 from typing import List
 from typing import Optional
 from typing import Tuple
-import uuid
+from typing import Union
+from uuid import UUID
 
 import attr
 from nptyping import NDArray
 import numpy as np
 
 from .exceptions import DataAlreadyLoadedInPipelineError
+from .peak_detection import data_metrics
 from .peak_detection import peak_detector
 from .transforms import apply_empty_plate_calibration
 from .transforms import apply_noise_filtering
@@ -49,6 +52,16 @@ class Pipeline:
         self._compressed_voltage: NDArray[(2, Any), np.float32]
         self._compressed_displacement: NDArray[(2, Any), np.float32]
         self._peak_detection_results: Tuple[List[int], List[int]]
+        self._magnetic_data_metrics: Tuple[
+            Dict[int, Dict[UUID, Union[float, int]]],
+            Dict[
+                UUID,
+                Union[
+                    Dict[str, Union[float, int]],
+                    Dict[int, Dict[str, Union[float, int]]],
+                ],
+            ],
+        ]
 
     def get_template(self) -> "PipelineTemplate":
         return self._pipeline_template
@@ -154,6 +167,27 @@ class Pipeline:
         )
         return self._peak_detection_results
 
+    def get_magnetic_data_metrics(
+        self,
+    ) -> Tuple[
+        Dict[int, Dict[UUID, Union[float, int]]],
+        Dict[
+            UUID,
+            Union[
+                Dict[str, Union[float, int]], Dict[int, Dict[str, Union[float, int]]]
+            ],
+        ],
+    ]:
+        """Calculate data metrics on noise filtered magnetic data."""
+        try:
+            return self._magnetic_data_metrics
+        except AttributeError:
+            pass
+        self._magnetic_data_metrics = data_metrics(
+            self.get_peak_detection_results(), self.get_noise_filtered_gmr()
+        )
+        return self._magnetic_data_metrics
+
     def get_compressed_gmr(self) -> NDArray[(2, Any), int]:
         try:
             return self._compressed_gmr
@@ -191,7 +225,7 @@ class PipelineTemplate:  # pylint: disable=too-few-public-methods # This is a si
     """
 
     tissue_sampling_period: int = attr.ib()
-    noise_filter_uuid: Optional[uuid.UUID] = attr.ib(default=None)
+    noise_filter_uuid: Optional[UUID] = attr.ib(default=None)
     magnetic_twitches_point_up: bool = attr.ib(default=False)
     _filter_coefficients: NDArray[(Any, Any), float]
 

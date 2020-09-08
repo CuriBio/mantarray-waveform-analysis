@@ -179,6 +179,16 @@ def test_Pipeline__get_sensitivity_calibrated_reference_gmr__calls_correct_metho
             [lambda the_pipeline: the_pipeline.get_noise_filtered_gmr()],
             "detecting the peaks in the magnetic traces",
         ),
+        (
+            "airplane",
+            "data_metrics",
+            lambda the_pipeline: the_pipeline.get_magnetic_data_metrics(),
+            [
+                lambda the_pipeline: the_pipeline.get_peak_detection_results(),
+                lambda the_pipeline: the_pipeline.get_noise_filtered_gmr(),
+            ],
+            "calculate data metrics on the traces from the raw magentic readings",
+        ),
     ],
 )
 def test_Pipeline__get_data_type__calls_correct_methods_to_perform_action__but_does_not_call_again_repeatedly(
@@ -198,15 +208,24 @@ def test_Pipeline__get_data_type__calls_correct_methods_to_perform_action__but_d
     # Eli (7/6/20): NumPy arrays don't play well with assert_called_once_with, so asserting things separately
     assert mocked_function_under_test.call_count == 1
     actual_array_arg = mocked_function_under_test.call_args_list[0][0][0]
-    np.testing.assert_array_equal(
-        actual_array_arg, list_of_lambdas_to_get_call_args[0](loaded_generic_pipeline),
-    )
+    expected_array_arg = list_of_lambdas_to_get_call_args[0](loaded_generic_pipeline)
+    if isinstance(expected_array_arg, np.ndarray):
+        np.testing.assert_array_equal(
+            actual_array_arg, expected_array_arg,
+        )
+    else:
+        assert actual_array_arg == expected_array_arg
     if len(list_of_lambdas_to_get_call_args) == 2:
         actual_array_arg = mocked_function_under_test.call_args_list[0][0][1]
-        np.testing.assert_array_equal(
-            actual_array_arg,
-            list_of_lambdas_to_get_call_args[1](loaded_generic_pipeline),
+        expected_array_arg = list_of_lambdas_to_get_call_args[1](
+            loaded_generic_pipeline
         )
+        if isinstance(expected_array_arg, np.ndarray):
+            np.testing.assert_array_equal(
+                actual_array_arg, expected_array_arg,
+            )
+        else:
+            assert actual_array_arg == expected_array_arg
 
     assert actual_return_1 == expected_return
 
