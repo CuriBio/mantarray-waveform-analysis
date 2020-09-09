@@ -6,6 +6,7 @@ from mantarray_waveform_analysis import AUC_UUID
 from mantarray_waveform_analysis import BESSEL_BANDPASS_UUID
 from mantarray_waveform_analysis import BESSEL_LOWPASS_10_UUID
 from mantarray_waveform_analysis import BESSEL_LOWPASS_30_UUID
+from mantarray_waveform_analysis import BUTTERWORTH_LOWPASS_30_UUID
 from mantarray_waveform_analysis import CENTIMILLISECONDS_PER_SECOND
 from mantarray_waveform_analysis import FILTER_CHARACTERISTICS
 from mantarray_waveform_analysis import MIDSCALE_CODE
@@ -31,6 +32,9 @@ def test_filter_uuids():
     assert BESSEL_BANDPASS_UUID == uuid.UUID("0ecf0e52-0a29-453f-a6ff-46f5ec3ae783")
     assert BESSEL_LOWPASS_10_UUID == uuid.UUID("7d64cac3-b841-4912-b734-c0cf20a81e7a")
     assert BESSEL_LOWPASS_30_UUID == uuid.UUID("eee66c75-4dc4-4eb4-8d48-6c608bf28d91")
+    assert BUTTERWORTH_LOWPASS_30_UUID == uuid.UUID(
+        "de8d8cef-65bf-4119-ada7-bdecbbaa897a"
+    )
 
 
 def test_filter_characteristics():
@@ -48,6 +52,11 @@ def test_filter_characteristics():
         },
         BESSEL_LOWPASS_30_UUID: {
             "filter_type": "bessel",
+            "order": 4,
+            "low_pass_hz": 30,
+        },
+        BUTTERWORTH_LOWPASS_30_UUID: {
+            "filter_type": "butterworth",
             "order": 4,
             "low_pass_hz": 30,
         },

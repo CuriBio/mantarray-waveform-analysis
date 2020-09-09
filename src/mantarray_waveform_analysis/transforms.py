@@ -13,6 +13,7 @@ from scipy import signal
 from .constants import BESSEL_BANDPASS_UUID
 from .constants import BESSEL_LOWPASS_10_UUID
 from .constants import BESSEL_LOWPASS_30_UUID
+from .constants import BUTTERWORTH_LOWPASS_30_UUID
 from .constants import CENTIMILLISECONDS_PER_SECOND
 from .constants import RAW_TO_SIGNED_CONVERSION_VALUE
 from .exceptions import FilterCreationNotImplementedError
@@ -25,8 +26,13 @@ FILTER_CHARACTERISTICS: Dict[uuid.UUID, Dict[str, Union[str, float, int]]] = {
         "high_pass_hz": 0.1,
         "low_pass_hz": 10,
     },
-    BESSEL_LOWPASS_10_UUID: {"filter_type": "bessel", "order": 4, "low_pass_hz": 10,},
-    BESSEL_LOWPASS_30_UUID: {"filter_type": "bessel", "order": 4, "low_pass_hz": 30,},
+    BESSEL_LOWPASS_10_UUID: {"filter_type": "bessel", "order": 4, "low_pass_hz": 10},
+    BESSEL_LOWPASS_30_UUID: {"filter_type": "bessel", "order": 4, "low_pass_hz": 30},
+    BUTTERWORTH_LOWPASS_30_UUID: {
+        "filter_type": "butterworth",
+        "order": 4,
+        "low_pass_hz": 30,
+    },
 }
 
 
@@ -45,7 +51,7 @@ def create_filter(
     sampling_frequency_hz = 1 / (
         sample_period_centimilliseconds / CENTIMILLISECONDS_PER_SECOND
     )
-    nyquist_freuqency_limit = sampling_frequency_hz / 2
+    nyquist_frequency_limit = sampling_frequency_hz / 2
 
     if filter_uuid not in FILTER_CHARACTERISTICS:
         raise UnrecognizedFilterUuidError(filter_uuid)
@@ -67,7 +73,7 @@ def create_filter(
                 "The high pass frequency should never be a string."
             )
         normalized_high_pass_frequency = (
-            the_filter_characteristics["high_pass_hz"] / nyquist_freuqency_limit
+            the_filter_characteristics["high_pass_hz"] / nyquist_frequency_limit
         )
         pass_boundaries.append(normalized_high_pass_frequency)
     if "low_pass_hz" in the_filter_characteristics:
@@ -76,7 +82,7 @@ def create_filter(
                 "The low pass frequency should never be a string."
             )
         normalized_low_pass_frequency = (
-            the_filter_characteristics["low_pass_hz"] / nyquist_freuqency_limit
+            the_filter_characteristics["low_pass_hz"] / nyquist_frequency_limit
         )
         pass_boundaries.append(normalized_low_pass_frequency)
 
@@ -87,11 +93,16 @@ def create_filter(
         sos_polys = signal.bessel(
             filter_order, pass_boundaries, btype=bandpass_type, output="sos"
         )
-        if not isinstance(sos_polys, NDArray[float]):
-            raise NotImplementedError("Returned polynomials most be float arrays")
-        return sos_polys
+    elif filter_type == "butterworth":
+        sos_polys = signal.butter(
+            filter_order, pass_boundaries, btype=bandpass_type, output="sos"
+        )
+    else:
+        raise FilterCreationNotImplementedError(filter_uuid)
 
-    raise FilterCreationNotImplementedError(filter_uuid)
+    if not isinstance(sos_polys, NDArray[float]):
+        raise NotImplementedError("Returned polynomials most be float arrays")
+    return sos_polys
 
 
 def apply_sensitivity_calibration(
