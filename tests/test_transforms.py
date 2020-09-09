@@ -127,8 +127,8 @@ def test_create_filter__raises_error_for_code_missing_to_generate_filter(mocker)
             BUTTERWORTH_LOWPASS_30_UUID,
             160,
             [
-                [2.673490e-05, 5.346981e-05, 2.673490e-05, 1.0, -1.736319, 0.7562495],
-                [1.0, 2.0, 1.0, 1.0, -1.869810, 0.8912729],
+                [3.588408e-04, 7.176816e-04, 3.588408e-04, 1.0, -1.498496, 0.5693282],
+                [1.0, 2.0, 1.0, 1.0, -1.7148030, 0.7958595],
             ],
             "butterworth lowpass at 625 Hz / 160 cms sampling, 30 Hz cutoff",
         ),

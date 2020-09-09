@@ -31,7 +31,7 @@ FILTER_CHARACTERISTICS: Dict[uuid.UUID, Dict[str, Union[str, float, int]]] = {
     BUTTERWORTH_LOWPASS_30_UUID: {
         "filter_type": "butterworth",
         "order": 4,
-        "low_pass_hz": 15,
+        "low_pass_hz": 30,
     },
 }
 

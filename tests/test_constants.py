@@ -58,7 +58,7 @@ def test_filter_characteristics():
         BUTTERWORTH_LOWPASS_30_UUID: {
             "filter_type": "butterworth",
             "order": 4,
-            "low_pass_hz": 15,
+            "low_pass_hz": 30,
         },
     }
 
