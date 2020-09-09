@@ -7,6 +7,7 @@ from .constants import AUC_UUID
 from .constants import BESSEL_BANDPASS_UUID
 from .constants import BESSEL_LOWPASS_10_UUID
 from .constants import BESSEL_LOWPASS_30_UUID
+from .constants import BUTTERWORTH_LOWPASS_30_UUID
 from .constants import CENTIMILLISECONDS_PER_SECOND
 from .constants import MIDSCALE_CODE
 from .constants import MIN_NUMBER_PEAKS
@@ -88,4 +89,5 @@ __all__ = [
     "TooFewPeaksDetectedError",
     "MIN_NUMBER_PEAKS",
     "BESSEL_LOWPASS_30_UUID",
+    "BUTTERWORTH_LOWPASS_30_UUID",
 ]

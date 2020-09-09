@@ -9,6 +9,7 @@ from mantarray_waveform_analysis import apply_sensitivity_calibration
 from mantarray_waveform_analysis import BESSEL_BANDPASS_UUID
 from mantarray_waveform_analysis import BESSEL_LOWPASS_10_UUID
 from mantarray_waveform_analysis import BESSEL_LOWPASS_30_UUID
+from mantarray_waveform_analysis import BUTTERWORTH_LOWPASS_30_UUID
 from mantarray_waveform_analysis import calculate_displacement_from_voltage
 from mantarray_waveform_analysis import calculate_voltage_from_gmr
 from mantarray_waveform_analysis import create_filter
@@ -60,7 +61,7 @@ def test_create_filter__raises_error_for_unrecognized_uuid():
 def test_create_filter__raises_error_for_code_missing_to_generate_filter(mocker):
     expected_uuid = uuid.UUID("0ecf0e52-0a29-453f-a6ff-46f5ec3ae782")
     mocker.patch.dict(FILTER_CHARACTERISTICS)
-    FILTER_CHARACTERISTICS[expected_uuid] = {"filter_type": "butterworth"}
+    FILTER_CHARACTERISTICS[expected_uuid] = {"filter_type": "fake_filter"}
     with pytest.raises(FilterCreationNotImplementedError, match=str(expected_uuid)):
         create_filter(expected_uuid, 48)
 
@@ -122,6 +123,15 @@ def test_create_filter__raises_error_for_code_missing_to_generate_filter(mocker)
             ],
             "bessel lowpass at 625 Hz / 160 cms sampling, 30 Hz cutoff",
         ),
+        (
+            BUTTERWORTH_LOWPASS_30_UUID,
+            160,
+            [
+                [3.588408e-04, 7.176816e-04, 3.588408e-04, 1.0, -1.498496, 0.5693282],
+                [1.0, 2.0, 1.0, 1.0, -1.7148030, 0.7958595],
+            ],
+            "butterworth lowpass at 625 Hz / 160 cms sampling, 30 Hz cutoff",
+        ),
     ],
 )
 def test_create_filter__bessel_bandpass__returns_correct_coefficients(
@@ -129,7 +139,7 @@ def test_create_filter__bessel_bandpass__returns_correct_coefficients(
 ):
     expected_sos = np.array(expected_sos, dtype=float)
 
-    actual_sos = create_filter(filter_uuid, sampling_period_centimilliseconds,)
+    actual_sos = create_filter(filter_uuid, sampling_period_centimilliseconds)
     np.testing.assert_array_almost_equal(actual_sos, expected_sos)
 
 
