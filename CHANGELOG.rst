@@ -1,6 +1,12 @@
 Changelog for Mantarray Waveform Analysis
 =========================================
 
+0.5.1 (2020-09-09)
+------------------
+
+- Added 30 Hz Butterworth Filter
+
+
 0.5.0 (2020-09-08)
 ------------------
 
