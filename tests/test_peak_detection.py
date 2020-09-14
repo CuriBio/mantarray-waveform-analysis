@@ -14,6 +14,7 @@ from mantarray_waveform_analysis import TooFewPeaksDetectedError
 from mantarray_waveform_analysis import TWITCH_FREQUENCY_UUID
 from mantarray_waveform_analysis import TWITCH_PERIOD_UUID
 from mantarray_waveform_analysis import TwoPeaksInARowError
+from mantarray_waveform_analysis import TwoValleysInARowError
 from mantarray_waveform_analysis import WIDTH_FALLING_COORDS_UUID
 from mantarray_waveform_analysis import WIDTH_RISING_COORDS_UUID
 from mantarray_waveform_analysis import WIDTH_UUID
@@ -1105,16 +1106,117 @@ def test_find_twitch_indices__excludes_only_last_peak_when_no_outer_peak_at_begi
     }
 
 
-def test_find_twitch_indices__raises_error_if_two_peaks_in_a_row_at_beginning(new_A1):
+@pytest.mark.parametrize(
+    "test_data,expected_match,test_description",
+    [
+        (
+            [24, 69, 105, 186, 266, 344, 424, 502, 586, 667, 745, 825, 906, 987],
+            "24 and 69",
+            "raises error when two peaks in a row at beginning",
+        ),
+        (
+            [24, 105, 186, 266, 344, 424, 502, 586, 600, 667, 745, 825, 906, 987],
+            "586 and 600",
+            "raises error when two peaks in a row in middle",
+        ),
+    ],
+)
+def test_find_twitch_indices__raises_error_if_two_peaks_in_a_row__and_start_with_peak(
+    new_A1, test_data, expected_match, test_description
+):
     pipeline, peak_and_valley_indices = new_A1
     filtered_data = pipeline.get_noise_filtered_gmr()
     _, valley_indices = peak_and_valley_indices
-    peak_indices = np.asarray(
-        [24, 69, 105, 186, 266, 344, 424, 502, 586, 667, 745, 825, 906, 987],
-        dtype=np.int32,
-    )
-    with pytest.raises(TwoPeaksInARowError, match="24 and 69"):
+    peak_indices = np.asarray(test_data, dtype=np.int32,)
+    with pytest.raises(TwoPeaksInARowError, match=expected_match):
         find_twitch_indices((peak_indices, valley_indices), filtered_data)
 
-    # expected_peak_indices=[70, 147, 220, 305, 397, 463, 555, 628, 713, 779, 871, 963]
-    # expected_valley_indices=[24, 105, 186, 266, 344, 424, 502, 586, 667, 745, 825, 906, 987]
+    # expected_peak_indices=[24, 105, 186, 266, 344, 424, 502, 586, 667, 745, 825, 906, 987]
+    # expected_valley_indices=[70, 147, 220, 305, 397, 463, 555, 628, 713, 779, 871, 963]
+
+
+@pytest.mark.parametrize(
+    "test_data,expected_match,test_description",
+    [
+        (
+            [71, 105, 186, 266, 344, 424, 502, 586, 667, 745, 825, 906, 987],
+            "71 and 105",
+            "raises error when two peaks in a row at beginning",
+        ),
+        (
+            [105, 186, 266, 344, 424, 502, 586, 600, 667, 745, 825, 906, 987],
+            "586 and 600",
+            "raises error when two peaks in a row in middle",
+        ),
+    ],
+)
+def test_find_twitch_indices__raises_error_if_two_peaks_in_a_row__and_does_not_start_with_peak(
+    new_A1, test_data, expected_match, test_description
+):
+    pipeline, peak_and_valley_indices = new_A1
+    filtered_data = pipeline.get_noise_filtered_gmr()
+    _, valley_indices = peak_and_valley_indices
+    peak_indices = np.asarray(test_data, dtype=np.int32,)
+    with pytest.raises(TwoPeaksInARowError, match=expected_match):
+        find_twitch_indices((peak_indices, valley_indices), filtered_data)
+
+    # expected_peak_indices=[    105, 186, 266, 344, 424, 502, 586, 667, 745, 825, 906, 987]
+    # expected_valley_indices=[70, 147, 220, 305, 397, 463, 555, 628, 713, 779, 871, 963]
+
+
+@pytest.mark.parametrize(
+    "test_data,expected_match,test_description",
+    [
+        (
+            [70, 100, 147, 220, 305, 397, 463, 555, 628, 713, 779, 871, 963],
+            "70 and 100",
+            "raises error when two peaks in a row at beginning",
+        ),
+        (
+            [70, 147, 220, 305, 397, 400, 463, 555, 628, 713, 779, 871, 963],
+            "397 and 400",
+            "raises error when two peaks in a row in middle",
+        ),
+    ],
+)
+def test_find_twitch_indices__raises_error_if_two_valleys_in_a_row__and_starts_with_peak(
+    new_A1, test_data, expected_match, test_description
+):
+    pipeline, peak_and_valley_indices = new_A1
+    filtered_data = pipeline.get_noise_filtered_gmr()
+    peak_indices, _ = peak_and_valley_indices
+    valley_indices = np.asarray(test_data, dtype=np.int32,)
+    with pytest.raises(TwoValleysInARowError, match=expected_match):
+        find_twitch_indices((peak_indices, valley_indices), filtered_data)
+
+    # expected_peak_indices=[24, 105, 186, 266, 344, 424, 502, 586, 667, 745, 825, 906, 987]
+    # expected_valley_indices=[70, 147, 220, 305, 397, 463, 555, 628, 713, 779, 871, 963]
+
+
+@pytest.mark.parametrize(
+    "test_data,expected_match,test_description",
+    [
+        (
+            [0, 70, 100, 147, 220, 305, 397, 463, 555, 628, 713, 779, 871, 963],
+            "70 and 100",
+            "raises error when two peaks in a row at beginning",
+        ),
+        (
+            [0, 70, 147, 220, 305, 397, 400, 463, 555, 628, 713, 779, 871, 963],
+            "397 and 400",
+            "raises error when two peaks in a row in middle",
+        ),
+    ],
+)
+def test_find_twitch_indices__raises_error_if_two_valleys_in_a_row__and_does_not_start_with_peak(
+    new_A1, test_data, expected_match, test_description
+):
+    pipeline, peak_and_valley_indices = new_A1
+    filtered_data = pipeline.get_noise_filtered_gmr()
+    peak_indices, _ = peak_and_valley_indices
+    valley_indices = np.asarray(test_data, dtype=np.int32,)
+    with pytest.raises(TwoValleysInARowError, match=expected_match):
+        find_twitch_indices((peak_indices, valley_indices), filtered_data)
+
+    # expected_peak_indices=[24, 105, 186, 266, 344, 424, 502, 586, 667, 745, 825, 906, 987]
+    # expected_valley_indices=[0, 70, 147, 220, 305, 397, 463, 555, 628, 713, 779, 871, 963]

@@ -30,6 +30,7 @@ from .constants import WIDTH_UUID
 from .constants import WIDTH_VALUE_UUID
 from .exceptions import TooFewPeaksDetectedError
 from .exceptions import TwoPeaksInARowError
+from .exceptions import TwoValleysInARowError
 
 TWITCH_WIDTH_PERCENTS = range(10, 95, 5)
 
@@ -275,12 +276,35 @@ def find_twitch_indices(
         if itr_idx == peak_indices.shape[0] - 1:  # last peak
             continue
 
-        if valley_indices[itr_idx] > peak_indices[itr_idx + 1]:
-            raise TwoPeaksInARowError(
-                peak_and_valley_indices,
-                filtered_data,
-                (peak_indices[itr_idx], peak_indices[itr_idx + 1]),
-            )
+        if starts_with_peak:
+            if valley_indices[itr_idx] > peak_indices[itr_idx + 1]:
+                raise TwoPeaksInARowError(
+                    peak_and_valley_indices,
+                    filtered_data,
+                    (peak_indices[itr_idx], peak_indices[itr_idx + 1]),
+                )
+            if itr_peak_index > valley_indices[itr_idx]:
+                raise TwoValleysInARowError(
+                    peak_and_valley_indices,
+                    filtered_data,
+                    (valley_indices[itr_idx - 1], valley_indices[itr_idx]),
+                )
+        else:
+            if valley_indices[itr_idx] > peak_indices[itr_idx]:
+                raise TwoPeaksInARowError(
+                    peak_and_valley_indices,
+                    filtered_data,
+                    (peak_indices[itr_idx - 1], peak_indices[itr_idx]),
+                )
+            if (
+                itr_idx < len(valley_indices) - 1
+                and itr_peak_index > valley_indices[itr_idx + 1]
+            ):
+                raise TwoValleysInARowError(
+                    peak_and_valley_indices,
+                    filtered_data,
+                    (valley_indices[itr_idx], valley_indices[itr_idx + 1]),
+                )
 
         if itr_idx == 0 and starts_with_peak:
             continue

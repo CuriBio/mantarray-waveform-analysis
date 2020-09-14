@@ -1,10 +1,22 @@
 Changelog for Mantarray Waveform Analysis
 =========================================
 
+0.5.3 (2020-09-14)
+------------------
+
+- Added TwoValleysInARow error.
+
+
+0.5.2 (2020-09-09)
+------------------
+
+- Added upload of source files to pypi for linux python3.7 download.
+
+
 0.5.1 (2020-09-09)
 ------------------
 
-- Added 30 Hz Butterworth Filter
+- Added 30 Hz Butterworth Filter.
 
 
 0.5.0 (2020-09-08)
@@ -12,7 +24,7 @@ Changelog for Mantarray Waveform Analysis
 
 - Added Twitch Frequency metric.
 - Added peak detetection and metric calculation (for magnetic signal) to Pipeline.
-- Created alias of load_raw_magnetic_data to become more agnostic to sensor type
+- Created alias of load_raw_magnetic_data to become more agnostic to sensor type.
 
 
 0.4.1 (2020-09-02)
