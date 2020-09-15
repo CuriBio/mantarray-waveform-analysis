@@ -1,7 +1,7 @@
 Changelog for Mantarray Waveform Analysis
 =========================================
 
-0.5.3 (2020-09-14)
+0.5.3 (2020-09-15)
 ------------------
 
 - Added TwoValleysInARowError.
