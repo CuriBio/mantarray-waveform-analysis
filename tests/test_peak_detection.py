@@ -1132,7 +1132,7 @@ def test_find_twitch_indices__raises_error_if_two_peaks_in_a_row__and_start_with
     pipeline, peak_and_valley_indices = new_A1
     filtered_data = pipeline.get_noise_filtered_gmr()
     _, valley_indices = peak_and_valley_indices
-    peak_indices = np.asarray(test_data, dtype=np.int32,)
+    peak_indices = np.asarray(test_data, dtype=np.int32)
     with pytest.raises(TwoPeaksInARowError, match=expected_match):
         find_twitch_indices((peak_indices, valley_indices), filtered_data)
 
@@ -1163,7 +1163,7 @@ def test_find_twitch_indices__raises_error_if_two_peaks_in_a_row__and_does_not_s
     pipeline, peak_and_valley_indices = new_A1
     filtered_data = pipeline.get_noise_filtered_gmr()
     _, valley_indices = peak_and_valley_indices
-    peak_indices = np.asarray(test_data, dtype=np.int32,)
+    peak_indices = np.asarray(test_data, dtype=np.int32)
     with pytest.raises(TwoPeaksInARowError, match=expected_match):
         find_twitch_indices((peak_indices, valley_indices), filtered_data)
 
@@ -1194,7 +1194,7 @@ def test_find_twitch_indices__raises_error_if_two_valleys_in_a_row__and_starts_w
     pipeline, peak_and_valley_indices = new_A1
     filtered_data = pipeline.get_noise_filtered_gmr()
     peak_indices, _ = peak_and_valley_indices
-    valley_indices = np.asarray(test_data, dtype=np.int32,)
+    valley_indices = np.asarray(test_data, dtype=np.int32)
     with pytest.raises(TwoValleysInARowError, match=expected_match):
         find_twitch_indices((peak_indices, valley_indices), filtered_data)
 
@@ -1225,6 +1225,12 @@ def test_find_twitch_indices__raises_error_if_two_valleys_in_a_row__and_does_not
     pipeline, peak_and_valley_indices = new_A1
     filtered_data = pipeline.get_noise_filtered_gmr()
     peak_indices, _ = peak_and_valley_indices
-    valley_indices = np.asarray(test_data, dtype=np.int32,)
+    valley_indices = np.asarray(test_data, dtype=np.int32)
     with pytest.raises(TwoValleysInARowError, match=expected_match):
         find_twitch_indices((peak_indices, valley_indices), filtered_data)
+
+
+def test_find_twitch_indices__returns_correct_values_with_data_that_ends_in_peak():
+    peak_indices = np.array(range(0, 10, 2), dtype=np.int32)
+    valley_indices = np.array(range(1, 9, 2), dtype=np.int32)
+    find_twitch_indices((peak_indices, valley_indices), None)

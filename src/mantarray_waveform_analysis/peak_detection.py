@@ -280,71 +280,71 @@ def find_twitch_indices(
                     filtered_data,
                     (valley_indices[itr_idx], valley_indices[itr_idx + 1]),
                 )
-            elif itr_idx == valley_indices.shape[0] - 3:
+            if itr_idx == valley_indices.shape[0] - 3:
                 raise TwoValleysInARowError(
                     peak_and_valley_indices,
                     filtered_data,
                     (valley_indices[itr_idx + 1], valley_indices[itr_idx + 2]),
                 )
+        else:
+            if starts_with_peak:
+                if (
+                    itr_idx == valley_indices.shape[0]
+                    and itr_idx == peak_indices.shape[0] - 2
+                    or valley_indices[itr_idx] > peak_indices[itr_idx + 1]
+                ):
+                    raise TwoPeaksInARowError(
+                        peak_and_valley_indices,
+                        filtered_data,
+                        (peak_indices[itr_idx], peak_indices[itr_idx + 1]),
+                    )
+                if itr_peak_index > valley_indices[itr_idx]:
+                    raise TwoValleysInARowError(
+                        peak_and_valley_indices,
+                        filtered_data,
+                        (valley_indices[itr_idx - 1], valley_indices[itr_idx]),
+                    )
             else:
+                if (
+                    itr_idx == valley_indices.shape[0] - 1
+                    and itr_idx == peak_indices.shape[0] - 2
+                ):
+                    raise TwoPeaksInARowError(
+                        peak_and_valley_indices,
+                        filtered_data,
+                        (peak_indices[itr_idx], peak_indices[itr_idx + 1]),
+                    )
+                if valley_indices[itr_idx] > peak_indices[itr_idx]:
+                    raise TwoPeaksInARowError(
+                        peak_and_valley_indices,
+                        filtered_data,
+                        (peak_indices[itr_idx - 1], peak_indices[itr_idx]),
+                    )
+                if (
+                    itr_idx < len(valley_indices) - 1
+                    and itr_peak_index > valley_indices[itr_idx + 1]
+                ):
+                    raise TwoValleysInARowError(
+                        peak_and_valley_indices,
+                        filtered_data,
+                        (valley_indices[itr_idx], valley_indices[itr_idx + 1]),
+                    )
+
+            if itr_idx == 0 and starts_with_peak:
                 continue
 
-        if starts_with_peak:
-            if (
-                itr_idx == valley_indices.shape[0]
-                and itr_idx == peak_indices.shape[0] - 2
-                or valley_indices[itr_idx] > peak_indices[itr_idx + 1]
-            ):
-                raise TwoPeaksInARowError(
-                    peak_and_valley_indices,
-                    filtered_data,
-                    (peak_indices[itr_idx], peak_indices[itr_idx + 1]),
-                )
-            if itr_peak_index > valley_indices[itr_idx]:
-                raise TwoValleysInARowError(
-                    peak_and_valley_indices,
-                    filtered_data,
-                    (valley_indices[itr_idx - 1], valley_indices[itr_idx]),
-                )
-        else:
-            if (
-                itr_idx == valley_indices.shape[0] - 1
-                and itr_idx == peak_indices.shape[0] - 2
-            ):
-                raise TwoPeaksInARowError(
-                    peak_and_valley_indices,
-                    filtered_data,
-                    (peak_indices[itr_idx], peak_indices[itr_idx + 1]),
-                )
-            if valley_indices[itr_idx] > peak_indices[itr_idx]:
-                raise TwoPeaksInARowError(
-                    peak_and_valley_indices,
-                    filtered_data,
-                    (peak_indices[itr_idx - 1], peak_indices[itr_idx]),
-                )
-            if (
-                itr_idx < len(valley_indices) - 1
-                and itr_peak_index > valley_indices[itr_idx + 1]
-            ):
-                raise TwoValleysInARowError(
-                    peak_and_valley_indices,
-                    filtered_data,
-                    (valley_indices[itr_idx], valley_indices[itr_idx + 1]),
-                )
-
-        if itr_idx == 0 and starts_with_peak:
-            continue
-
-        twitches[itr_peak_index] = {
-            PRIOR_PEAK_INDEX_UUID: None if itr_idx == 0 else peak_indices[itr_idx - 1],
-            PRIOR_VALLEY_INDEX_UUID: valley_indices[
-                itr_idx - 1 if starts_with_peak else itr_idx
-            ],
-            SUBSEQUENT_PEAK_INDEX_UUID: peak_indices[itr_idx + 1],
-            SUBSEQUENT_VALLEY_INDEX_UUID: valley_indices[
-                itr_idx if starts_with_peak else itr_idx + 1
-            ],
-        }
+            twitches[itr_peak_index] = {
+                PRIOR_PEAK_INDEX_UUID: None
+                if itr_idx == 0
+                else peak_indices[itr_idx - 1],
+                PRIOR_VALLEY_INDEX_UUID: valley_indices[
+                    itr_idx - 1 if starts_with_peak else itr_idx
+                ],
+                SUBSEQUENT_PEAK_INDEX_UUID: peak_indices[itr_idx + 1],
+                SUBSEQUENT_VALLEY_INDEX_UUID: valley_indices[
+                    itr_idx if starts_with_peak else itr_idx + 1
+                ],
+            }
 
     # print(list(twitches.keys())[0])
     # print(twitches[list(twitches.keys())[0]])
