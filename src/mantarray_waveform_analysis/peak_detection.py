@@ -76,13 +76,13 @@ def peak_detector(
         gmr_signal * peak_invertor_factor,
         width=minimum_required_samples_between_twitches / 2,
         distance=minimum_required_samples_between_twitches,
-        prominence=max_prominence / 22,
+        prominence=max_prominence / 2,
     )
     valley_indices, _ = signal.find_peaks(
         gmr_signal * valley_invertor_factor,
         width=minimum_required_samples_between_twitches / 2,
         distance=minimum_required_samples_between_twitches,
-        prominence=max_prominence / 22,
+        prominence=max_prominence / 2,
     )
     return peak_indices, valley_indices
 

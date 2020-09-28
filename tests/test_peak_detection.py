@@ -32,6 +32,7 @@ from .fixtures_compression import fixture_new_A4
 from .fixtures_compression import fixture_new_A5
 from .fixtures_compression import fixture_new_A6
 from .fixtures_peak_detection import fixture_maiden_voyage_data
+from .fixtures_peak_detection import fixture_noisy_data_A1
 from .fixtures_utils import _get_data_metrics
 from .fixtures_utils import _load_file_tsv
 from .fixtures_utils import _plot_data
@@ -51,6 +52,7 @@ __fixtures__ = [
     fixture_new_A4,
     fixture_new_A5,
     fixture_new_A6,
+    fixture_noisy_data_A1,
 ]
 
 
@@ -960,7 +962,7 @@ def test_new_A6(new_A6):
         808,
         874,
         926,
-        981,
+        # 981,
     ]
     expected_peak_indices = [
         31,
@@ -1010,7 +1012,7 @@ def test_maiden_voyage_data_peak_detection(maiden_voyage_data):
         1439,
         1678,
         1769,
-        1942,
+        # 1942,
     ]
     expected_peak_indices = [
         84,
@@ -1234,3 +1236,47 @@ def test_find_twitch_indices__returns_correct_values_with_data_that_ends_in_peak
     peak_indices = np.array(range(0, 10, 2), dtype=np.int32)
     valley_indices = np.array(range(1, 9, 2), dtype=np.int32)
     find_twitch_indices((peak_indices, valley_indices), None)
+
+
+def test_noisy_data_A1(noisy_data_A1):
+    pipeline, peak_and_valley_indices = noisy_data_A1
+
+    # plot and save results
+    filtered_data = pipeline.get_noise_filtered_gmr()
+    _plot_data(
+        peak_and_valley_indices,
+        filtered_data,
+        os.path.join(PATH_TO_PNGS, "new_noisy_data_A1_peaks.png"),
+    )
+
+    peak_indices, valley_indices = peak_and_valley_indices
+
+    expected_peak_indices = [
+        580,
+        1165,
+        1728,
+        2340,
+        2866,
+        3394,
+        3956,
+        4529,
+        5087,
+        5710,
+        6227,
+    ]
+    expected_valley_indices = [
+        330,
+        802,
+        1572,
+        2126,
+        2711,
+        3111,
+        3680,
+        4205,
+        4968,
+        5503,
+        6093,
+        6617,
+    ]
+    assert np.array_equal(peak_indices, expected_peak_indices)
+    assert np.array_equal(valley_indices, expected_valley_indices)
