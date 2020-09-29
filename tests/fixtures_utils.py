@@ -48,20 +48,37 @@ def _load_file_tsv(file_path: str) -> Tuple[List[str], List[str]]:
     return time, v
 
 
+def _load_file_tsv_with_floats(
+    file_path: str, time_scaling_factor: int = 1
+) -> Tuple[List[int], List[str]]:
+    time = []
+    v = []
+    with open(file_path, "r") as file_name:
+        file_reader = csv.reader(file_name, delimiter="\t")
+        for row in file_reader:
+            time.append(round(float(row[0]) * time_scaling_factor))
+            v.append(row[1])
+    return time, v
+
+
 def create_numpy_array_of_raw_gmr_from_python_arrays(time_array, gmr_array):
     time = np.array(time_array, dtype=np.int32)
     v = np.array(gmr_array, dtype=np.int32)
 
-    data = np.zeros((2, len(time_array)), dtype=np.int32)
-    for i in range(len(time_array)):
-        data[0, i] = time[i]
-        data[1, i] = v[i]
+    data = np.array([time, v], dtype=np.int32)
     return data
 
 
-def _run_peak_detection(filename, sampling_rate_construct=100, flip_data=True):
-    time, v = _load_file_tsv(os.path.join(PATH_TO_DATASETS, filename))
-
+def _run_peak_detection(
+    filename, sampling_rate_construct=100, flip_data=True, time_scaling_factor=None
+):
+    time, v = (
+        _load_file_tsv_with_floats(
+            os.path.join(PATH_TO_DATASETS, filename), time_scaling_factor
+        )
+        if time_scaling_factor
+        else _load_file_tsv(os.path.join(PATH_TO_DATASETS, filename))
+    )
     # create numpy matrix
     raw_data = create_numpy_array_of_raw_gmr_from_python_arrays(time, v)
     simple_pipeline_template = PipelineTemplate(

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 
+from mantarray_waveform_analysis import CENTIMILLISECONDS_PER_SECOND
 import pytest
 
 from .fixtures_utils import _run_peak_detection
@@ -19,4 +20,14 @@ def fixture_noisy_data_A1():
         os.path.join("noisy_data", "noisy_data_A1.tsv"),
         sampling_rate_construct=600,
         flip_data=True,
+    )
+
+
+@pytest.fixture(scope="session", name="noisy_data_B1")
+def fixture_noisy_data_B1():
+    return _run_peak_detection(
+        os.path.join("noisy_data", "noisy_data_B1.tsv"),
+        sampling_rate_construct=600,
+        flip_data=True,
+        time_scaling_factor=CENTIMILLISECONDS_PER_SECOND,
     )
