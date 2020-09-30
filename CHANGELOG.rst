@@ -1,6 +1,12 @@
 Changelog for Mantarray Waveform Analysis
 =========================================
 
+0.5.4 (2020-09-30)
+------------------
+
+- Fixed peak detection so it is less likely to report two peaks/valleys in a row.
+
+
 0.5.3 (2020-09-15)
 ------------------
 

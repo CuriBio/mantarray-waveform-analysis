@@ -32,6 +32,8 @@ from .fixtures_compression import fixture_new_A4
 from .fixtures_compression import fixture_new_A5
 from .fixtures_compression import fixture_new_A6
 from .fixtures_peak_detection import fixture_maiden_voyage_data
+from .fixtures_peak_detection import fixture_noisy_data_A1
+from .fixtures_peak_detection import fixture_noisy_data_B1
 from .fixtures_utils import _get_data_metrics
 from .fixtures_utils import _load_file_tsv
 from .fixtures_utils import _plot_data
@@ -51,6 +53,8 @@ __fixtures__ = [
     fixture_new_A4,
     fixture_new_A5,
     fixture_new_A6,
+    fixture_noisy_data_A1,
+    fixture_noisy_data_B1,
 ]
 
 
@@ -1010,7 +1014,7 @@ def test_maiden_voyage_data_peak_detection(maiden_voyage_data):
         1439,
         1678,
         1769,
-        1942,
+        # 1942,
     ]
     expected_peak_indices = [
         84,
@@ -1234,3 +1238,140 @@ def test_find_twitch_indices__returns_correct_values_with_data_that_ends_in_peak
     peak_indices = np.array(range(0, 10, 2), dtype=np.int32)
     valley_indices = np.array(range(1, 9, 2), dtype=np.int32)
     find_twitch_indices((peak_indices, valley_indices), None)
+
+
+def test_noisy_data_A1(noisy_data_A1):
+    pipeline, peak_and_valley_indices = noisy_data_A1
+
+    # plot and save results
+    filtered_data = pipeline.get_noise_filtered_gmr()
+    _plot_data(
+        peak_and_valley_indices,
+        filtered_data,
+        os.path.join(PATH_TO_PNGS, "new_noisy_data_A1_peaks.png"),
+    )
+
+    peak_indices, valley_indices = peak_and_valley_indices
+
+    expected_peak_indices = [
+        19,
+        580,
+        1165,
+        1728,
+        2341,
+        2867,
+        3393,
+        3956,
+        4530,
+        5088,
+        5710,
+        6228,
+        6797,
+        7340,
+        7964,
+        8525,
+        9102,
+        9623,
+        10184,
+        10763,
+        11358,
+        11909,
+        12521,
+        13045,
+    ]
+    expected_valley_indices = [
+        330,
+        803,
+        1573,
+        2126,
+        2712,
+        3111,
+        3681,
+        4206,
+        4968,
+        5504,
+        6094,
+        6617,
+        7067,
+        7550,
+        8379,
+        8895,
+        9427,
+        9992,
+        10501,
+        10989,
+        11730,
+        12293,
+        12820,
+    ]
+    assert np.array_equal(peak_indices, expected_peak_indices)
+    assert np.array_equal(valley_indices, expected_valley_indices)
+
+
+def test_noisy_data_B1(noisy_data_B1):
+    pipeline, peak_and_valley_indices = noisy_data_B1
+    # plot and save results
+    filtered_data = pipeline.get_noise_filtered_gmr()
+    _plot_data(
+        peak_and_valley_indices,
+        filtered_data,
+        os.path.join(PATH_TO_PNGS, "new_noisy_data_B1_peaks.png"),
+    )
+
+    peak_indices, valley_indices = peak_and_valley_indices
+
+    expected_peak_indices = [
+        341,
+        867,
+        1392,
+        1936,
+        2451,
+        3006,
+        3507,
+        4036,
+        4584,
+        5079,
+        5625,
+        6138,
+        6676,
+        7219,
+        7751,
+        8279,
+        8778,
+        9333,
+        9847,
+        10389,
+        10908,
+        11454,
+        11981,
+        12503,
+        13034,
+    ]
+    expected_valley_indices = [
+        701,
+        1145,
+        1721,
+        2271,
+        2829,
+        3178,
+        3816,
+        4372,
+        4815,
+        5340,
+        5897,
+        6450,
+        7040,
+        7570,
+        8091,
+        8616,
+        9155,
+        9602,
+        10134,
+        10686,
+        11233,
+        11798,
+        12347,
+        12851,
+    ]
+    assert np.array_equal(peak_indices, expected_peak_indices)
+    assert np.array_equal(valley_indices, expected_valley_indices)
