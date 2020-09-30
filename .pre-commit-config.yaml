@@ -65,7 +65,7 @@ repos:
     rev: v3.2.0  # Use the ref you want to point at
     hooks:
     -   id: check-added-large-files
-        exclude: \.tsv
+        exclude: \.tsv|\.h5
         args: ['--maxkb=123']
     -   id: check-json
     -   id: check-yaml

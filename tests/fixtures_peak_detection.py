@@ -17,7 +17,7 @@ def fixture_maiden_voyage_data():
 @pytest.fixture(scope="session", name="noisy_data_A1")
 def fixture_noisy_data_A1():
     return _run_peak_detection(
-        os.path.join("noisy_data", "noisy_data_A1.tsv"),
+        os.path.join("noisy_data", "MA20001025__2020_09_21_163232__A1.h5"),
         sampling_rate_construct=600,
         flip_data=True,
     )
@@ -26,7 +26,7 @@ def fixture_noisy_data_A1():
 @pytest.fixture(scope="session", name="noisy_data_B1")
 def fixture_noisy_data_B1():
     return _run_peak_detection(
-        os.path.join("noisy_data", "noisy_data_B1.tsv"),
+        os.path.join("noisy_data", "MA20001025__2020_09_21_163232__B1.h5"),
         sampling_rate_construct=600,
         flip_data=True,
         time_scaling_factor=CENTIMILLISECONDS_PER_SECOND,
