@@ -964,7 +964,7 @@ def test_new_A6(new_A6):
         808,
         874,
         926,
-        # 981,
+        981,
     ]
     expected_peak_indices = [
         31,
@@ -1254,6 +1254,7 @@ def test_noisy_data_A1(noisy_data_A1):
     peak_indices, valley_indices = peak_and_valley_indices
 
     expected_peak_indices = [
+        19,
         580,
         1165,
         1728,
