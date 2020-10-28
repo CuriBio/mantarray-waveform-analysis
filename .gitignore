@@ -2,23 +2,20 @@
 .idea/
 .~c9*
 
+# CI caches
+.npm_cache/
+.precommit_cache/
+.pipenv_cache/
+
 # Python
 *.py[cod]
 __pycache__/
-
-# Cython
-*.so
-*.c
-*.html
 
 # Venv
 .venv/
 venv/
 *.egg-info
 
-
-build/
-dist/
 
 # sphinx html
 docs/build
@@ -29,7 +26,9 @@ docs/build
 .coverage
 tests/**/snapshots/*_actual.png
 tests/**/snapshots/*_diff.png
-tests/pngs/*.png
+
+dist/
+build/
 
 # test coverage
 tests/__coverage__
@@ -53,3 +52,11 @@ pipeline_outputs/
 
 
 secrets.json
+
+
+# project-specific
+tests/pngs/*.png
+
+# Cython
+*.so
+*.c

@@ -1,6 +1,12 @@
 Changelog for Mantarray Waveform Analysis
 =========================================
 
+0.5.5 (2020-10-28)
+------------------
+
+- Publishing using github workflow and build environment
+
+
 0.5.4 (2020-09-30)
 ------------------
 

@@ -36,7 +36,8 @@ TWITCH_WIDTH_PERCENTS = range(10, 95, 5)
 
 
 def peak_detector(
-    filtered_gmr: NDArray[(2, Any), int], twitches_point_up: bool = True,
+    filtered_gmr: NDArray[(2, Any), int],
+    twitches_point_up: bool = True,
 ) -> Tuple[List[int], List[int]]:
     """Locates peaks and valleys and returns the indices.
 
