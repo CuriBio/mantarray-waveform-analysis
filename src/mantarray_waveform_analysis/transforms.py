@@ -37,7 +37,8 @@ FILTER_CHARACTERISTICS: Dict[uuid.UUID, Dict[str, Union[str, float, int]]] = {
 
 
 def create_filter(
-    filter_uuid: uuid.UUID, sample_period_centimilliseconds: int,
+    filter_uuid: uuid.UUID,
+    sample_period_centimilliseconds: int,
 ) -> NDArray[(Any, Any), float]:
     """Create a filter to apply to data streams.
 
