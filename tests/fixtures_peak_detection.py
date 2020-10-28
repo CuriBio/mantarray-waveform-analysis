@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import os
 
+from mantarray_waveform_analysis import BUTTERWORTH_LOWPASS_30_UUID
 from mantarray_waveform_analysis import CENTIMILLISECONDS_PER_SECOND
 import pytest
 
@@ -30,4 +31,15 @@ def fixture_noisy_data_B1():
         sampling_rate_construct=600,
         flip_data=True,
         time_scaling_factor=CENTIMILLISECONDS_PER_SECOND,
+    )
+
+
+@pytest.fixture(scope="session", name="MA20123123__2020_10_13_173812__B6")
+def fixture_MA20123123__2020_10_13_173812__B6():
+    return _run_peak_detection(
+        os.path.join("two_valley_error", "MA20123123__2020_10_13_173812__B6.h5"),
+        sampling_rate_construct=625,
+        flip_data=True,
+        time_scaling_factor=CENTIMILLISECONDS_PER_SECOND,
+        noise_filter_uuid=BUTTERWORTH_LOWPASS_30_UUID,
     )

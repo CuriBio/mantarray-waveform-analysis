@@ -54,13 +54,7 @@ def _load_file_tsv(file_path: str) -> Tuple[List[str], List[str]]:
 def _load_file_h5(file_path: str) -> Tuple[List[str], List[str]]:
     wf = WellFile(file_path)
     tissue_data = wf.get_raw_tissue_reading()
-    # only analyze first 21 seconds of data so png graphs are readablw
-    last_index = 0
-    for idx, t in enumerate(tissue_data[0]):
-        last_index = idx
-        if t > CENTIMILLISECONDS_PER_SECOND * 21:
-            break
-    return tissue_data[0][:last_index], tissue_data[1][:last_index]
+    return tissue_data[0], tissue_data[1]
 
 
 def create_numpy_array_of_raw_gmr_from_python_arrays(time_array, gmr_array):
@@ -72,7 +66,11 @@ def create_numpy_array_of_raw_gmr_from_python_arrays(time_array, gmr_array):
 
 
 def _run_peak_detection(
-    filename, sampling_rate_construct=100, flip_data=True, time_scaling_factor=None
+    filename,
+    sampling_rate_construct=100,
+    flip_data=True,
+    time_scaling_factor=None,
+    noise_filter_uuid=None,
 ):
     the_path = os.path.join(PATH_TO_DATASETS, filename)
     time, v = (
@@ -80,7 +78,8 @@ def _run_peak_detection(
         if filename.endswith(".h5")
         else _load_file_tsv(the_path)
     )
-    noise_filter_uuid = BESSEL_LOWPASS_30_UUID if filename.endswith(".h5") else None
+    if noise_filter_uuid is None:
+        noise_filter_uuid = BESSEL_LOWPASS_30_UUID if filename.endswith(".h5") else None
     # create numpy matrix
     raw_data = create_numpy_array_of_raw_gmr_from_python_arrays(time, v)
     simple_pipeline_template = PipelineTemplate(
@@ -96,22 +95,61 @@ def _run_peak_detection(
     return pipeline, peak_and_valley_timepoints
 
 
-def _plot_data(peak_and_valley_indices, filtered_data, my_local_path_graphs):
+def _plot_data(
+    peak_and_valley_indices,
+    filtered_data,
+    my_local_path_graphs,
+    x_bounds: Tuple[int, int] = (0, 20),
+):
     time_series = filtered_data[0, :]
     peak_indices, valley_indices = peak_and_valley_indices
+
+    time_series_in_bounds = [
+        t
+        for t in time_series
+        if (
+            t / CENTIMILLISECONDS_PER_SECOND > x_bounds[0]
+            and t / CENTIMILLISECONDS_PER_SECOND < x_bounds[1]
+        )
+    ]
+    waveforms_in_bounds = [
+        y_val
+        for idx, y_val in enumerate(filtered_data[1, :])
+        if (
+            time_series[idx] / CENTIMILLISECONDS_PER_SECOND > x_bounds[0]
+            and time_series[idx] / CENTIMILLISECONDS_PER_SECOND < x_bounds[1]
+        )
+    ]
+    peak_indices = [
+        idx
+        for idx in peak_indices
+        if (
+            time_series[idx] / CENTIMILLISECONDS_PER_SECOND > x_bounds[0]
+            and time_series[idx] / CENTIMILLISECONDS_PER_SECOND < x_bounds[1]
+        )
+    ]
+    valley_indices = [
+        idx
+        for idx in valley_indices
+        if (
+            time_series[idx] / CENTIMILLISECONDS_PER_SECOND > x_bounds[0]
+            and time_series[idx] / CENTIMILLISECONDS_PER_SECOND < x_bounds[1]
+        )
+    ]
+
     plt.figure()
-    plt.plot(time_series, filtered_data[1, :], "b")
+    plt.plot(time_series_in_bounds, waveforms_in_bounds, "g")
     plt.plot(
         time_series[peak_indices],
         filtered_data[1][peak_indices],
-        "ro",
+        "bo",
         label="peaks",
         fillstyle="none",
     )
     plt.plot(
         time_series[valley_indices],
         filtered_data[1][valley_indices],
-        "go",
+        "ro",
         label="valleys",
         fillstyle="none",
     )

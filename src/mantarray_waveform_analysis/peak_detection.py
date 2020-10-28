@@ -57,8 +57,8 @@ def peak_detector(
         peak_invertor_factor *= -1
         valley_invertor_factor *= -1
     sampling_period_cms = filtered_gmr[0, 1] - filtered_gmr[0, 0]
-    maximum_possible_twitch_frequency = 7  # pylint:disable=invalid-name # (Eli 9/1/20: I can't think of a shorter name to describe this concept fully) # Hz
-    minimum_required_samples_between_twitches = int(  # pylint:disable=invalid-name # (Eli 9/1/20: I can't think of a shorter name to describe this concept fully)
+    maximum_possible_twitch_frequency = 7  # pylint:disable=invalid-name # (Eli 9/1/20): I can't think of a shorter name to describe this concept fully # Hz
+    minimum_required_samples_between_twitches = int(  # pylint:disable=invalid-name # (Eli 9/1/20): I can't think of a shorter name to describe this concept fully
         round(
             (1 / maximum_possible_twitch_frequency)
             * CENTIMILLISECONDS_PER_SECOND
