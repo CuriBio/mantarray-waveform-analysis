@@ -71,9 +71,8 @@ def peak_detector(
     max_height = np.max(gmr_signal)
     min_height = np.min(gmr_signal)
     max_prominence = abs(max_height - min_height)
-    # print(f"max prom {max_prominence}")
     # find peaks and valleys
-    peak_indices, _ = signal.find_peaks(
+    peak_indices, properties = signal.find_peaks(
         gmr_signal * peak_invertor_factor,
         width=minimum_required_samples_between_twitches / 2,
         distance=minimum_required_samples_between_twitches,
@@ -85,7 +84,7 @@ def peak_detector(
         distance=minimum_required_samples_between_twitches,
         prominence=max_prominence / 4,
     )
-    valley_bases = signal.peak_prominences(gmr_signal, valley_indices)[1:]
+    valley_bases = properties["prominences"]
     left_valley_bases = valley_bases[0]
     right_valley_bases = valley_bases[1]
     for i in range(1, len(valley_indices)):
@@ -96,12 +95,6 @@ def peak_detector(
             valley_indices = np.delete(valley_indices, i)
             i -= 1
 
-    # prominences = signal.peak_prominences(gmr_signal, valley_indices)[0]
-    # contour_heights = gmr_signal[valley_indices[52:57]] - prominences[52:57]
-    # plt.plot(range(41179, 44256), gmr_signal[41179:44256])
-    # plt.plot(valley_indices[52:57], gmr_signal[valley_indices[52:57]], "x")
-    # plt.vlines(x=valley_indices[52:57], ymin=contour_heights, ymax=gmr_signal[valley_indices[52:57]], colors="r")
-    # plt.savefig("GRAPH")
     return peak_indices, valley_indices
 
 
