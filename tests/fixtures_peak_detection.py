@@ -19,8 +19,9 @@ def fixture_maiden_voyage_data():
 def fixture_noisy_data_A1():
     return _run_peak_detection(
         os.path.join("noisy_data", "MA20001025__2020_09_21_163232__A1.h5"),
-        sampling_rate_construct=600,
+        sampling_rate_construct=625,
         flip_data=True,
+        x_range=(0, 21),
     )
 
 
@@ -28,9 +29,10 @@ def fixture_noisy_data_A1():
 def fixture_noisy_data_B1():
     return _run_peak_detection(
         os.path.join("noisy_data", "MA20001025__2020_09_21_163232__B1.h5"),
-        sampling_rate_construct=600,
+        sampling_rate_construct=625,
         flip_data=True,
         time_scaling_factor=CENTIMILLISECONDS_PER_SECOND,
+        x_range=(0, 21),
     )
 
 

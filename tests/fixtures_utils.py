@@ -2,6 +2,7 @@
 import csv
 import os
 from typing import List
+from typing import Optional
 from typing import Tuple
 
 from mantarray_file_manager import WellFile
@@ -51,9 +52,15 @@ def _load_file_tsv(file_path: str) -> Tuple[List[str], List[str]]:
     return time, v
 
 
-def _load_file_h5(file_path: str) -> Tuple[List[str], List[str]]:
+def _load_file_h5(
+    file_path: str, sampling_rate_construct: int, x_range: Optional[Tuple[int, int]]
+) -> Tuple[List[str], List[str]]:
     wf = WellFile(file_path)
     tissue_data = wf.get_raw_tissue_reading()
+    if x_range is not None:
+        start = x_range[0] * sampling_rate_construct
+        stop = x_range[1] * sampling_rate_construct
+        return tissue_data[0][start:stop], tissue_data[1][start:stop]
     return tissue_data[0], tissue_data[1]
 
 
@@ -71,10 +78,11 @@ def _run_peak_detection(
     flip_data=True,
     time_scaling_factor=None,
     noise_filter_uuid=None,
+    x_range=None,
 ):
     the_path = os.path.join(PATH_TO_DATASETS, filename)
     time, v = (
-        _load_file_h5(the_path)
+        _load_file_h5(the_path, sampling_rate_construct, x_range=x_range)
         if filename.endswith(".h5")
         else _load_file_tsv(the_path)
     )
@@ -83,7 +91,9 @@ def _run_peak_detection(
     # create numpy matrix
     raw_data = create_numpy_array_of_raw_gmr_from_python_arrays(time, v)
     simple_pipeline_template = PipelineTemplate(
-        tissue_sampling_period=1 / sampling_rate_construct * 100000,
+        tissue_sampling_period=1
+        / sampling_rate_construct
+        * CENTIMILLISECONDS_PER_SECOND,
         noise_filter_uuid=noise_filter_uuid,
     )
     pipeline = simple_pipeline_template.create_pipeline()
