@@ -1,10 +1,12 @@
 Changelog for Mantarray Waveform Analysis
 =========================================
 
-0.5.5 (2020-10-28)
+0.5.5 (2020-11-03)
 ------------------
 
-- Publishing using github workflow and build environment
+- Publishing using github workflow and build environment.
+- Fixed incorrect raising of TwoValleysInARowError.
+- Fixed issue with two valleys incorrectly being found between peaks.
 
 
 0.5.4 (2020-09-30)
