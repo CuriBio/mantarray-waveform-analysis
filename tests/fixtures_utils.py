@@ -57,11 +57,11 @@ def _load_file_h5(
 ) -> Tuple[List[str], List[str]]:
     wf = WellFile(file_path)
     tissue_data = wf.get_raw_tissue_reading()
-    if x_range is not None:
-        start = x_range[0] * sampling_rate_construct
-        stop = x_range[1] * sampling_rate_construct
-        return tissue_data[0][start:stop], tissue_data[1][start:stop]
-    return tissue_data[0], tissue_data[1]
+    if x_range is None:
+        return tissue_data[0], tissue_data[1]
+    start = x_range[0] * sampling_rate_construct
+    stop = x_range[1] * sampling_rate_construct
+    return tissue_data[0][start:stop], tissue_data[1][start:stop]
 
 
 def create_numpy_array_of_raw_gmr_from_python_arrays(time_array, gmr_array):
