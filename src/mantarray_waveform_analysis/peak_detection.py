@@ -72,21 +72,20 @@ def peak_detector(
     min_height = np.min(gmr_signal)
     max_prominence = abs(max_height - min_height)
     # find peaks and valleys
-    peak_indices, properties = signal.find_peaks(
+    peak_indices, _ = signal.find_peaks(
         gmr_signal * peak_invertor_factor,
         width=minimum_required_samples_between_twitches / 2,
         distance=minimum_required_samples_between_twitches,
         prominence=max_prominence / 4,
     )
-    valley_indices, _ = signal.find_peaks(
+    valley_indices, properties = signal.find_peaks(
         gmr_signal * valley_invertor_factor,
         width=minimum_required_samples_between_twitches / 2,
         distance=minimum_required_samples_between_twitches,
         prominence=max_prominence / 4,
     )
-    valley_bases = properties["prominences"]
-    left_valley_bases = valley_bases[0]
-    right_valley_bases = valley_bases[1]
+    left_valley_bases = properties["left_bases"]
+    right_valley_bases = properties["right_bases"]
     for i in range(1, len(valley_indices)):
         if (
             left_valley_bases[i] == left_valley_bases[i - 1]
