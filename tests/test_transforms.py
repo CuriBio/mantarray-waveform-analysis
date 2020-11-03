@@ -99,9 +99,30 @@ def test_create_filter__raises_error_for_code_missing_to_generate_filter(mocker)
                     -1.73792987e00,
                     7.56492551e-01,
                 ],
-                [1, 2, 1, 1, -1.79217579e00, 8.16847162e-01,],
-                [1, -2, 1, 1, -1.99675894e00, 9.96761815e-01,],
-                [1, -2, 1, 1, -1.99816395e00, 9.98166184e-01,],
+                [
+                    1,
+                    2,
+                    1,
+                    1,
+                    -1.79217579e00,
+                    8.16847162e-01,
+                ],
+                [
+                    1,
+                    -2,
+                    1,
+                    1,
+                    -1.99675894e00,
+                    9.96761815e-01,
+                ],
+                [
+                    1,
+                    -2,
+                    1,
+                    1,
+                    -1.99816395e00,
+                    9.98166184e-01,
+                ],
             ],
             "bessel bandpass at 400 Hz / 250 cms sampling, 0.1 Hz and 10 Hz cutoffs",
         ),
@@ -135,7 +156,10 @@ def test_create_filter__raises_error_for_code_missing_to_generate_filter(mocker)
     ],
 )
 def test_create_filter__bessel_bandpass__returns_correct_coefficients(
-    filter_uuid, sampling_period_centimilliseconds, expected_sos, test_description,
+    filter_uuid,
+    sampling_period_centimilliseconds,
+    expected_sos,
+    test_description,
 ):
     expected_sos = np.array(expected_sos, dtype=float)
 

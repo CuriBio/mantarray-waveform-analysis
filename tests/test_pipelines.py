@@ -202,7 +202,10 @@ def test_Pipeline__get_data_type__calls_correct_methods_to_perform_action__but_d
 ):
 
     mocked_function_under_test = mocker.patch.object(
-        pipelines, function_name_to_mock, autospec=True, return_value=expected_return,
+        pipelines,
+        function_name_to_mock,
+        autospec=True,
+        return_value=expected_return,
     )
     actual_return_1 = lambda_of_method_under_test(loaded_generic_pipeline)
     # Eli (7/6/20): NumPy arrays don't play well with assert_called_once_with, so asserting things separately
@@ -211,7 +214,8 @@ def test_Pipeline__get_data_type__calls_correct_methods_to_perform_action__but_d
     expected_array_arg = list_of_lambdas_to_get_call_args[0](loaded_generic_pipeline)
     if isinstance(expected_array_arg, np.ndarray):
         np.testing.assert_array_equal(
-            actual_array_arg, expected_array_arg,
+            actual_array_arg,
+            expected_array_arg,
         )
     else:
         assert actual_array_arg == expected_array_arg
@@ -222,7 +226,8 @@ def test_Pipeline__get_data_type__calls_correct_methods_to_perform_action__but_d
         )
         if isinstance(expected_array_arg, np.ndarray):
             np.testing.assert_array_equal(
-                actual_array_arg, expected_array_arg,
+                actual_array_arg,
+                expected_array_arg,
             )
         else:
             assert actual_array_arg == expected_array_arg
@@ -238,7 +243,9 @@ def test_Pipeline__get_noise_filtered_gmr__creates_and_uses_filter_supplied_by_t
     mocker, loaded_generic_pipeline, generic_pipeline_template
 ):
     mocked_function_under_test = mocker.patch.object(
-        pipelines, "apply_noise_filtering", autospec=True,
+        pipelines,
+        "apply_noise_filtering",
+        autospec=True,
     )
     loaded_generic_pipeline.get_noise_filtered_magnetic_data()
     # Eli (7/6/20): NumPy arrays don't play well with assert_called_once_with, so asserting things separately
