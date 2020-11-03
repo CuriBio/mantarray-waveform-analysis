@@ -57,8 +57,8 @@ def peak_detector(
         peak_invertor_factor *= -1
         valley_invertor_factor *= -1
     sampling_period_cms = filtered_gmr[0, 1] - filtered_gmr[0, 0]
-    maximum_possible_twitch_frequency = 7  # pylint:disable=invalid-name # (Eli 9/1/20: I can't think of a shorter name to describe this concept fully) # Hz
-    minimum_required_samples_between_twitches = int(  # pylint:disable=invalid-name # (Eli 9/1/20: I can't think of a shorter name to describe this concept fully)
+    maximum_possible_twitch_frequency = 7  # pylint:disable=invalid-name # (Eli 9/1/20): I can't think of a shorter name to describe this concept fully # Hz
+    minimum_required_samples_between_twitches = int(  # pylint:disable=invalid-name # (Eli 9/1/20): I can't think of a shorter name to describe this concept fully
         round(
             (1 / maximum_possible_twitch_frequency)
             * CENTIMILLISECONDS_PER_SECOND
@@ -71,7 +71,6 @@ def peak_detector(
     max_height = np.max(gmr_signal)
     min_height = np.min(gmr_signal)
     max_prominence = abs(max_height - min_height)
-    # print(f"max prom {max_prominence}")
     # find peaks and valleys
     peak_indices, _ = signal.find_peaks(
         gmr_signal * peak_invertor_factor,
@@ -79,12 +78,23 @@ def peak_detector(
         distance=minimum_required_samples_between_twitches,
         prominence=max_prominence / 4,
     )
-    valley_indices, _ = signal.find_peaks(
+    valley_indices, properties = signal.find_peaks(
         gmr_signal * valley_invertor_factor,
         width=minimum_required_samples_between_twitches / 2,
         distance=minimum_required_samples_between_twitches,
         prominence=max_prominence / 4,
     )
+    left_valley_bases = properties["left_bases"]
+    right_valley_bases = properties["right_bases"]
+    # TODO Tanner (11/3/20): move this loop to find_twitch_indices
+    for i in range(1, len(valley_indices)):
+        if (
+            left_valley_bases[i] == left_valley_bases[i - 1]
+            and right_valley_bases[i] == right_valley_bases[i - 1]
+        ):
+            valley_indices = np.delete(valley_indices, i)
+            i -= 1
+
     return peak_indices, valley_indices
 
 
@@ -271,66 +281,51 @@ def find_twitch_indices(
             f"A minimum of {MIN_NUMBER_PEAKS} peaks is required to extract twitch metrics, however only {len(peak_indices)} peak(s) were detected"
         )
     twitches: Dict[int, Dict[UUID, Optional[int]]] = {}
-    starts_with_peak = peak_indices[0] < valley_indices[0]
-    # ends_with_peak = peak_indices[-1] > valley_indices[-1]
-    for itr_idx, itr_peak_index in enumerate(peak_indices):
-        if itr_idx == peak_indices.shape[0] - 1:  # last peak
-            if itr_idx == valley_indices.shape[0] - 2:
-                raise TwoValleysInARowError(
-                    peak_and_valley_indices,
-                    filtered_data,
-                    (valley_indices[itr_idx], valley_indices[itr_idx + 1]),
-                )
-            if itr_idx == valley_indices.shape[0] - 3:
-                raise TwoValleysInARowError(
-                    peak_and_valley_indices,
-                    filtered_data,
-                    (valley_indices[itr_idx + 1], valley_indices[itr_idx + 2]),
-                )
-        else:
-            if starts_with_peak:
-                if (
-                    itr_idx == valley_indices.shape[0]
-                    and itr_idx == peak_indices.shape[0] - 2
-                    or valley_indices[itr_idx] > peak_indices[itr_idx + 1]
-                ):
-                    raise TwoPeaksInARowError(
-                        peak_and_valley_indices,
-                        filtered_data,
-                        (peak_indices[itr_idx], peak_indices[itr_idx + 1]),
-                    )
-                if itr_peak_index > valley_indices[itr_idx]:
-                    raise TwoValleysInARowError(
-                        peak_and_valley_indices,
-                        filtered_data,
-                        (valley_indices[itr_idx - 1], valley_indices[itr_idx]),
-                    )
-            else:
-                if (
-                    itr_idx == valley_indices.shape[0] - 1
-                    and itr_idx == peak_indices.shape[0] - 2
-                ):
-                    raise TwoPeaksInARowError(
-                        peak_and_valley_indices,
-                        filtered_data,
-                        (peak_indices[itr_idx], peak_indices[itr_idx + 1]),
-                    )
-                if valley_indices[itr_idx] > peak_indices[itr_idx]:
-                    raise TwoPeaksInARowError(
-                        peak_and_valley_indices,
-                        filtered_data,
-                        (peak_indices[itr_idx - 1], peak_indices[itr_idx]),
-                    )
-                if (
-                    itr_idx < len(valley_indices) - 1
-                    and itr_peak_index > valley_indices[itr_idx + 1]
-                ):
-                    raise TwoValleysInARowError(
-                        peak_and_valley_indices,
-                        filtered_data,
-                        (valley_indices[itr_idx], valley_indices[itr_idx + 1]),
-                    )
 
+    starts_with_peak = peak_indices[0] < valley_indices[0]
+    prev_feature_is_peak = starts_with_peak
+    peak_idx = 0
+    valley_idx = 0
+    if starts_with_peak:
+        peak_idx += 1
+    else:
+        valley_idx += 1
+
+    # check for two back-to-back features
+    while peak_idx < len(peak_indices) and valley_idx < len(valley_indices):
+        if prev_feature_is_peak:
+            if valley_indices[valley_idx] > peak_indices[peak_idx]:
+                raise TwoPeaksInARowError(
+                    peak_and_valley_indices,
+                    filtered_data,
+                    (peak_indices[peak_idx - 1], peak_indices[peak_idx]),
+                )
+            valley_idx += 1
+        else:
+            if valley_indices[valley_idx] < peak_indices[peak_idx]:
+                raise TwoValleysInARowError(
+                    peak_and_valley_indices,
+                    filtered_data,
+                    (valley_indices[valley_idx - 1], valley_indices[valley_idx]),
+                )
+            peak_idx += 1
+        prev_feature_is_peak = not prev_feature_is_peak
+    if peak_idx < len(peak_indices) - 1:
+        raise TwoPeaksInARowError(
+            peak_and_valley_indices,
+            filtered_data,
+            (peak_indices[peak_idx], peak_indices[peak_idx + 1]),
+        )
+    if valley_idx < len(valley_indices) - 1:
+        raise TwoValleysInARowError(
+            peak_and_valley_indices,
+            filtered_data,
+            (valley_indices[valley_idx], valley_indices[valley_idx + 1]),
+        )
+
+    # compile dict of twitch information
+    for itr_idx, itr_peak_index in enumerate(peak_indices):
+        if itr_idx < peak_indices.shape[0] - 1:  # last peak
             if itr_idx == 0 and starts_with_peak:
                 continue
 

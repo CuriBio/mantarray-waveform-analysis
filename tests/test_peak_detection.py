@@ -31,6 +31,8 @@ from .fixtures_compression import fixture_new_A3
 from .fixtures_compression import fixture_new_A4
 from .fixtures_compression import fixture_new_A5
 from .fixtures_compression import fixture_new_A6
+from .fixtures_peak_detection import fixture_MA20123123__2020_10_13_173812__B6
+from .fixtures_peak_detection import fixture_MA20123123__2020_10_13_234733__A1
 from .fixtures_peak_detection import fixture_maiden_voyage_data
 from .fixtures_peak_detection import fixture_noisy_data_A1
 from .fixtures_peak_detection import fixture_noisy_data_B1
@@ -55,6 +57,8 @@ __fixtures__ = [
     fixture_new_A6,
     fixture_noisy_data_A1,
     fixture_noisy_data_B1,
+    fixture_MA20123123__2020_10_13_173812__B6,
+    fixture_MA20123123__2020_10_13_234733__A1,
 ]
 
 
@@ -713,35 +717,10 @@ def test_new_A1(new_A1):
 
     peak_indices, valley_indices = peak_and_valley_indices
 
-    expected_valley_indices = [
-        70,
-        147,
-        220,
-        305,
-        397,
-        463,
-        555,
-        628,
-        713,
-        779,
-        871,
-        963,
-    ]
-    expected_peak_indices = [
-        24,
-        105,
-        186,
-        266,
-        344,
-        424,
-        502,
-        586,
-        667,
-        745,
-        825,
-        906,
-        987,
-    ]
+    # fmt: off
+    expected_valley_indices = [70, 147, 220, 305, 397, 463, 555, 628, 713, 779, 871, 963]
+    expected_peak_indices = [24, 105, 186, 266, 344, 424, 502, 586, 667, 745, 825, 906, 987]
+    # fmt: on
     assert np.array_equal(peak_indices, expected_peak_indices)
     assert np.array_equal(valley_indices, expected_valley_indices)
 
@@ -759,35 +738,10 @@ def test_new_A2(new_A2):
 
     peak_indices, valley_indices = peak_and_valley_indices
 
-    expected_valley_indices = [
-        58,
-        164,
-        235,
-        308,
-        393,
-        466,
-        565,
-        643,
-        716,
-        797,
-        867,
-        947,
-    ]
-    expected_peak_indices = [
-        24,
-        104,
-        185,
-        262,
-        347,
-        424,
-        505,
-        586,
-        663,
-        744,
-        825,
-        906,
-        986,
-    ]
+    # fmt: off
+    expected_valley_indices = [58, 164, 235, 308, 393, 466, 565, 643, 716, 797, 867, 947]
+    expected_peak_indices = [24, 104, 185, 262, 347, 424, 505, 586, 663, 744, 825, 906, 986]
+    # fmt: on
     assert np.array_equal(peak_indices, expected_peak_indices)
     assert np.array_equal(valley_indices, expected_valley_indices)
 
@@ -805,21 +759,10 @@ def test_new_A3(new_A3):
 
     peak_indices, valley_indices = peak_and_valley_indices
 
-    expected_valley_indices = [
-        62,
-        165,
-        239,
-        324,
-        404,
-        470,
-        562,
-        628,
-        727,
-        805,
-        871,
-        963,
-    ]
+    # fmt: off
+    expected_valley_indices = [62, 165, 239, 324, 404, 470, 562, 628, 727, 805, 871, 963]
     expected_peak_indices = [28, 108, 193, 266, 351, 428, 509, 594, 667, 752, 832, 910]
+    # fmt: on
     assert np.array_equal(peak_indices, expected_peak_indices)
     assert np.array_equal(valley_indices, expected_valley_indices)
 
@@ -837,44 +780,10 @@ def test_new_A4(new_A4):
 
     peak_indices, valley_indices = peak_and_valley_indices
 
-    expected_valley_indices = [
-        58,
-        117,
-        176,
-        235,
-        290,
-        349,
-        407,
-        466,
-        518,
-        584,
-        639,
-        697,
-        756,
-        815,
-        867,
-        926,
-        985,
-    ]
-    expected_peak_indices = [
-        23,
-        81,
-        137,
-        196,
-        255,
-        311,
-        369,
-        427,
-        486,
-        545,
-        601,
-        659,
-        715,
-        774,
-        832,
-        890,
-        946,
-    ]
+    # fmt: off
+    expected_valley_indices = [58, 117, 176, 235, 290, 349, 407, 466, 518, 584, 639, 697, 756, 815, 867, 926, 985]
+    expected_peak_indices = [23, 81, 137, 196, 255, 311, 369, 427, 486, 545, 601, 659, 715, 774, 832, 890, 946]
+    # fmt: on
     assert np.array_equal(peak_indices, expected_peak_indices)
     assert np.array_equal(valley_indices, expected_valley_indices)
 
@@ -947,44 +856,10 @@ def test_new_A6(new_A6):
 
     peak_indices, valley_indices = peak_and_valley_indices
 
-    expected_valley_indices = [
-        51,
-        117,
-        176,
-        238,
-        294,
-        341,
-        400,
-        459,
-        525,
-        580,
-        625,
-        698,
-        757,
-        808,
-        874,
-        926,
-        981,
-    ]
-    expected_peak_indices = [
-        31,
-        88,
-        148,
-        201,
-        255,
-        318,
-        376,
-        428,
-        490,
-        552,
-        604,
-        663,
-        722,
-        784,
-        832,
-        898,
-        953,
-    ]
+    # fmt: off
+    expected_valley_indices = [51, 117, 176, 238, 294, 341, 400, 459, 525, 580, 625, 698, 757, 808, 874, 926, 981]
+    expected_peak_indices = [31, 88, 148, 201, 255, 318, 376, 428, 490, 552, 604, 663, 722, 784, 832, 898, 953]
+    # fmt: on
     assert np.array_equal(peak_indices, expected_peak_indices)
     assert np.array_equal(valley_indices, expected_valley_indices)
 
@@ -1002,34 +877,10 @@ def test_maiden_voyage_data_peak_detection(maiden_voyage_data):
 
     peak_indices, valley_indices = peak_and_valley_indices
 
-    expected_valley_indices = [
-        154,
-        340,
-        526,
-        686,
-        862,
-        960,
-        1185,
-        1309,
-        1439,
-        1678,
-        1769,
-        # 1942,
-    ]
-    expected_peak_indices = [
-        84,
-        247,
-        413,
-        576,
-        739,
-        899,
-        1059,
-        1226,
-        1383,
-        1549,
-        1712,
-        1875,
-    ]
+    # fmt: off
+    expected_valley_indices = [154, 340, 526, 686, 862, 960, 1185, 1309, 1439, 1678, 1769]
+    expected_peak_indices = [84, 247, 413, 576, 739, 899, 1059, 1226, 1383, 1549, 1712, 1875]
+    # fmt: on
 
     assert np.array_equal(peak_indices, expected_peak_indices)
     assert np.array_equal(valley_indices, expected_valley_indices)
@@ -1051,19 +902,9 @@ def test_find_twitch_indices__excludes_first_and_last_peak_when_no_outer_valleys
 
     actual_twitch_indices = find_twitch_indices(peak_and_valley_indices, filtered_data)
     actual_twitch_peak_indices = list(actual_twitch_indices.keys())
-    expected_twitch_peak_indices = [
-        105,
-        186,
-        266,
-        344,
-        424,
-        502,
-        586,
-        667,
-        745,
-        825,
-        906,
-    ]
+    # fmt: off
+    expected_twitch_peak_indices = [105, 186, 266, 344, 424, 502, 586, 667, 745, 825, 906]
+    # fmt: on
     assert actual_twitch_peak_indices == expected_twitch_peak_indices
 
     assert actual_twitch_indices[105] == {
@@ -1080,26 +921,16 @@ def test_find_twitch_indices__excludes_only_last_peak_when_no_outer_peak_at_begi
     pipeline, peak_and_valley_indices = new_A1
     filtered_data = pipeline.get_noise_filtered_gmr()
     _, valley_indices = peak_and_valley_indices
-    peak_indices = np.asarray(
-        [105, 186, 266, 344, 424, 502, 586, 667, 745, 825, 906, 987], dtype=np.int32
-    )
+    # fmt: off
+    peak_indices = np.asarray([105, 186, 266, 344, 424, 502, 586, 667, 745, 825, 906, 987], dtype=np.int32)
+    # fmt: on
     actual_twitch_indices = find_twitch_indices(
         (peak_indices, valley_indices), filtered_data
     )
     actual_twitch_peak_indices = list(actual_twitch_indices.keys())
-    expected_twitch_peak_indices = [
-        105,
-        186,
-        266,
-        344,
-        424,
-        502,
-        586,
-        667,
-        745,
-        825,
-        906,
-    ]
+    # fmt: off
+    expected_twitch_peak_indices = [105, 186, 266, 344, 424, 502, 586, 667, 745, 825, 906]
+    # fmt: on
     assert actual_twitch_peak_indices == expected_twitch_peak_indices
 
     assert actual_twitch_indices[105] == {
@@ -1252,58 +1083,11 @@ def test_noisy_data_A1(noisy_data_A1):
     )
 
     peak_indices, valley_indices = peak_and_valley_indices
-
-    expected_peak_indices = [
-        19,
-        580,
-        1165,
-        1728,
-        2341,
-        2867,
-        3393,
-        3956,
-        4530,
-        5088,
-        5710,
-        6228,
-        6797,
-        7340,
-        7964,
-        8525,
-        9102,
-        9623,
-        10184,
-        10763,
-        11358,
-        11909,
-        12521,
-        13045,
-    ]
-    expected_valley_indices = [
-        330,
-        803,
-        1573,
-        2126,
-        2712,
-        3111,
-        3681,
-        4206,
-        4968,
-        5504,
-        6094,
-        6617,
-        7067,
-        7550,
-        8379,
-        8895,
-        9427,
-        9992,
-        10501,
-        10989,
-        11730,
-        12293,
-        12820,
-    ]
+    # TODO Tanner (11/3/20): lock this and other data in to a specific filter
+    # fmt: off
+    expected_peak_indices = [19, 580, 1166, 1729, 2341, 2866, 3394, 3956, 4530, 5088, 5710, 6228, 6797, 7340, 7964, 8525, 9103, 9623, 10184, 10763, 11358, 11909, 12520, 13045]
+    expected_valley_indices = [330, 803, 1573, 2127, 2711, 3111, 3681, 4206, 4968, 5504, 6094, 6618, 7067, 7550, 8379, 8896, 9428, 9992, 10502, 10989, 11730, 12293, 12820]
+    # fmt: on
     assert np.array_equal(peak_indices, expected_peak_indices)
     assert np.array_equal(valley_indices, expected_valley_indices)
 
@@ -1320,58 +1104,52 @@ def test_noisy_data_B1(noisy_data_B1):
 
     peak_indices, valley_indices = peak_and_valley_indices
 
-    expected_peak_indices = [
-        341,
-        867,
-        1392,
-        1936,
-        2451,
-        3006,
-        3507,
-        4036,
-        4584,
-        5079,
-        5625,
-        6138,
-        6676,
-        7219,
-        7751,
-        8279,
-        8778,
-        9333,
-        9847,
-        10389,
-        10908,
-        11454,
-        11981,
-        12503,
-        13034,
-    ]
-    expected_valley_indices = [
-        701,
-        1145,
-        1721,
-        2271,
-        2829,
-        3178,
-        3816,
-        4372,
-        4815,
-        5340,
-        5897,
-        6450,
-        7040,
-        7570,
-        8091,
-        8616,
-        9155,
-        9602,
-        10134,
-        10686,
-        11233,
-        11798,
-        12347,
-        12851,
-    ]
+    # fmt: off
+    expected_peak_indices = [342, 867, 1392, 1936, 2451, 3005, 3507, 4036, 4584, 5079, 5595, 6139, 6676, 7219, 7751, 8279, 8778, 9333, 9847, 10390, 10908, 11454, 11981, 12503, 13033]
+    expected_valley_indices = [701, 1145, 1721, 2271, 2829, 3178, 3816, 4372, 4815, 5340, 5897, 6449, 7040, 7570, 8091, 8617, 9154, 9602, 10134, 10686, 11233, 11797, 12347, 12851]
+    # fmt: on
+    assert np.array_equal(peak_indices, expected_peak_indices)
+    assert np.array_equal(valley_indices, expected_valley_indices)
+
+
+def test__B6_data_causing_TwoValleysInARowError(MA20123123__2020_10_13_173812__B6):
+    pipeline, peak_and_valley_indices = MA20123123__2020_10_13_173812__B6
+    # plot and save results
+    filtered_data = pipeline.get_noise_filtered_gmr()
+    _plot_data(
+        peak_and_valley_indices,
+        filtered_data,
+        os.path.join(PATH_TO_PNGS, "new_MA20123123__2020_10_13_173812__B6.png"),
+        x_bounds=(65, 75),
+    )
+
+    peak_indices, valley_indices = peak_and_valley_indices
+    find_twitch_indices(peak_and_valley_indices, filtered_data)
+
+    # fmt: off
+    expected_peak_indices = [828, 1593, 2388, 3184, 3980, 4755, 5545, 6258, 7048, 7850, 8636, 9446, 10248, 11017, 11802, 12564, 13370, 14153, 14948, 15718, 16497, 17271, 18050, 18822, 19574, 20335, 21150, 21907, 22714, 23474, 24273, 25041, 25830, 26625, 27408, 28189, 28968, 29800, 30571, 31358, 32137, 32970, 33750, 34516, 35296, 36075, 36857, 37635, 38446, 39182, 39935, 40651, 41366, 42211, 42995, 43757, 44520, 45254, 45998, 46731, 47472, 48232, 48975, 49699, 50479, 51226, 51983, 52707, 53424, 54179, 54844, 55575, 56281, 56982, 57723, 58482, 59253, 60019, 60782, 61528, 62303, 63085, 63851, 64657, 65430, 66214, 66988, 67778, 68573, 69366, 70092, 70809, 71556, 72302, 72997, 73741, 74475, 75211]
+    expected_valley_indices = [559, 1338, 2054, 2873, 3752, 4555, 5282, 5994, 6812, 7413, 8182, 8989, 9852, 10642, 11434, 12258, 13055, 13942, 14728, 15498, 16188, 17024, 17669, 18504, 19381, 20119, 20864, 21556, 22510, 23279, 24008, 24859, 25636, 26430, 27222, 27975, 28765, 29567, 30254, 30942, 31910, 32482, 33476, 34099, 34991, 35836, 36576, 37270, 38185, 38830, 39733, 40406, 41179, 41823, 42619, 43533, 44256, 44906, 45785, 46373, 47259, 47852, 48738, 49504, 50292, 51053, 51712, 52500, 53220, 53723, 54485, 55337, 56083, 56649, 57501, 58312, 59058, 59771, 60585, 61183, 62017, 62877, 63646, 64315, 65212, 65912, 66790, 67592, 68370, 69182, 69870, 70570, 71222, 72108, 72793, 73488, 74236, 74983]
+    # fmt: on
+    assert np.array_equal(peak_indices, expected_peak_indices)
+    assert np.array_equal(valley_indices, expected_valley_indices)
+
+
+def test__A1_data_causing_TwoValleysInARowError(MA20123123__2020_10_13_234733__A1):
+    pipeline, peak_and_valley_indices = MA20123123__2020_10_13_234733__A1
+    # plot and save results
+    filtered_data = pipeline.get_noise_filtered_gmr()
+    _plot_data(
+        peak_and_valley_indices,
+        filtered_data,
+        os.path.join(PATH_TO_PNGS, "new_MA20123123__2020_10_13_234733__A1.png"),
+    )
+
+    peak_indices, valley_indices = peak_and_valley_indices
+    find_twitch_indices(peak_and_valley_indices, filtered_data)
+
+    # fmt: off
+    expected_peak_indices = [625, 1314, 2030, 2718, 3426, 4123, 4840, 5533, 6227, 6934, 7633, 8301, 9009, 9739, 10517, 11275, 12035, 12799, 13577, 14326, 15105, 15872, 16645, 17416, 18175, 18954, 19706, 20478, 21250, 22005, 22792, 23592, 24361, 25169, 25961, 26748, 27528, 28324, 29119, 29921, 30711, 31510, 32330, 33146]
+    expected_valley_indices = [404, 942, 1669, 2395, 3237, 3853, 4635, 5345, 6007, 6676, 7433, 8027, 8602, 9516, 10226, 11059, 11829, 12463, 13296, 14119, 14917, 15680, 16279, 17061, 17951, 18748, 19538, 20223, 21023, 21764, 22578, 23157, 24130, 24949, 25656, 26487, 27088, 28068, 28882, 29725, 30215, 31162, 32072, 32828, 33697]
+    # fmt: on
     assert np.array_equal(peak_indices, expected_peak_indices)
     assert np.array_equal(valley_indices, expected_valley_indices)
