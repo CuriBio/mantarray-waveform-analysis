@@ -86,6 +86,7 @@ def peak_detector(
     )
     left_valley_bases = properties["left_bases"]
     right_valley_bases = properties["right_bases"]
+    # TODO Tanner (11/3/20): move this loop to find_twitch_indices
     for i in range(1, len(valley_indices)):
         if (
             left_valley_bases[i] == left_valley_bases[i - 1]

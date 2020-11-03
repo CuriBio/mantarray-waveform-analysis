@@ -1083,6 +1083,7 @@ def test_noisy_data_A1(noisy_data_A1):
     )
 
     peak_indices, valley_indices = peak_and_valley_indices
+    # TODO Tanner (11/3/20): lock this and other data in to a specific filter
     # fmt: off
     expected_peak_indices = [19, 580, 1166, 1729, 2341, 2866, 3394, 3956, 4530, 5088, 5710, 6228, 6797, 7340, 7964, 8525, 9103, 9623, 10184, 10763, 11358, 11909, 12520, 13045]
     expected_valley_indices = [330, 803, 1573, 2127, 2711, 3111, 3681, 4206, 4968, 5504, 6094, 6618, 7067, 7550, 8379, 8896, 9428, 9992, 10502, 10989, 11730, 12293, 12820]
