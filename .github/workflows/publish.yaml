@@ -31,7 +31,7 @@ jobs:
             python-version: "3.7"
             IS_FASTEST_JOB: true
 
-    name: Test code befoer publishing in Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    name: Test code before publishing in Python ${{ matrix.python-version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
