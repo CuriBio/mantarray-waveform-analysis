@@ -152,14 +152,14 @@ jobs:
       - name: Rename wheel for Linux (Python 3.7)
         if: runner.os == 'Linux' && matrix.python-version == 3.8
         run: |
-          cp ./dist/mantarray_waveform_analysis-$PACKAGE_VERSION-cp37-cp37m-linux_x86_64.whl ./dist/mantarray_waveform_analysis-$PACKAGE_VERSION-cp37-cp37m-manylinux1_x86_64.whl
-          rm ./dist/mantarray_waveform_analysis-$PACKAGE_VERSION-cp37-cp37m-linux_x86_64.whl
+          cp ./dist/mantarray_waveform_analysis-${{ steps.extract_version.outputs.package-version }}-cp37-cp37m-linux_x86_64.whl ./dist/mantarray_waveform_analysis-${{ steps.extract_version.outputs.package-version }}-cp37-cp37m-manylinux1_x86_64.whl
+          rm ./dist/mantarray_waveform_analysis-${{ steps.extract_version.outputs.package-version }}-cp37-cp37m-linux_x86_64.whl
 
       - name: Rename wheel for Linux (Python 3.8)
         if: runner.os == 'Linux' && matrix.python-version == 3.8
         run: |
-          cp ./dist/mantarray_waveform_analysis-$PACKAGE_VERSION-cp38-cp38-linux_x86_64.whl ./dist/mantarray_waveform_analysis-$PACKAGE_VERSION-cp38-cp38-manylinux1_x86_64.whl
-          rm ./dist/mantarray_waveform_analysis-$PACKAGE_VERSION-cp38-cp38-linux_x86_64.whl
+          cp ./dist/mantarray_waveform_analysis-${{ steps.extract_version.outputs.package-version }}-cp38-cp38-linux_x86_64.whl ./dist/mantarray_waveform_analysis-${{ steps.extract_version.outputs.package-version }}-cp38-cp38-manylinux1_x86_64.whl
+          rm ./dist/mantarray_waveform_analysis-${{ steps.extract_version.outputs.package-version }}-cp38-cp38-linux_x86_64.whl
 
       - name: Build sdist for release (Linux)
         if: matrix.IS_FASTEST_JOB == true
