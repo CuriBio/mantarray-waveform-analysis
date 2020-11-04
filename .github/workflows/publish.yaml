@@ -146,10 +146,12 @@ jobs:
       - name: Run prerelease to check packaging compatibilty
         run: prerelease --no-input
 
-      - name: Build package for release
-        run: |
-          python setup.py sdist
-          python setup.py bdist_wheel
+      - name: Build wheel for release
+        run: python setup.py bdist_wheel
+
+      - name: Build sdist for release (Linux)
+        if: matrix.IS_FASTEST_JOB == true
+        run: python setup.py sdist
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v2
