@@ -147,10 +147,11 @@ jobs:
         run: prerelease --no-input
 
       - name: Build wheel for release
-        run: python setup.py bdist_wheel
+        run: |
+          python setup.py bdist_wheel
 
       - name: Rename wheel for Linux (Python 3.7)
-        if: runner.os == 'Linux' && matrix.python-version == 3.8
+        if: runner.os == 'Linux' && matrix.python-version == 3.7
         run: |
           cp ./dist/mantarray_waveform_analysis-${{ steps.extract_version.outputs.package-version }}-cp37-cp37m-linux_x86_64.whl ./dist/mantarray_waveform_analysis-${{ steps.extract_version.outputs.package-version }}-cp37-cp37m-manylinux1_x86_64.whl
           rm ./dist/mantarray_waveform_analysis-${{ steps.extract_version.outputs.package-version }}-cp37-cp37m-linux_x86_64.whl
