@@ -293,6 +293,11 @@ jobs:
         if: github.event.inputs.publish_to_pypi == '1'
         run: python .github/workflows/extract_package_info.py install_from_test_pypi
 
+      # Tanner (11/4/20): We need to install packages in requirements-dev to install cython before building from local repo
+      - name: Install Dev Dependencies if downloading from from Test PyPI
+        if: github.event.inputs.publish_to_pypi != '1'
+        run: pip install -r requirements-dev.txt
+
       - name: Install Main Package From Local repo as test since not publishing to PyPI
         if: github.event.inputs.publish_to_pypi != '1'
         run: |
@@ -303,7 +308,9 @@ jobs:
       - name: Confirm no import errors when opening package
         run: python -c "import ${{ steps.extract_package_info.outputs.package-name }}"
 
-      - name: Install Dev Dependencies
+      # Tanner (11/4/20): We need to install packages in requirements-dev after confirming no import errors if downloading from test pypi causes any errors
+      - name: Install Dev Dependencies if downloading from from Test PyPI
+        if: github.event.inputs.publish_to_pypi == '1'
         run: pip install -r requirements-dev.txt
 
       - name: Log full installed packages
@@ -438,6 +445,11 @@ jobs:
         if: github.event.inputs.publish_to_pypi == '1'
         run: python .github/workflows/extract_package_info.py install_from_pypi
 
+      # Tanner (11/4/20): We need to install packages in requirements-dev to install cython before building from local repo
+      - name: Install Dev Dependencies if downloading from from PyPI
+        if: github.event.inputs.publish_to_pypi != '1'
+        run: pip install -r requirements-dev.txt
+
       - name: Install Main Package From Local repo as test since not publishing to PyPI
         if: github.event.inputs.publish_to_pypi != '1'
         run: |
@@ -448,7 +460,9 @@ jobs:
       - name: Confirm no import errors when opening package
         run: python -c "import ${{ steps.extract_package_info.outputs.package-name }}"
 
-      - name: Install Dev Dependencies
+      # Tanner (11/4/20): We need to install packages in requirements-dev after confirming no import errors if downloading from pypi causes any errors
+      - name: Install Dev Dependencies if downloading from from PyPI
+        if: github.event.inputs.publish_to_pypi == '1'
         run: pip install -r requirements-dev.txt
 
       - name: Log full installed packages
