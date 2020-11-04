@@ -31,7 +31,7 @@ jobs:
             python-version: "3.7"
             IS_FASTEST_JOB: true
 
-    name: Test code befoer publishing in Python ${{ matrix.python-version }} on ${{ matrix.os }}
+    name: Test code before publishing in Python ${{ matrix.python-version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
@@ -146,10 +146,24 @@ jobs:
       - name: Run prerelease to check packaging compatibilty
         run: prerelease --no-input
 
-      - name: Build package for release
+      - name: Build wheel for release
+        run: python setup.py bdist_wheel
+
+      - name: Rename wheel for Linux (Python 3.7)
+        if: runner.os == 'Linux' && matrix.python-version == 3.7
         run: |
-          python setup.py sdist
-          python setup.py bdist_wheel
+          cp ./dist/mantarray_waveform_analysis-${{ steps.extract_version.outputs.package-version }}-cp37-cp37m-linux_x86_64.whl ./dist/mantarray_waveform_analysis-${{ steps.extract_version.outputs.package-version }}-cp37-cp37m-manylinux1_x86_64.whl
+          rm ./dist/mantarray_waveform_analysis-${{ steps.extract_version.outputs.package-version }}-cp37-cp37m-linux_x86_64.whl
+
+      - name: Rename wheel for Linux (Python 3.8)
+        if: runner.os == 'Linux' && matrix.python-version == 3.8
+        run: |
+          cp ./dist/mantarray_waveform_analysis-${{ steps.extract_version.outputs.package-version }}-cp38-cp38-linux_x86_64.whl ./dist/mantarray_waveform_analysis-${{ steps.extract_version.outputs.package-version }}-cp38-cp38-manylinux1_x86_64.whl
+          rm ./dist/mantarray_waveform_analysis-${{ steps.extract_version.outputs.package-version }}-cp38-cp38-linux_x86_64.whl
+
+      - name: Build sdist for release (Linux)
+        if: matrix.IS_FASTEST_JOB == true
+        run: python setup.py sdist
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v2
@@ -278,6 +292,11 @@ jobs:
         if: github.event.inputs.publish_to_pypi == '1'
         run: python .github/workflows/extract_package_info.py install_from_test_pypi
 
+      # Tanner (11/4/20): We need to install packages in requirements-dev to install cython before building from local repo
+      - name: Install Dev Dependencies if downloading from from Test PyPI
+        if: github.event.inputs.publish_to_pypi != '1'
+        run: pip install -r requirements-dev.txt
+
       - name: Install Main Package From Local repo as test since not publishing to PyPI
         if: github.event.inputs.publish_to_pypi != '1'
         run: |
@@ -288,7 +307,9 @@ jobs:
       - name: Confirm no import errors when opening package
         run: python -c "import ${{ steps.extract_package_info.outputs.package-name }}"
 
-      - name: Install Dev Dependencies
+      # Tanner (11/4/20): We need to install packages in requirements-dev after confirming no import errors if downloading from test pypi causes any errors
+      - name: Install Dev Dependencies if downloading from from Test PyPI
+        if: github.event.inputs.publish_to_pypi == '1'
         run: pip install -r requirements-dev.txt
 
       - name: Log full installed packages
@@ -423,6 +444,11 @@ jobs:
         if: github.event.inputs.publish_to_pypi == '1'
         run: python .github/workflows/extract_package_info.py install_from_pypi
 
+      # Tanner (11/4/20): We need to install packages in requirements-dev to install cython before building from local repo
+      - name: Install Dev Dependencies if downloading from from PyPI
+        if: github.event.inputs.publish_to_pypi != '1'
+        run: pip install -r requirements-dev.txt
+
       - name: Install Main Package From Local repo as test since not publishing to PyPI
         if: github.event.inputs.publish_to_pypi != '1'
         run: |
@@ -433,7 +459,9 @@ jobs:
       - name: Confirm no import errors when opening package
         run: python -c "import ${{ steps.extract_package_info.outputs.package-name }}"
 
-      - name: Install Dev Dependencies
+      # Tanner (11/4/20): We need to install packages in requirements-dev after confirming no import errors if downloading from pypi causes any errors
+      - name: Install Dev Dependencies if downloading from from PyPI
+        if: github.event.inputs.publish_to_pypi == '1'
         run: pip install -r requirements-dev.txt
 
       - name: Log full installed packages
