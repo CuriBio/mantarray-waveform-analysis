@@ -1,6 +1,12 @@
 Changelog for Mantarray Waveform Analysis
 =========================================
 
+0.5.7 (2020-11-05)
+------------------
+
+- Added support for Python 3.9
+
+
 0.5.6 (2020-11-04)
 ------------------
 
