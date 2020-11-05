@@ -27,11 +27,11 @@ jobs:
         python-version:
             - 3.7
             - 3.8
-            - 3.9
+            # - 3.9 # matplotlib doesn't support 3.9 yet
         include:
           # only enable coverage on the fastest job
           - os: "ubuntu-18.04"
-            python-version: "3.9"
+            python-version: "3.8" # matplotlib doesn't support 3.9 yet
             IS_FASTEST_JOB: true
 
     name: Test code before publishing in Python ${{ matrix.python-version }} on ${{ matrix.os }}
@@ -193,7 +193,7 @@ jobs:
         python-version:
             - 3.7
             - 3.8
-            - 3.9
+            # - 3.9 # matplotlib doesn't support 3.9 yet
     name: Publish to Test PyPI for Python ${{ matrix.python-version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
@@ -263,7 +263,7 @@ jobs:
         python-version:
             - 3.7
             - 3.8
-            - 3.9
+            # - 3.9 # matplotlib doesn't support 3.9 yet
     name: Install from Test PyPI and run tests on Python ${{ matrix.python-version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
@@ -348,7 +348,7 @@ jobs:
         python-version:
             - 3.7
             - 3.8
-            - 3.9
+            # - 3.9 # matplotlib doesn't support 3.9 yet
     name: Publish to PyPI for Python ${{ matrix.python-version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:
@@ -419,7 +419,7 @@ jobs:
         python-version:
             - 3.7
             - 3.8
-            - 3.9
+            # - 3.9 # matplotlib doesn't support 3.9 yet
     name: Test installation from PyPI for Python ${{ matrix.python-version }} on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     steps:

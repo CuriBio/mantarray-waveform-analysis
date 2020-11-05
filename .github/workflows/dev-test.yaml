@@ -30,11 +30,11 @@ jobs:
         python-version:
             - 3.7
             - 3.8
-            - 3.9
+            # - 3.9 # matplotlib doesn't support 3.9 yet
         include:
           # only enable coverage on the fastest job
           - os: "ubuntu-18.04"
-            python-version: "3.9"
+            python-version: "3.8" # matplotlib doesn't support 3.9 yet
             IS_FASTEST_JOB: true
 
     name: Python ${{ matrix.python-version }} on ${{ matrix.os }}
