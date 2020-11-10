@@ -11,6 +11,7 @@ from mantarray_waveform_analysis import CENTIMILLISECONDS_PER_SECOND
 from mantarray_waveform_analysis import FILTER_CHARACTERISTICS
 from mantarray_waveform_analysis import MIDSCALE_CODE
 from mantarray_waveform_analysis import MIN_NUMBER_PEAKS
+from mantarray_waveform_analysis import MIN_NUMBER_VALLEYS
 from mantarray_waveform_analysis import PRIOR_PEAK_INDEX_UUID
 from mantarray_waveform_analysis import PRIOR_VALLEY_INDEX_UUID
 from mantarray_waveform_analysis import RAW_TO_SIGNED_CONVERSION_VALUE
@@ -92,3 +93,4 @@ def test_gmr_conversion_factors():
 
 def test_peak_detection_vals():
     assert MIN_NUMBER_PEAKS == 3
+    assert MIN_NUMBER_VALLEYS == 3

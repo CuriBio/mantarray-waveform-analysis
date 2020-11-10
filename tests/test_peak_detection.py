@@ -5,6 +5,7 @@ from mantarray_waveform_analysis import AMPLITUDE_UUID
 from mantarray_waveform_analysis import AUC_UUID
 from mantarray_waveform_analysis import find_twitch_indices
 from mantarray_waveform_analysis import MIN_NUMBER_PEAKS
+from mantarray_waveform_analysis import MIN_NUMBER_VALLEYS
 from mantarray_waveform_analysis import peak_detector
 from mantarray_waveform_analysis import PRIOR_PEAK_INDEX_UUID
 from mantarray_waveform_analysis import PRIOR_VALLEY_INDEX_UUID
@@ -892,6 +893,14 @@ def test_find_twitch_indices__raises_error_if_less_than_3_peaks_given():
         match=rf"A minimum of {MIN_NUMBER_PEAKS} peaks is required to extract twitch metrics, however only 2 peak\(s\) were detected",
     ):
         find_twitch_indices((np.array([1, 2]), None), None)
+
+
+def test_find_twitch_indices__raises_error_if_less_than_3_valleys_given():
+    with pytest.raises(
+        TooFewPeaksDetectedError,
+        match=rf"A minimum of {MIN_NUMBER_VALLEYS} valleys is required to extract twitch metrics, however only 0 valley\(s\) were detected",
+    ):
+        find_twitch_indices((np.array([1, 3, 5]), np.array([])), None)
 
 
 def test_find_twitch_indices__excludes_first_and_last_peak_when_no_outer_valleys(
