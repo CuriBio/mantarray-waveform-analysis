@@ -898,6 +898,14 @@ def test_find_twitch_indices__raises_error_if_less_than_3_peaks_given():
 def test_find_twitch_indices__raises_error_if_less_than_3_valleys_given():
     with pytest.raises(
         TooFewPeaksDetectedError,
+        match=rf"A minimum of {MIN_NUMBER_VALLEYS} valleys is required to extract twitch metrics, however only 2 valley\(s\) were detected",
+    ):
+        find_twitch_indices((np.array([1, 3, 5]), np.array([2, 4])), None)
+
+
+def test_find_twitch_indices__raises_error_if_no_valleys_given():
+    with pytest.raises(
+        TooFewPeaksDetectedError,
         match=rf"A minimum of {MIN_NUMBER_VALLEYS} valleys is required to extract twitch metrics, however only 0 valley\(s\) were detected",
     ):
         find_twitch_indices((np.array([1, 3, 5]), np.array([])), None)
