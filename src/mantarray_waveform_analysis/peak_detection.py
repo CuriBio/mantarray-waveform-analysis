@@ -18,6 +18,7 @@ from .constants import AMPLITUDE_UUID
 from .constants import AUC_UUID
 from .constants import CENTIMILLISECONDS_PER_SECOND
 from .constants import MIN_NUMBER_PEAKS
+from .constants import MIN_NUMBER_VALLEYS
 from .constants import PRIOR_PEAK_INDEX_UUID
 from .constants import PRIOR_VALLEY_INDEX_UUID
 from .constants import SUBSEQUENT_PEAK_INDEX_UUID
@@ -279,6 +280,10 @@ def find_twitch_indices(
     if len(peak_indices) < MIN_NUMBER_PEAKS:
         raise TooFewPeaksDetectedError(
             f"A minimum of {MIN_NUMBER_PEAKS} peaks is required to extract twitch metrics, however only {len(peak_indices)} peak(s) were detected"
+        )
+    if len(valley_indices) < MIN_NUMBER_VALLEYS:
+        raise TooFewPeaksDetectedError(
+            f"A minimum of {MIN_NUMBER_VALLEYS} valleys is required to extract twitch metrics, however only {len(valley_indices)} valley(s) were detected"
         )
     twitches: Dict[int, Dict[UUID, Optional[int]]] = {}
 

@@ -33,3 +33,4 @@ RAW_TO_SIGNED_CONVERSION_VALUE = 2 ** 23  # subtract this value from raw hardwar
 # ADC_GAIN = 32
 
 MIN_NUMBER_PEAKS = 3
+MIN_NUMBER_VALLEYS = 3
