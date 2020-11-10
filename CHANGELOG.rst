@@ -1,10 +1,9 @@
 Changelog for Mantarray Waveform Analysis
 =========================================
 
-0.6.0 (unreleased)
+0.5.7 (2020-11-09)
 ------------------
 
-- Added support for Python 3.9.
 - Fixed issue with peak detection on data with no detected valleys.
 
 
