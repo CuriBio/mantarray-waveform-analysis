@@ -1083,9 +1083,32 @@ def test_find_twitch_indices__raises_error_if_two_valleys_in_a_row__and_does_not
 
 
 def test_find_twitch_indices__returns_correct_values_with_data_that_ends_in_peak():
-    peak_indices = np.array(range(0, 10, 2), dtype=np.int32)
-    valley_indices = np.array(range(1, 9, 2), dtype=np.int32)
-    find_twitch_indices((peak_indices, valley_indices), None)
+    peak_indices = np.array([1, 3, 5], dtype=np.int32)
+    valley_indices = np.array([0, 2, 4], dtype=np.int32)
+    actual = find_twitch_indices((peak_indices, valley_indices), None)
+
+    assert actual[1][PRIOR_PEAK_INDEX_UUID] is None
+    assert actual[3][PRIOR_PEAK_INDEX_UUID] == 1
+
+    assert actual[1][PRIOR_VALLEY_INDEX_UUID] == 0
+    assert actual[3][PRIOR_VALLEY_INDEX_UUID] == 2
+
+    assert actual[1][SUBSEQUENT_PEAK_INDEX_UUID] == 3
+    assert actual[3][SUBSEQUENT_PEAK_INDEX_UUID] == 5
+
+    assert actual[1][SUBSEQUENT_VALLEY_INDEX_UUID] == 2
+    assert actual[3][SUBSEQUENT_VALLEY_INDEX_UUID] == 4
+
+
+def test_find_twitch_indices__returns_correct_values_with_data_that_ends_in_valley():
+    peak_indices = np.array([1, 3, 5], dtype=np.int32)
+    valley_indices = np.array([2, 4, 6], dtype=np.int32)
+    actual = find_twitch_indices((peak_indices, valley_indices), None)
+
+    assert actual[3][PRIOR_PEAK_INDEX_UUID] == 1
+    assert actual[3][PRIOR_VALLEY_INDEX_UUID] == 2
+    assert actual[3][SUBSEQUENT_PEAK_INDEX_UUID] == 5
+    assert actual[3][SUBSEQUENT_VALLEY_INDEX_UUID] == 4
 
 
 def test_noisy_data_A1(noisy_data_A1):
