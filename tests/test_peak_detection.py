@@ -5,6 +5,7 @@ from mantarray_waveform_analysis import AMPLITUDE_UUID
 from mantarray_waveform_analysis import AUC_UUID
 from mantarray_waveform_analysis import find_twitch_indices
 from mantarray_waveform_analysis import MIN_NUMBER_PEAKS
+from mantarray_waveform_analysis import MIN_NUMBER_VALLEYS
 from mantarray_waveform_analysis import peak_detector
 from mantarray_waveform_analysis import PRIOR_PEAK_INDEX_UUID
 from mantarray_waveform_analysis import PRIOR_VALLEY_INDEX_UUID
@@ -894,6 +895,22 @@ def test_find_twitch_indices__raises_error_if_less_than_3_peaks_given():
         find_twitch_indices((np.array([1, 2]), None), None)
 
 
+def test_find_twitch_indices__raises_error_if_less_than_3_valleys_given():
+    with pytest.raises(
+        TooFewPeaksDetectedError,
+        match=rf"A minimum of {MIN_NUMBER_VALLEYS} valleys is required to extract twitch metrics, however only 2 valley\(s\) were detected",
+    ):
+        find_twitch_indices((np.array([1, 3, 5]), np.array([2, 4])), None)
+
+
+def test_find_twitch_indices__raises_error_if_no_valleys_given():
+    with pytest.raises(
+        TooFewPeaksDetectedError,
+        match=rf"A minimum of {MIN_NUMBER_VALLEYS} valleys is required to extract twitch metrics, however only 0 valley\(s\) were detected",
+    ):
+        find_twitch_indices((np.array([1, 3, 5]), np.array([])), None)
+
+
 def test_find_twitch_indices__excludes_first_and_last_peak_when_no_outer_valleys(
     new_A1,
 ):
@@ -1066,9 +1083,32 @@ def test_find_twitch_indices__raises_error_if_two_valleys_in_a_row__and_does_not
 
 
 def test_find_twitch_indices__returns_correct_values_with_data_that_ends_in_peak():
-    peak_indices = np.array(range(0, 10, 2), dtype=np.int32)
-    valley_indices = np.array(range(1, 9, 2), dtype=np.int32)
-    find_twitch_indices((peak_indices, valley_indices), None)
+    peak_indices = np.array([1, 3, 5], dtype=np.int32)
+    valley_indices = np.array([0, 2, 4], dtype=np.int32)
+    actual = find_twitch_indices((peak_indices, valley_indices), None)
+
+    assert actual[1][PRIOR_PEAK_INDEX_UUID] is None
+    assert actual[3][PRIOR_PEAK_INDEX_UUID] == 1
+
+    assert actual[1][PRIOR_VALLEY_INDEX_UUID] == 0
+    assert actual[3][PRIOR_VALLEY_INDEX_UUID] == 2
+
+    assert actual[1][SUBSEQUENT_PEAK_INDEX_UUID] == 3
+    assert actual[3][SUBSEQUENT_PEAK_INDEX_UUID] == 5
+
+    assert actual[1][SUBSEQUENT_VALLEY_INDEX_UUID] == 2
+    assert actual[3][SUBSEQUENT_VALLEY_INDEX_UUID] == 4
+
+
+def test_find_twitch_indices__returns_correct_values_with_data_that_ends_in_valley():
+    peak_indices = np.array([1, 3, 5], dtype=np.int32)
+    valley_indices = np.array([2, 4, 6], dtype=np.int32)
+    actual = find_twitch_indices((peak_indices, valley_indices), None)
+
+    assert actual[3][PRIOR_PEAK_INDEX_UUID] == 1
+    assert actual[3][PRIOR_VALLEY_INDEX_UUID] == 2
+    assert actual[3][SUBSEQUENT_PEAK_INDEX_UUID] == 5
+    assert actual[3][SUBSEQUENT_VALLEY_INDEX_UUID] == 4
 
 
 def test_noisy_data_A1(noisy_data_A1):

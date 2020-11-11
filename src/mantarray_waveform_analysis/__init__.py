@@ -11,6 +11,7 @@ from .constants import BUTTERWORTH_LOWPASS_30_UUID
 from .constants import CENTIMILLISECONDS_PER_SECOND
 from .constants import MIDSCALE_CODE
 from .constants import MIN_NUMBER_PEAKS
+from .constants import MIN_NUMBER_VALLEYS
 from .constants import PRIOR_PEAK_INDEX_UUID
 from .constants import PRIOR_VALLEY_INDEX_UUID
 from .constants import RAW_TO_SIGNED_CONVERSION_VALUE
@@ -88,6 +89,7 @@ __all__ = [
     "find_twitch_indices",
     "TooFewPeaksDetectedError",
     "MIN_NUMBER_PEAKS",
+    "MIN_NUMBER_VALLEYS",
     "BESSEL_LOWPASS_30_UUID",
     "BUTTERWORTH_LOWPASS_30_UUID",
 ]

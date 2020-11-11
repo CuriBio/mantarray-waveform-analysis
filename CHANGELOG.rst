@@ -1,6 +1,12 @@
 Changelog for Mantarray Waveform Analysis
 =========================================
 
+0.5.7 (2020-11-10)
+------------------
+
+- Fixed issue with peak detection on data with no detected valleys.
+
+
 0.5.6 (2020-11-04)
 ------------------
 
