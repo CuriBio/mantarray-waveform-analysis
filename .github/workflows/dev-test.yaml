@@ -33,7 +33,7 @@ jobs:
             # - 3.9 # matplotlib doesn't support 3.9 yet
         include:
           # only enable coverage on the fastest job
-          - os: "ubuntu-18.04"
+          - os: "ubuntu-20.04"
             python-version: "3.8" # matplotlib doesn't support 3.9 yet
             IS_FASTEST_JOB: true
 
