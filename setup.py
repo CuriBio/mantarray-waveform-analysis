@@ -30,7 +30,7 @@ if USE_CYTHON:
 
 setup(
     name="mantarray_waveform_analysis",
-    version="0.5.8",
+    version="0.5.9",
     description="Tools for analyzing waveforms produced by a Mantarray Instrument",
     url="https://github.com/CuriBio/mantarray-waveform-analysis",
     author="Curi Bio",
@@ -54,6 +54,7 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
         "Topic :: Scientific/Engineering",
     ],
     ext_modules=extensions,
