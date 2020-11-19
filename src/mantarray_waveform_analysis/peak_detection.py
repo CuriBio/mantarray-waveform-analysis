@@ -37,7 +37,7 @@ TWITCH_WIDTH_PERCENTS = range(10, 95, 5)
 
 
 def peak_detector(
-    filtered_gmr: NDArray[(2, Any), int],
+    filtered_magnetic: NDArray[(2, Any), int],
     twitches_point_up: bool = True,
 ) -> Tuple[List[int], List[int]]:
     """Locates peaks and valleys and returns the indices.
@@ -51,13 +51,13 @@ def peak_detector(
     Returns:
         A tuple of the indices of the peaks and valleys
     """
-    gmr_signal: NDArray[int] = filtered_gmr[1, :]
+    magnetic_signal: NDArray[int] = filtered_magnetic[1, :]
     peak_invertor_factor = 1
     valley_invertor_factor = -1
     if not twitches_point_up:
         peak_invertor_factor *= -1
         valley_invertor_factor *= -1
-    sampling_period_cms = filtered_gmr[0, 1] - filtered_gmr[0, 0]
+    sampling_period_cms = filtered_magnetic[0, 1] - filtered_magnetic[0, 0]
     maximum_possible_twitch_frequency = 7  # pylint:disable=invalid-name # (Eli 9/1/20): I can't think of a shorter name to describe this concept fully # Hz
     minimum_required_samples_between_twitches = int(  # pylint:disable=invalid-name # (Eli 9/1/20): I can't think of a shorter name to describe this concept fully
         round(
@@ -69,18 +69,18 @@ def peak_detector(
     )
 
     # find required height of peaks
-    max_height = np.max(gmr_signal)
-    min_height = np.min(gmr_signal)
+    max_height = np.max(magnetic_signal)
+    min_height = np.min(magnetic_signal)
     max_prominence = abs(max_height - min_height)
     # find peaks and valleys
     peak_indices, _ = signal.find_peaks(
-        gmr_signal * peak_invertor_factor,
+        magnetic_signal * peak_invertor_factor,
         width=minimum_required_samples_between_twitches / 2,
         distance=minimum_required_samples_between_twitches,
         prominence=max_prominence / 4,
     )
     valley_indices, properties = signal.find_peaks(
-        gmr_signal * valley_invertor_factor,
+        magnetic_signal * valley_invertor_factor,
         width=minimum_required_samples_between_twitches / 2,
         distance=minimum_required_samples_between_twitches,
         prominence=max_prominence / 4,
@@ -173,6 +173,7 @@ def data_metrics(
         combined_twitch_periods.astype(np.float) / CENTIMILLISECONDS_PER_SECOND
     )
     frequency_averages_dict = create_avg_dict(twitch_frequencies, round_to_int=False)
+
     # find aggregate values of period data
     period_averages_dict = create_avg_dict(combined_twitch_periods)
 
@@ -277,24 +278,17 @@ def find_twitch_indices(
         a 1D array of integers representing the time points of all the twitches
     """
     peak_indices, valley_indices = peak_and_valley_indices
-    if len(peak_indices) < MIN_NUMBER_PEAKS:
-        raise TooFewPeaksDetectedError(
-            f"A minimum of {MIN_NUMBER_PEAKS} peaks is required to extract twitch metrics, however only {len(peak_indices)} peak(s) were detected"
-        )
-    if len(valley_indices) < MIN_NUMBER_VALLEYS:
-        raise TooFewPeaksDetectedError(
-            f"A minimum of {MIN_NUMBER_VALLEYS} valleys is required to extract twitch metrics, however only {len(valley_indices)} valley(s) were detected"
-        )
+
+    # raise error if there are too few peaks/valleys detected
+    _too_few_error(peak_indices, valley_indices)
+
     twitches: Dict[int, Dict[UUID, Optional[int]]] = {}
 
     starts_with_peak = peak_indices[0] < valley_indices[0]
     prev_feature_is_peak = starts_with_peak
-    peak_idx = 0
-    valley_idx = 0
-    if starts_with_peak:
-        peak_idx += 1
-    else:
-        valley_idx += 1
+    peak_idx, valley_idx = _find_start_indices(
+        peak_indices, valley_indices, starts_with_peak
+    )
 
     # check for two back-to-back features
     while peak_idx < len(peak_indices) and valley_idx < len(valley_indices):
@@ -350,6 +344,46 @@ def find_twitch_indices(
     # print(list(twitches.keys())[0])
     # print(twitches[list(twitches.keys())[0]])
     return twitches
+
+
+def _too_few_error(peak_indices: NDArray[int], valley_indices: NDArray[int]) -> None:
+    """Raise an error if there are too few peaks or valleys detected.
+
+    Args:
+        peak_indices: a 1D array of integers representing the indices of the peaks
+        valley_indices: a 1D array of integeres representing the indices of the valleys
+    """
+    if len(peak_indices) < MIN_NUMBER_PEAKS:
+        raise TooFewPeaksDetectedError(
+            f"A minimum of {MIN_NUMBER_PEAKS} peaks is required to extract twitch metrics, however only {len(peak_indices)} peak(s) were detected"
+        )
+    if len(valley_indices) < MIN_NUMBER_VALLEYS:
+        raise TooFewPeaksDetectedError(
+            f"A minimum of {MIN_NUMBER_VALLEYS} valleys is required to extract twitch metrics, however only {len(valley_indices)} valley(s) were detected"
+        )
+
+
+def _find_start_indices(
+    peak_indices: NDArray[int], valley_indices: NDArray[int], starts_with_peak: bool
+) -> Tuple[int, int]:
+    """Find start indices for peaks and valleys.
+
+    Args:
+        peak_indices: a 1D array of integers representing the indices of the peaks
+        valley_indices: a 1D array of integeres representing the indices of the valleys
+
+    Returns:
+        peak_idx: peak start index
+        valley_idx: valley start index
+    """
+    peak_idx = 0
+    valley_idx = 0
+    if starts_with_peak:
+        peak_idx += 1
+    else:
+        valley_idx += 1
+
+    return peak_idx, valley_idx
 
 
 def calculate_amplitudes(
