@@ -37,7 +37,7 @@ TWITCH_WIDTH_PERCENTS = range(10, 95, 5)
 
 
 def peak_detector(
-    filtered_magnetic: NDArray[(2, Any), int],
+    filtered_magnetic_signal: NDArray[(2, Any), int],
     twitches_point_up: bool = True,
 ) -> Tuple[List[int], List[int]]:
     """Locates peaks and valleys and returns the indices.
@@ -51,13 +51,15 @@ def peak_detector(
     Returns:
         A tuple of the indices of the peaks and valleys
     """
-    magnetic_signal: NDArray[int] = filtered_magnetic[1, :]
+    magnetic_signal: NDArray[int] = filtered_magnetic_signal[1, :]
     peak_invertor_factor = 1
     valley_invertor_factor = -1
     if not twitches_point_up:
         peak_invertor_factor *= -1
         valley_invertor_factor *= -1
-    sampling_period_cms = filtered_magnetic[0, 1] - filtered_magnetic[0, 0]
+    sampling_period_cms = (
+        filtered_magnetic_signal[0, 1] - filtered_magnetic_signal[0, 0]
+    )
     maximum_possible_twitch_frequency = 7  # pylint:disable=invalid-name # (Eli 9/1/20): I can't think of a shorter name to describe this concept fully # Hz
     minimum_required_samples_between_twitches = int(  # pylint:disable=invalid-name # (Eli 9/1/20): I can't think of a shorter name to describe this concept fully
         round(
