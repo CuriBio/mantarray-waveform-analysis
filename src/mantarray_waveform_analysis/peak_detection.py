@@ -281,8 +281,7 @@ def find_twitch_indices(
     """
     peak_indices, valley_indices = peak_and_valley_indices
 
-    # raise error if there are too few peaks/valleys detected
-    _too_few_error(peak_indices, valley_indices)
+    _too_few_peaks_or_valleys(peak_indices, valley_indices)
 
     twitches: Dict[int, Dict[UUID, Optional[int]]] = {}
 
@@ -348,7 +347,9 @@ def find_twitch_indices(
     return twitches
 
 
-def _too_few_error(peak_indices: NDArray[int], valley_indices: NDArray[int]) -> None:
+def _too_few_peaks_or_valleys(
+    peak_indices: NDArray[int], valley_indices: NDArray[int]
+) -> None:
     """Raise an error if there are too few peaks or valleys detected.
 
     Args:
@@ -557,28 +558,27 @@ def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20)
             iter_twitch_indices_info[SUBSEQUENT_VALLEY_INDEX_UUID]
         ]
         rising_coords = width_info[width_percent][WIDTH_RISING_COORDS_UUID]
+        falling_coords = width_info[width_percent][WIDTH_FALLING_COORDS_UUID]
+
+        # _is_coord_a_tuple(rising_coords, falling_coords)
+
         if not isinstance(
             rising_coords, tuple
         ):  # Eli (9/1/20): this appears needed to make mypy happy
             raise NotImplementedError(
                 f"Rising coordinates under the key {WIDTH_RISING_COORDS_UUID} must be a tuple."
             )
-        rising_x, rising_y = rising_coords
-        falling_coords = width_info[width_percent][WIDTH_FALLING_COORDS_UUID]
+
         if not isinstance(
             falling_coords, tuple
         ):  # Eli (9/1/20): this appears needed to make mypy happy
             raise NotImplementedError(
                 f"Falling coordinates under the key {WIDTH_FALLING_COORDS_UUID} must be a tuple."
             )
+
+        rising_x, rising_y = rising_coords
         falling_x, falling_y = falling_coords
-        interp_y_for_lower_bound = partial(
-            interpolate_y_for_x_between_two_points,
-            x_1=rising_x,
-            y_1=rising_y,
-            x_2=falling_x,
-            y_2=falling_y,
-        )
+
         auc_total: Union[float, int] = 0
 
         # calculate area of rising side
@@ -591,21 +591,30 @@ def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20)
             right_x = time_series[rising_idx]
             left_y = value_series[rising_idx - 1]
             right_y = value_series[rising_idx]
-            trapezoid_h = right_x - left_x
-            trapezoid_left_side = abs(left_y - interp_y_for_lower_bound(left_x))
-            trapezoid_right_side = abs(right_y - interp_y_for_lower_bound(right_x))
 
-            auc_total += (trapezoid_left_side + trapezoid_right_side) / 2 * trapezoid_h
+            auc_total += _calculate_trap_area(
+                left_x,
+                right_x,
+                left_y,
+                right_y,
+                rising_coords,
+                falling_coords,
+            )
             rising_idx -= 1
         # final trapezoid at the boundary of the interpolated twitch width point
         left_x = rising_x
         right_x = time_series[rising_idx]
         left_y = rising_y
         right_y = value_series[rising_idx]
-        trapezoid_h = right_x - left_x
-        trapezoid_left_side = abs(left_y - interp_y_for_lower_bound(left_x))
-        trapezoid_right_side = abs(right_y - interp_y_for_lower_bound(right_x))
-        auc_total += (trapezoid_left_side + trapezoid_right_side) / 2 * trapezoid_h
+
+        auc_total += _calculate_trap_area(
+            left_x,
+            right_x,
+            left_y,
+            right_y,
+            rising_coords,
+            falling_coords,
+        )
 
         # calculate area of falling side
         falling_idx = iter_twitch_peak_idx
@@ -617,10 +626,15 @@ def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20)
             right_x = time_series[falling_idx + 1]
             left_y = value_series[falling_idx]
             right_y = value_series[falling_idx + 1]
-            trapezoid_h = right_x - left_x
-            trapezoid_left_side = abs(left_y - interp_y_for_lower_bound(left_x))
-            trapezoid_right_side = abs(right_y - interp_y_for_lower_bound(right_x))
-            auc_total += (trapezoid_left_side + trapezoid_right_side) / 2 * trapezoid_h
+
+            auc_total += _calculate_trap_area(
+                left_x,
+                right_x,
+                left_y,
+                right_y,
+                rising_coords,
+                falling_coords,
+            )
             falling_idx += 1
 
         # final trapezoid at the boundary of the interpolated twitch width point
@@ -628,11 +642,46 @@ def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20)
         right_x = falling_x
         left_y = value_series[rising_idx]
         right_y = falling_y
-        trapezoid_h = right_x - left_x
-        trapezoid_left_side = abs(left_y - interp_y_for_lower_bound(left_x))
-        trapezoid_right_side = abs(right_y - interp_y_for_lower_bound(right_x))
-        auc_total += (trapezoid_left_side + trapezoid_right_side) / 2 * trapezoid_h
 
+        auc_total += _calculate_trap_area(
+            left_x,
+            right_x,
+            left_y,
+            right_y,
+            rising_coords,
+            falling_coords,
+        )
         auc_per_twitch.append(int(round(auc_total, 0)))
 
     return np.asarray(auc_per_twitch, dtype=np.int64)
+
+
+def _calculate_trap_area(
+    left_x: int,
+    right_x: int,
+    left_y: int,
+    right_y: int,
+    rising_coords: Tuple[int, int],
+    falling_coords: Tuple[int, int],
+) -> Union[int, float]:
+    """Calculate the area under the trapezoid.
+
+    Returns: area of the trapezoid
+    """
+    rising_x, rising_y = rising_coords
+    falling_x, falling_y = falling_coords
+
+    interp_y_for_lower_bound = partial(
+        interpolate_y_for_x_between_two_points,
+        x_1=rising_x,
+        y_1=rising_y,
+        x_2=falling_x,
+        y_2=falling_y,
+    )
+
+    trapezoid_h = right_x - left_x
+    trapezoid_left_side = abs(left_y - interp_y_for_lower_bound(left_x))
+    trapezoid_right_side = abs(right_y - interp_y_for_lower_bound(right_x))
+    auc_total = (trapezoid_left_side + trapezoid_right_side) / 2 * trapezoid_h
+
+    return auc_total
