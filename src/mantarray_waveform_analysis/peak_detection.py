@@ -560,8 +560,6 @@ def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20)
         rising_coords = width_info[width_percent][WIDTH_RISING_COORDS_UUID]
         falling_coords = width_info[width_percent][WIDTH_FALLING_COORDS_UUID]
 
-        # _is_coord_a_tuple(rising_coords, falling_coords)
-
         if not isinstance(
             rising_coords, tuple
         ):  # Eli (9/1/20): this appears needed to make mypy happy
@@ -592,7 +590,7 @@ def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20)
             left_y = value_series[rising_idx - 1]
             right_y = value_series[rising_idx]
 
-            auc_total += _calculate_trap_area(
+            auc_total += _calculate_trapezoid_area(
                 left_x,
                 right_x,
                 left_y,
@@ -607,7 +605,7 @@ def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20)
         left_y = rising_y
         right_y = value_series[rising_idx]
 
-        auc_total += _calculate_trap_area(
+        auc_total += _calculate_trapezoid_area(
             left_x,
             right_x,
             left_y,
@@ -627,7 +625,7 @@ def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20)
             left_y = value_series[falling_idx]
             right_y = value_series[falling_idx + 1]
 
-            auc_total += _calculate_trap_area(
+            auc_total += _calculate_trapezoid_area(
                 left_x,
                 right_x,
                 left_y,
@@ -643,7 +641,7 @@ def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20)
         left_y = value_series[rising_idx]
         right_y = falling_y
 
-        auc_total += _calculate_trap_area(
+        auc_total += _calculate_trapezoid_area(
             left_x,
             right_x,
             left_y,
@@ -656,7 +654,7 @@ def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20)
     return np.asarray(auc_per_twitch, dtype=np.int64)
 
 
-def _calculate_trap_area(
+def _calculate_trapezoid_area(
     left_x: int,
     right_x: int,
     left_y: int,
