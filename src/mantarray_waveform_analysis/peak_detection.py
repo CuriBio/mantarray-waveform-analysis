@@ -287,9 +287,7 @@ def find_twitch_indices(
 
     starts_with_peak = peak_indices[0] < valley_indices[0]
     prev_feature_is_peak = starts_with_peak
-    peak_idx, valley_idx = _find_start_indices(
-        peak_indices, valley_indices, starts_with_peak
-    )
+    peak_idx, valley_idx = _find_start_indices(starts_with_peak)
 
     # check for two back-to-back features
     while peak_idx < len(peak_indices) and valley_idx < len(valley_indices):
@@ -366,9 +364,7 @@ def _too_few_peaks_or_valleys(
         )
 
 
-def _find_start_indices(
-    peak_indices: NDArray[int], valley_indices: NDArray[int], starts_with_peak: bool
-) -> Tuple[int, int]:
+def _find_start_indices(starts_with_peak: bool) -> Tuple[int, int]:
     """Find start indices for peaks and valleys.
 
     Args:
