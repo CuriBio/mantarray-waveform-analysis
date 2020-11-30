@@ -368,8 +368,7 @@ def _find_start_indices(starts_with_peak: bool) -> Tuple[int, int]:
     """Find start indices for peaks and valleys.
 
     Args:
-        peak_indices: a 1D array of integers representing the indices of the peaks
-        valley_indices: a 1D array of integeres representing the indices of the valleys
+        starts_with_peak: bool indicating whether or not a peak rather than a valley comes first
 
     Returns:
         peak_idx: peak start index
