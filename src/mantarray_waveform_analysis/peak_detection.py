@@ -130,7 +130,16 @@ def data_metrics(
     peak_and_valley_indices: Tuple[NDArray[int], NDArray[int]],
     filtered_data: NDArray[(2, Any), int],
 ) -> Tuple[
-    Dict[int, Dict[UUID, Union[float, int]]],
+    Dict[
+        int,
+        Dict[
+            UUID,
+            Union[
+                Dict[int, Dict[UUID, Union[Tuple[int, int], int]]],
+                Union[float, int],
+            ],
+        ],
+    ],
     Dict[
         UUID,
         Union[Dict[str, Union[float, int]], Dict[int, Dict[str, Union[float, int]]]],
@@ -147,7 +156,15 @@ def data_metrics(
         aggregate_dict: a dictionary of entire metric statistics. Most metrics have the stats underneath the UUID, but for twitch widths, there is an additional dictionary where the percent of repolarization is the key
     """
     # create main dictionaries
-    main_twitch_dict: Dict[int, Dict[UUID, Union[float, int]]] = dict()
+    main_twitch_dict: Dict[
+        int,
+        Dict[
+            UUID,
+            Union[
+                Dict[int, Dict[UUID, Union[Tuple[int, int], int]]], Union[float, int]
+            ],
+        ],
+    ] = dict()
     aggregate_dict: Dict[
         UUID,
         Union[Dict[str, Union[float, int]], Dict[int, Dict[str, Union[float, int]]]],
