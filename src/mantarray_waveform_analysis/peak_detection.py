@@ -560,7 +560,7 @@ def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20)
         per_twitch_widths: a list of dictionaries where the first key is the percentage of the way down to the nearby valleys, the second key is a UUID representing either the value of the width, or the rising or falling coordinates. The final value is either an int (for value) or a tuple of ints for the x/y coordinates
 
     Returns:
-        an array of integers
+        a 1D array of integers which represent the area under the curve for each twitch
     """
     width_percent = 90  # what percent of repolarization to use as the bottom limit for calculating AUC
     auc_per_twitch: List[int] = list()
