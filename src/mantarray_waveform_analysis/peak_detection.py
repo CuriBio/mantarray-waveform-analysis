@@ -294,7 +294,7 @@ def find_twitch_indices(
         filtered_data: a 2D array of the data after being noise filtered
 
     Returns:
-        a 1D array of integers representing the time points of all the twitches
+        a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUID of prior/subsequent peaks and valleys and their index values.
     """
     peak_indices, valley_indices = peak_and_valley_indices
 
@@ -408,7 +408,7 @@ def calculate_amplitudes(
     """Get the amplitudes for all twitches.
 
     Args:
-        twitch_indices: a 1D array of all the time values of the peaks of interest
+        twitch_indices: a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUID of prior/subsequent peaks and valleys and their index values.
         filtered_data: a 2D array of the time and value (magnetic, voltage, displacement, force...) data after it has gone through noise filtering
 
     Returns:
@@ -479,7 +479,7 @@ def calculate_twitch_widths(
     """Determine twitch width between 10-90% down to the nearby valleys.
 
     Args:
-        twitch_indices: a 1D array of all the time values of the peaks of interest
+        twitch_indices: a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUID of prior/subsequent peaks and valleys and their index values.
         filtered_data: a 2D array of the time and value (magnetic, voltage, displacement, force...) data after it has gone through noise filtering
 
     Returns:
@@ -552,7 +552,16 @@ def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20)
     filtered_data: NDArray[(2, Any), int],
     per_twitch_widths: List[Dict[int, Dict[UUID, Union[Tuple[int, int], int]]]],
 ) -> NDArray[int]:
-    """Calculate the area under the curve (AUC) for twitches."""
+    """Calculate the area under the curve (AUC) for twitches.
+
+    Args:
+        twitch_indices: a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUID of prior/subsequent peaks and valleys and their index values.
+        filtered_data: a 2D array of the time and value (magnetic, voltage, displacement, force...) data after it has gone through noise filtering
+        per_twitch_widths: a list of dictionaries where the first key is the percentage of the way down to the nearby valleys, the second key is a UUID representing either the value of the width, or the rising or falling coordinates. The final value is either an int (for value) or a tuple of ints for the x/y coordinates
+
+    Returns:
+        an array of integers
+    """
     width_percent = 90  # what percent of repolarization to use as the bottom limit for calculating AUC
     auc_per_twitch: List[int] = list()
     value_series = filtered_data[1, :]
