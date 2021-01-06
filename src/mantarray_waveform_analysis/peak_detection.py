@@ -110,7 +110,7 @@ def create_avg_dict(
         metric: a 1D array of integer values of a specific metric results
 
     Returns:
-        a dictionary of the average statistics of that metric
+        a dictionary of the average statistics of that metric in which the metrics are the key and average statistics are the value
     """
     dictionary: Dict[str, Union[float, int]] = dict()
 
@@ -148,7 +148,7 @@ def data_metrics(
     """Find all data metrics for individual twitches and averages.
 
     Args:
-        peakind: a tuple of integer values representing the time indices of peaks and valleys within the data
+        peak_and_valley_indices: a tuple of integer value arrays representing the time indices of peaks and valleys within the data
         filtered_data: a 2D array of the time and voltage data after it has gone through noise cancellation
 
     Returns:
@@ -264,7 +264,7 @@ def calculate_twitch_period(
         filtered_data: a 2D array (time vs value) of the data
 
     Returns:
-        an array of integers that are the peeriod of each twitch
+        an array of integers that are the period of each twitch
     """
     list_of_twitch_indices = list(twitch_indices.keys())
     idx_of_first_twitch = np.where(all_peak_indices == list_of_twitch_indices[0])[0][0]
@@ -464,7 +464,7 @@ def interpolate_y_for_x_between_two_points(  # pylint:disable=invalid-name # (El
     x_2: Union[int, float],
     y_2: Union[int, float],
 ) -> Union[int, float]:
-    """Find a value of x between two points that matches the desired y value.
+    """Find a value of y between two points that matches the desired x value.
 
     Uses linear interpolation, based on point-slope formula.
     """
