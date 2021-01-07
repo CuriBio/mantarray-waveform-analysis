@@ -33,6 +33,7 @@ from .exceptions import TooFewPeaksDetectedError
 from .exceptions import TwoPeaksInARowError
 from .exceptions import TwoValleysInARowError
 
+
 TWITCH_WIDTH_PERCENTS = range(10, 95, 5)
 
 
@@ -110,7 +111,7 @@ def create_avg_dict(
         metric: a 1D array of integer values of a specific metric results
 
     Returns:
-        a dictionary of the average statistics of that metric
+        a dictionary of the average statistics of that metric in which the metrics are the key and average statistics are the value
     """
     dictionary: Dict[str, Union[float, int]] = dict()
 
@@ -130,7 +131,16 @@ def data_metrics(
     peak_and_valley_indices: Tuple[NDArray[int], NDArray[int]],
     filtered_data: NDArray[(2, Any), int],
 ) -> Tuple[
-    Dict[int, Dict[UUID, Union[float, int]]],
+    Dict[
+        int,
+        Dict[
+            UUID,  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failture
+            Union[
+                Dict[int, Dict[UUID, Union[Tuple[int, int], int]]],
+                Union[float, int],
+            ],
+        ],  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failture
+    ],
     Dict[
         UUID,
         Union[Dict[str, Union[float, int]], Dict[int, Dict[str, Union[float, int]]]],
@@ -139,15 +149,23 @@ def data_metrics(
     """Find all data metrics for individual twitches and averages.
 
     Args:
-        peakind: a tuple of integer values representing the time indices of peaks and valleys within the data
+        peak_and_valley_indices: a tuple of integer value arrays representing the time indices of peaks and valleys within the data
         filtered_data: a 2D array of the time and voltage data after it has gone through noise cancellation
 
     Returns:
-        per_twitch_dict: a dictionary of individual peak metrics
+        per_twitch_dict: a dictionary of individual peak metrics in which the twitch timepoint is accompanied by a dictionary in which the UUIDs for each twitch metric are the key and with its accompanying value as the value. For the Twitch Width metric UUID, another dictionary is stored in which the key is the percentage of the way down and the value is another dictionary in which the UUIDs for the rising coord, falling coord or width value are stored with the value as an int for the width value or a tuple of ints for the x/y coordinates
         aggregate_dict: a dictionary of entire metric statistics. Most metrics have the stats underneath the UUID, but for twitch widths, there is an additional dictionary where the percent of repolarization is the key
     """
     # create main dictionaries
-    main_twitch_dict: Dict[int, Dict[UUID, Union[float, int]]] = dict()
+    main_twitch_dict: Dict[
+        int,
+        Dict[
+            UUID,
+            Union[
+                Dict[int, Dict[UUID, Union[Tuple[int, int], int]]], Union[float, int]
+            ],
+        ],
+    ] = dict()
     aggregate_dict: Dict[
         UUID,
         Union[Dict[str, Union[float, int]], Dict[int, Dict[str, Union[float, int]]]],
@@ -247,7 +265,7 @@ def calculate_twitch_period(
         filtered_data: a 2D array (time vs value) of the data
 
     Returns:
-        an array of integers that are the peeriod of each twitch
+        an array of integers that are the period of each twitch
     """
     list_of_twitch_indices = list(twitch_indices.keys())
     idx_of_first_twitch = np.where(all_peak_indices == list_of_twitch_indices[0])[0][0]
@@ -277,7 +295,7 @@ def find_twitch_indices(
         filtered_data: a 2D array of the data after being noise filtered
 
     Returns:
-        a 1D array of integers representing the time points of all the twitches
+        a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUIDs of prior/subsequent peaks and valleys and their index values.
     """
     peak_indices, valley_indices = peak_and_valley_indices
 
@@ -391,7 +409,7 @@ def calculate_amplitudes(
     """Get the amplitudes for all twitches.
 
     Args:
-        twitch_indices: a 1D array of all the time values of the peaks of interest
+        twitch_indices: a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUID of prior/subsequent peaks and valleys and their index values.
         filtered_data: a 2D array of the time and value (magnetic, voltage, displacement, force...) data after it has gone through noise filtering
 
     Returns:
@@ -447,7 +465,7 @@ def interpolate_y_for_x_between_two_points(  # pylint:disable=invalid-name # (El
     x_2: Union[int, float],
     y_2: Union[int, float],
 ) -> Union[int, float]:
-    """Find a value of x between two points that matches the desired y value.
+    """Find a value of y between two points that matches the desired x value.
 
     Uses linear interpolation, based on point-slope formula.
     """
@@ -462,7 +480,7 @@ def calculate_twitch_widths(
     """Determine twitch width between 10-90% down to the nearby valleys.
 
     Args:
-        twitch_indices: a 1D array of all the time values of the peaks of interest
+        twitch_indices: a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUIDs of prior/subsequent peaks and valleys and their index values.
         filtered_data: a 2D array of the time and value (magnetic, voltage, displacement, force...) data after it has gone through noise filtering
 
     Returns:
@@ -535,7 +553,16 @@ def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20)
     filtered_data: NDArray[(2, Any), int],
     per_twitch_widths: List[Dict[int, Dict[UUID, Union[Tuple[int, int], int]]]],
 ) -> NDArray[int]:
-    """Calculate the area under the curve (AUC) for twitches."""
+    """Calculate the area under the curve (AUC) for twitches.
+
+    Args:
+        twitch_indices: a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUIDs of prior/subsequent peaks and valleys and their index values.
+        filtered_data: a 2D array of the time and value (magnetic, voltage, displacement, force...) data after it has gone through noise filtering
+        per_twitch_widths: a list of dictionaries where the first key is the percentage of the way down to the nearby valleys, the second key is a UUID representing either the value of the width, or the rising or falling coordinates. The final value is either an int representing the width value or a tuple of ints for the x/y coordinates
+
+    Returns:
+        a 1D array of integers which represent the area under the curve for each twitch
+    """
     width_percent = 90  # what percent of repolarization to use as the bottom limit for calculating AUC
     auc_per_twitch: List[int] = list()
     value_series = filtered_data[1, :]
