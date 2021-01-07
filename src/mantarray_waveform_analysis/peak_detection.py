@@ -33,6 +33,7 @@ from .exceptions import TooFewPeaksDetectedError
 from .exceptions import TwoPeaksInARowError
 from .exceptions import TwoValleysInARowError
 
+
 TWITCH_WIDTH_PERCENTS = range(10, 95, 5)
 
 
@@ -133,12 +134,12 @@ def data_metrics(
     Dict[
         int,
         Dict[
-            UUID,
+            UUID,  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failture
             Union[
                 Dict[int, Dict[UUID, Union[Tuple[int, int], int]]],
                 Union[float, int],
             ],
-        ],
+        ],  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failture
     ],
     Dict[
         UUID,
