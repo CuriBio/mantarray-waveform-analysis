@@ -34,6 +34,7 @@ from .fixtures_compression import fixture_new_A5
 from .fixtures_compression import fixture_new_A6
 from .fixtures_peak_detection import fixture_MA20123123__2020_10_13_173812__B6
 from .fixtures_peak_detection import fixture_MA20123123__2020_10_13_234733__A1
+from .fixtures_peak_detection import fixture_MA202000030__2020_12_11_233215__D4
 from .fixtures_peak_detection import fixture_maiden_voyage_data
 from .fixtures_peak_detection import fixture_noisy_data_A1
 from .fixtures_peak_detection import fixture_noisy_data_B1
@@ -60,6 +61,7 @@ __fixtures__ = [
     fixture_noisy_data_B1,
     fixture_MA20123123__2020_10_13_173812__B6,
     fixture_MA20123123__2020_10_13_234733__A1,
+    fixture_MA202000030__2020_12_11_233215__D4,
 ]
 
 
@@ -1193,3 +1195,18 @@ def test__A1_data_causing_TwoValleysInARowError(MA20123123__2020_10_13_234733__A
     # fmt: on
     assert np.array_equal(peak_indices, expected_peak_indices)
     assert np.array_equal(valley_indices, expected_valley_indices)
+
+
+def test__D4_data_causing_TwoPeaksInARowError(MA202000030__2020_12_11_233215__D4):
+    _, peak_and_valley_indices = MA202000030__2020_12_11_233215__D4
+    # plot and save results
+    # filtered_data = pipeline.get_noise_filtered_gmr()
+
+    peak_indices, valley_indices = peak_and_valley_indices
+    # find_twitch_indices(peak_and_valley_indices, filtered_data)
+
+    expected_number_peaks = 14
+    expected_number_valleys = 14
+
+    assert expected_number_valleys == len(valley_indices)
+    assert expected_number_peaks == len(peak_indices)
