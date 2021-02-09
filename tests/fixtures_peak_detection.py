@@ -70,3 +70,45 @@ def fixture_MA202000030__2020_12_11_233215__D4():
         time_scaling_factor=CENTIMILLISECONDS_PER_SECOND,
         noise_filter_uuid=BUTTERWORTH_LOWPASS_30_UUID,
     )
+
+
+@pytest.fixture(scope="session", name="MA202000030__2020_12_14_225041__D4")
+def fixture_MA202000030__2020_12_14_225041__D4():
+    return _run_peak_detection(
+        os.path.join(
+            "two_peaks_error",
+            "MA202000030__2020_12_14_225041__D4__trimmed_4200000_9500000.h5",
+        ),
+        sampling_rate_construct=625,
+        flip_data=True,
+        time_scaling_factor=CENTIMILLISECONDS_PER_SECOND,
+        noise_filter_uuid=BUTTERWORTH_LOWPASS_30_UUID,
+    )
+
+
+@pytest.fixture(scope="session", name="MA202000030__2020_12_15_233947__D2")
+def fixture_MA202000030__2020_12_15_233947__D2():
+    return _run_peak_detection(
+        os.path.join(
+            "two_peaks_error",
+            "MA202000030__2020_12_15_233947__D2__trimmed_5000000_1000000.h5",
+        ),
+        sampling_rate_construct=625,
+        flip_data=True,
+        time_scaling_factor=CENTIMILLISECONDS_PER_SECOND,
+        noise_filter_uuid=BUTTERWORTH_LOWPASS_30_UUID,
+    )
+
+
+@pytest.fixture(scope="session", name="MA202000030__2020_12_18_000826__D2")
+def fixture_MA202000030__2020_12_18_000826__D2():
+    return _run_peak_detection(
+        os.path.join(
+            "two_peaks_error",
+            "MA202000030__2020_12_18_000826__D2__trimmed_5000000_1900000.h5",
+        ),
+        sampling_rate_construct=625,
+        flip_data=True,
+        time_scaling_factor=CENTIMILLISECONDS_PER_SECOND,
+        noise_filter_uuid=BUTTERWORTH_LOWPASS_30_UUID,
+    )
