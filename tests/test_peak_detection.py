@@ -1172,7 +1172,7 @@ def test__B6_data_causing_TwoValleysInARowError(MA20123123__2020_10_13_173812__B
     )
 
     peak_indices, valley_indices = peak_and_valley_indices
-    # find_twitch_indices(peak_and_valley_indices, filtered_data)
+    find_twitch_indices(peak_and_valley_indices, filtered_data)
 
     # fmt: off
     expected_peak_indices = [828, 1593, 2388, 3184, 3980, 4755, 5545, 6258, 7048, 7850, 8636, 9446, 10248, 11017, 11802, 12564, 13370, 14153, 14948, 15718, 16497, 17271, 18050, 18822, 19574, 20335, 21150, 21907, 22714, 23474, 24273, 25041, 25830, 26625, 27408, 28189, 28968, 29800, 30571, 31358, 32137, 32970, 33750, 34516, 35296, 36075, 36857, 37635, 38446, 39182, 39935, 40651, 41366, 42211, 42995, 43757, 44520, 45254, 45998, 46731, 47472, 48232, 48975, 49699, 50479, 51226, 51983, 52707, 53424, 54179, 54844, 55575, 56281, 56982, 57723, 58482, 59253, 60019, 60782, 61528, 62303, 63085, 63851, 64657, 65430, 66214, 66988, 67778, 68573, 69366, 70092, 70809, 71556, 72302, 72997, 73741, 74475, 75211]
@@ -1214,12 +1214,9 @@ def test__D4_data_causing_TwoPeaksInARowError(MA202000030__2020_12_11_233215__D4
     )
 
     peak_indices, valley_indices = peak_and_valley_indices
-    # find_twitch_indices(peak_and_valley_indices, filtered_data)
 
     expected_number_peaks = 15
     expected_number_valleys = 15
-    # [ 525  997 1487 2177 2716 3237 3750 4759 5239 5717 6372 6895 7334 7895]
-    # missing between index 6 & 7
 
     assert expected_number_peaks == len(peak_indices)
     assert expected_number_valleys == len(valley_indices)
@@ -1238,7 +1235,6 @@ def test__D4_data_from_12_14_2020_causing_TwoPeaksInARowError(
     )
 
     _, valley_indices = peak_and_valley_indices
-    # find_twitch_indices(peak_and_valley_indices, filtered_data)
 
     expected_number_valleys = 19
 
@@ -1258,7 +1254,6 @@ def test__D2_data_from_12_15_2020_causing_TwoPeaksInARowError(
     )
 
     _, valley_indices = peak_and_valley_indices
-    # find_twitch_indices(peak_and_valley_indices, filtered_data)
 
     expected_number_valleys = 8
 
@@ -1278,7 +1273,6 @@ def test__D2_data_from_12_18_2020_causing_TwoPeaksInARowError(
     )
 
     _, valley_indices = peak_and_valley_indices
-    # find_twitch_indices(peak_and_valley_indices, filtered_data)
 
     expected_number_valleys = 15
 

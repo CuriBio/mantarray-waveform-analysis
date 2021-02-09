@@ -81,21 +81,22 @@ def peak_detector(
         width=minimum_required_samples_between_twitches / 2,
         distance=minimum_required_samples_between_twitches,
         prominence=max_prominence / 4,
+        threshold=0,
     )
     valley_indices, properties = signal.find_peaks(
         magnetic_signal * valley_invertor_factor,
         width=minimum_required_samples_between_twitches / 2,
         distance=minimum_required_samples_between_twitches,
         prominence=max_prominence / 4,
+        threshold=0,
     )
-    left_valley_bases = properties["left_bases"]
-    right_valley_bases = properties["right_bases"]
+    left_ips = properties["left_ips"]
+    right_ips = properties["right_ips"]
+
     # TODO Tanner (11/3/20): move this loop to find_twitch_indices
+    # Patches error in B6 file for when two valleys are found in a single valley: if this is true left_bases, right_bases, prominences, and raw magnetic sensor data will also be equivalent to their previous value
     for i in range(1, len(valley_indices)):
-        if (
-            left_valley_bases[i] == left_valley_bases[i - 1]
-            and right_valley_bases[i] == right_valley_bases[i - 1]
-        ):
+        if left_ips[i] == left_ips[i - 1] and right_ips[i] == right_ips[i - 1]:
             valley_indices = np.delete(valley_indices, i)
             i -= 1
 
