@@ -1204,14 +1204,7 @@ def test__A1_data_causing_TwoValleysInARowError(MA20123123__2020_10_13_234733__A
 
 
 def test__D4_data_causing_TwoPeaksInARowError(MA202000030__2020_12_11_233215__D4):
-    pipeline, peak_and_valley_indices = MA202000030__2020_12_11_233215__D4
-    # plot and save results
-    filtered_data = pipeline.get_noise_filtered_gmr()
-    _plot_data(
-        peak_and_valley_indices,
-        filtered_data,
-        os.path.join(PATH_TO_PNGS, "new_MA202000030__2020_12_11_233215__D4.png"),
-    )
+    _, peak_and_valley_indices = MA202000030__2020_12_11_233215__D4
 
     peak_indices, valley_indices = peak_and_valley_indices
 
@@ -1222,17 +1215,10 @@ def test__D4_data_causing_TwoPeaksInARowError(MA202000030__2020_12_11_233215__D4
     assert expected_number_valleys == len(valley_indices)
 
 
-def test__D4_data_from_12_14_2020_causing_TwoPeaksInARowError(
+def test__D4_data_from_12_14_2020_causing_TwoValleysInARowError(
     MA202000030__2020_12_14_225041__D4,
 ):
-    pipeline, peak_and_valley_indices = MA202000030__2020_12_14_225041__D4
-    # plot and save results
-    filtered_data = pipeline.get_noise_filtered_gmr()
-    _plot_data(
-        peak_and_valley_indices,
-        filtered_data,
-        os.path.join(PATH_TO_PNGS, "new_MA202000030__2020_12_14_225041__D4.png"),
-    )
+    _, peak_and_valley_indices = MA202000030__2020_12_14_225041__D4
 
     _, valley_indices = peak_and_valley_indices
 
@@ -1241,18 +1227,10 @@ def test__D4_data_from_12_14_2020_causing_TwoPeaksInARowError(
     assert expected_number_valleys == len(valley_indices)
 
 
-def test__D2_data_from_12_15_2020_causing_TwoPeaksInARowError(
+def test__D2_data_from_12_15_2020_causing_TwoValleysInARowError(
     MA202000030__2020_12_15_233947__D2,
 ):
-    pipeline, peak_and_valley_indices = MA202000030__2020_12_15_233947__D2
-    # plot and save results
-    filtered_data = pipeline.get_noise_filtered_gmr()
-    _plot_data(
-        peak_and_valley_indices,
-        filtered_data,
-        os.path.join(PATH_TO_PNGS, "new_MA202000030__2020_12_15_225041__D2.png"),
-    )
-
+    _, peak_and_valley_indices = MA202000030__2020_12_15_233947__D2
     _, valley_indices = peak_and_valley_indices
 
     expected_number_valleys = 8
@@ -1260,17 +1238,10 @@ def test__D2_data_from_12_15_2020_causing_TwoPeaksInARowError(
     assert expected_number_valleys == len(valley_indices)
 
 
-def test__D2_data_from_12_18_2020_causing_TwoPeaksInARowError(
+def test__D2_data_from_12_18_2020_causing_TwoValleysInARowError(
     MA202000030__2020_12_18_000826__D2,
 ):
-    pipeline, peak_and_valley_indices = MA202000030__2020_12_18_000826__D2
-    # plot and save results
-    filtered_data = pipeline.get_noise_filtered_gmr()
-    _plot_data(
-        peak_and_valley_indices,
-        filtered_data,
-        os.path.join(PATH_TO_PNGS, "new_MA202000030__2020_12_18_000826__D2.png"),
-    )
+    _, peak_and_valley_indices = MA202000030__2020_12_18_000826__D2
 
     _, valley_indices = peak_and_valley_indices
 
