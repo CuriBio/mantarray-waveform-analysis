@@ -35,9 +35,6 @@ from .fixtures_compression import fixture_new_A6
 from .fixtures_peak_detection import fixture_MA20123123__2020_10_13_173812__B6
 from .fixtures_peak_detection import fixture_MA20123123__2020_10_13_234733__A1
 from .fixtures_peak_detection import fixture_MA202000030__2020_12_11_233215__D4
-from .fixtures_peak_detection import fixture_MA202000030__2020_12_14_225041__D4
-from .fixtures_peak_detection import fixture_MA202000030__2020_12_15_233947__D2
-from .fixtures_peak_detection import fixture_MA202000030__2020_12_18_000826__D2
 from .fixtures_peak_detection import fixture_maiden_voyage_data
 from .fixtures_peak_detection import fixture_noisy_data_A1
 from .fixtures_peak_detection import fixture_noisy_data_B1
@@ -65,9 +62,6 @@ __fixtures__ = [
     fixture_MA20123123__2020_10_13_173812__B6,
     fixture_MA20123123__2020_10_13_234733__A1,
     fixture_MA202000030__2020_12_11_233215__D4,
-    fixture_MA202000030__2020_12_14_225041__D4,
-    fixture_MA202000030__2020_12_15_233947__D2,
-    fixture_MA202000030__2020_12_18_000826__D2,
 ]
 
 
@@ -1209,31 +1203,4 @@ def test__D4_data_causing_TwoPeaksInARowError(MA202000030__2020_12_11_233215__D4
     expected_number_peaks = 15
     expected_number_valleys = 15
     assert expected_number_peaks == len(peak_indices)
-    assert expected_number_valleys == len(valley_indices)
-
-
-def test__D4_data_from_12_14_2020_causing_TwoValleysInARowError(
-    MA202000030__2020_12_14_225041__D4,
-):
-    _, peak_and_valley_indices = MA202000030__2020_12_14_225041__D4
-    _, valley_indices = peak_and_valley_indices
-    expected_number_valleys = 19
-    assert expected_number_valleys == len(valley_indices)
-
-
-def test__D2_data_from_12_15_2020_causing_TwoValleysInARowError(
-    MA202000030__2020_12_15_233947__D2,
-):
-    _, peak_and_valley_indices = MA202000030__2020_12_15_233947__D2
-    _, valley_indices = peak_and_valley_indices
-    expected_number_valleys = 8
-    assert expected_number_valleys == len(valley_indices)
-
-
-def test__D2_data_from_12_18_2020_causing_TwoValleysInARowError(
-    MA202000030__2020_12_18_000826__D2,
-):
-    _, peak_and_valley_indices = MA202000030__2020_12_18_000826__D2
-    _, valley_indices = peak_and_valley_indices
-    expected_number_valleys = 15
     assert expected_number_valleys == len(valley_indices)
