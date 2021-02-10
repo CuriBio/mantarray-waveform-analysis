@@ -1197,7 +1197,7 @@ def test__A1_data_causing_TwoValleysInARowError(MA20123123__2020_10_13_234733__A
     assert np.array_equal(valley_indices, expected_valley_indices)
 
 
-def test__D4_data_causing_TwoPeaksInARowError(MA202000030__2020_12_11_233215__D4):
+def test__D4_data_causing_TwoValleysInARowError(MA202000030__2020_12_11_233215__D4):
     _, peak_and_valley_indices = MA202000030__2020_12_11_233215__D4
     peak_indices, valley_indices = peak_and_valley_indices
     expected_number_peaks = 15

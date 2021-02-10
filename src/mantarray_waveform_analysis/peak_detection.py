@@ -81,14 +81,12 @@ def peak_detector(
         width=minimum_required_samples_between_twitches / 2,
         distance=minimum_required_samples_between_twitches,
         prominence=max_prominence / 4,
-        threshold=0,
     )
     valley_indices, properties = signal.find_peaks(
         magnetic_signal * valley_invertor_factor,
         width=minimum_required_samples_between_twitches / 2,
         distance=minimum_required_samples_between_twitches,
         prominence=max_prominence / 4,
-        threshold=0,
     )
     left_ips = properties["left_ips"]
     right_ips = properties["right_ips"]
