@@ -92,7 +92,7 @@ def peak_detector(
     right_ips = properties["right_ips"]
 
     # TODO Tanner (11/3/20): move this loop to find_twitch_indices
-    # Patches error in B6 file for when two valleys are found in a single valley: if this is true left_bases, right_bases, prominences, and raw magnetic sensor data will also be equivalent to their previous value
+    # Patches error in B6 file for when two valleys are found in a single valley. If this is true left_bases, right_bases, prominences, and raw magnetic sensor data will also be equivalent to their previous value. This if statement indicates that the valley should be disregarded if the interpolated values on left and right intersection points of a horizontal line at the an evaluation height are equivalent. This would mean that the left and right sides of the peak and its neighbor peak align, indicating that it just one peak rather than two.
     for i in range(1, len(valley_indices)):
         if left_ips[i] == left_ips[i - 1] and right_ips[i] == right_ips[i - 1]:
             valley_indices = np.delete(valley_indices, i)
