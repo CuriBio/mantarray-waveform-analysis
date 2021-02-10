@@ -1205,12 +1205,9 @@ def test__A1_data_causing_TwoValleysInARowError(MA20123123__2020_10_13_234733__A
 
 def test__D4_data_causing_TwoPeaksInARowError(MA202000030__2020_12_11_233215__D4):
     _, peak_and_valley_indices = MA202000030__2020_12_11_233215__D4
-
     peak_indices, valley_indices = peak_and_valley_indices
-
     expected_number_peaks = 15
     expected_number_valleys = 15
-
     assert expected_number_peaks == len(peak_indices)
     assert expected_number_valleys == len(valley_indices)
 
@@ -1219,11 +1216,8 @@ def test__D4_data_from_12_14_2020_causing_TwoValleysInARowError(
     MA202000030__2020_12_14_225041__D4,
 ):
     _, peak_and_valley_indices = MA202000030__2020_12_14_225041__D4
-
     _, valley_indices = peak_and_valley_indices
-
     expected_number_valleys = 19
-
     assert expected_number_valleys == len(valley_indices)
 
 
@@ -1232,9 +1226,7 @@ def test__D2_data_from_12_15_2020_causing_TwoValleysInARowError(
 ):
     _, peak_and_valley_indices = MA202000030__2020_12_15_233947__D2
     _, valley_indices = peak_and_valley_indices
-
     expected_number_valleys = 8
-
     assert expected_number_valleys == len(valley_indices)
 
 
@@ -1242,9 +1234,6 @@ def test__D2_data_from_12_18_2020_causing_TwoValleysInARowError(
     MA202000030__2020_12_18_000826__D2,
 ):
     _, peak_and_valley_indices = MA202000030__2020_12_18_000826__D2
-
     _, valley_indices = peak_and_valley_indices
-
     expected_number_valleys = 15
-
     assert expected_number_valleys == len(valley_indices)
