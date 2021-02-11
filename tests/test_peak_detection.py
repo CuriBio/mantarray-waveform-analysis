@@ -1200,7 +1200,41 @@ def test__A1_data_causing_TwoValleysInARowError(MA20123123__2020_10_13_234733__A
 def test__D4_data_causing_TwoValleysInARowError(MA202000030__2020_12_11_233215__D4):
     _, peak_and_valley_indices = MA202000030__2020_12_11_233215__D4
     peak_indices, valley_indices = peak_and_valley_indices
-    expected_number_peaks = 15
-    expected_number_valleys = 15
-    assert expected_number_peaks == len(peak_indices)
-    assert expected_number_valleys == len(valley_indices)
+
+    expected_peak_indices = [
+        257,
+        781,
+        1306,
+        1833,
+        2358,
+        2888,
+        3408,
+        3931,
+        4454,
+        4978,
+        5501,
+        6024,
+        6539,
+        7068,
+        7597,
+    ]
+    expected_valley_indices = [
+        525,
+        997,
+        1487,
+        2177,
+        2716,
+        3237,
+        3750,
+        4289,
+        4759,
+        5239,
+        5717,
+        6372,
+        6895,
+        7334,
+        7895,
+    ]
+
+    assert np.array_equal(peak_indices, expected_peak_indices)
+    assert np.array_equal(valley_indices, expected_valley_indices)
