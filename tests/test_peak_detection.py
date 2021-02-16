@@ -1174,6 +1174,7 @@ def test__B6_data_causing_TwoValleysInARowError(MA20123123__2020_10_13_173812__B
     # fmt: on
     assert np.array_equal(peak_indices, expected_peak_indices)
     assert np.array_equal(valley_indices, expected_valley_indices)
+    assert len(valley_indices) == 98
 
 
 def test__A1_data_causing_TwoValleysInARowError(MA20123123__2020_10_13_234733__A1):
@@ -1237,4 +1238,119 @@ def test__D4_data_causing_TwoValleysInARowError(MA202000030__2020_12_11_233215__
     ]
 
     assert np.array_equal(peak_indices, expected_peak_indices)
+    assert np.array_equal(valley_indices, expected_valley_indices)
+
+
+def test__B6_data_causing_TwoValleysInARowError_with_second_peak_greater(
+    MA20123123__2020_10_13_173812__B6,
+):
+    pipeline, _ = MA20123123__2020_10_13_173812__B6
+
+    filtered_data = pipeline.get_noise_filtered_gmr()
+
+    filtered_data_vals = np.flip(filtered_data[1, :])
+    filtered_data[1, :] = filtered_data_vals
+
+    _, valley_indices = peak_detector(filtered_data, twitches_point_up=False)
+    expected_valley_indices = [
+        559,
+        1338,
+        2054,
+        2873,
+        3752,
+        4555,
+        5282,
+        5994,
+        6812,
+        7413,
+        8182,
+        8989,
+        9852,
+        10642,
+        11434,
+        12258,
+        13055,
+        13942,
+        14728,
+        15498,
+        16188,
+        17024,
+        17669,
+        18504,
+        19381,
+        20119,
+        20864,
+        21556,
+        22510,
+        23279,
+        24008,
+        24859,
+        25636,
+        26430,
+        27222,
+        27975,
+        28765,
+        29567,
+        30254,
+        30942,
+        31910,
+        32482,
+        33476,
+        34099,
+        34991,
+        35836,
+        36576,
+        37270,
+        38185,
+        38830,
+        39733,
+        40406,
+        41179,
+        41823,
+        42751,
+        43533,
+        44256,
+        44906,
+        45785,
+        46373,
+        47259,
+        47852,
+        48738,
+        49504,
+        50292,
+        51053,
+        51712,
+        52500,
+        53220,
+        53723,
+        54485,
+        55337,
+        56083,
+        56649,
+        57501,
+        58312,
+        59058,
+        59771,
+        60585,
+        61183,
+        62017,
+        62877,
+        63646,
+        64315,
+        65212,
+        65912,
+        66790,
+        67592,
+        68370,
+        69182,
+        69870,
+        70570,
+        71222,
+        72108,
+        72793,
+        73488,
+        74236,
+        74983,
+    ]
+
     assert np.array_equal(valley_indices, expected_valley_indices)

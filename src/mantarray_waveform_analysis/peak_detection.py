@@ -96,7 +96,13 @@ def peak_detector(
     # https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.peak_widths.html#scipy.signal.peak_widths
     for i in range(1, len(valley_indices)):
         if left_ips[i] == left_ips[i - 1] and right_ips[i] == right_ips[i - 1]:
-            valley_indices = np.delete(valley_indices, i)
+            valley_idx = valley_indices[i]
+            valley_idx_last = valley_indices[i - 1]
+            if magnetic_signal[valley_idx] > magnetic_signal[valley_idx_last]:
+                index_to_delete = i - 1
+            else:
+                index_to_delete = i
+            valley_indices = np.delete(valley_indices, index_to_delete)
             i -= 1
     return peak_indices, valley_indices
 
