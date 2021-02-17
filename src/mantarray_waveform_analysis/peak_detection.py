@@ -88,17 +88,23 @@ def peak_detector(
         distance=minimum_required_samples_between_twitches,
         prominence=max_prominence / 4,
     )
-    left_valley_bases = properties["left_bases"]
-    right_valley_bases = properties["right_bases"]
-    # TODO Tanner (11/3/20): move this loop to find_twitch_indices
-    for i in range(1, len(valley_indices)):
-        if (
-            left_valley_bases[i] == left_valley_bases[i - 1]
-            and right_valley_bases[i] == right_valley_bases[i - 1]
-        ):
-            valley_indices = np.delete(valley_indices, i)
-            i -= 1
+    left_ips = properties["left_ips"]
+    right_ips = properties["right_ips"]
 
+    # TODO Tanner (11/3/20): move this loop to find_twitch_indices
+    # Patches error in B6 file for when two valleys are found in a single valley. If this is true left_bases, right_bases, prominences, and raw magnetic sensor data will also be equivalent to their previous value. This if statement indicates that the valley should be disregarded if the interpolated values on left and right intersection points of a horizontal line at the an evaluation height are equivalent. This would mean that the left and right sides of the peak and its neighbor peak align, indicating that it just one peak rather than two.
+    # https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.peak_widths.html#scipy.signal.peak_widths
+    for i in range(1, len(valley_indices)):
+        if left_ips[i] == left_ips[i - 1] and right_ips[i] == right_ips[i - 1]:
+            valley_idx = valley_indices[i]
+            valley_idx_last = valley_indices[i - 1]
+            if magnetic_signal[valley_idx_last] == magnetic_signal[valley_idx]:
+                valley_indices = np.delete(valley_indices, i)
+                i -= 1
+            else:
+                raise NotImplementedError(
+                    "The only examples observed so far where two peaks were detected were due to the values/heights of the peaks being identical. In that case the decision was made to always choose the earlier peak. This error is a defensive assertion against the future possibility that there might be a case in the future where the values of the two peaks are unequal---in which case we would need to revisit how we would like to handle that outcome."
+                )
     return peak_indices, valley_indices
 
 
