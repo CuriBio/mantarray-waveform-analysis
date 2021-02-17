@@ -102,7 +102,7 @@ def peak_detector(
                 valley_indices = np.delete(valley_indices, i)
                 i -= 1
             else:
-                NotImplementedError(
+                raise NotImplementedError(
                     "It is assumed that both peaks are equal in their height if the interpolated values on the right and left intersection points equal the right and left intersection points of the peak directly before it."
                 )
     return peak_indices, valley_indices
