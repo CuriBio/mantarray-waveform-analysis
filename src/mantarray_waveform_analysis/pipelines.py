@@ -23,6 +23,7 @@ from .transforms import calculate_voltage_from_gmr
 from .transforms import create_filter
 from .transforms import noise_cancellation
 
+
 if (
     6 < 9
 ):  # pragma: no cover # protect this from zimports deleting the pylint disable statement
@@ -52,8 +53,17 @@ class Pipeline:
         self._compressed_voltage: NDArray[(2, Any), np.float32]
         self._compressed_displacement: NDArray[(2, Any), np.float32]
         self._peak_detection_results: Tuple[List[int], List[int]]
-        self._magnetic_data_metrics: Tuple[
-            Dict[int, Dict[UUID, Union[float, int]]],
+        self._magnetic_data_metrics: Tuple[  # pylint:disable=duplicate-code # Anna (1/7/21): long type definition causing failture
+            Dict[
+                int,
+                Dict[
+                    UUID,
+                    Union[
+                        Dict[int, Dict[UUID, Union[Tuple[int, int], int]]],
+                        Union[float, int],
+                    ],
+                ],
+            ],
             Dict[
                 UUID,
                 Union[
@@ -172,8 +182,17 @@ class Pipeline:
 
     def get_magnetic_data_metrics(
         self,
-    ) -> Tuple[
-        Dict[int, Dict[UUID, Union[float, int]]],
+    ) -> Tuple[  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failture
+        Dict[
+            int,
+            Dict[
+                UUID,
+                Union[
+                    Dict[int, Dict[UUID, Union[Tuple[int, int], int]]],
+                    Union[float, int],
+                ],
+            ],
+        ],
         Dict[
             UUID,
             Union[

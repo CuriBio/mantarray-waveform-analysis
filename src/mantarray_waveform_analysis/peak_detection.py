@@ -33,11 +33,12 @@ from .exceptions import TooFewPeaksDetectedError
 from .exceptions import TwoPeaksInARowError
 from .exceptions import TwoValleysInARowError
 
+
 TWITCH_WIDTH_PERCENTS = range(10, 95, 5)
 
 
 def peak_detector(
-    filtered_gmr: NDArray[(2, Any), int],
+    filtered_magnetic_signal: NDArray[(2, Any), int],
     twitches_point_up: bool = True,
 ) -> Tuple[List[int], List[int]]:
     """Locates peaks and valleys and returns the indices.
@@ -51,13 +52,15 @@ def peak_detector(
     Returns:
         A tuple of the indices of the peaks and valleys
     """
-    gmr_signal: NDArray[int] = filtered_gmr[1, :]
+    magnetic_signal: NDArray[int] = filtered_magnetic_signal[1, :]
     peak_invertor_factor = 1
     valley_invertor_factor = -1
     if not twitches_point_up:
         peak_invertor_factor *= -1
         valley_invertor_factor *= -1
-    sampling_period_cms = filtered_gmr[0, 1] - filtered_gmr[0, 0]
+    sampling_period_cms = (
+        filtered_magnetic_signal[0, 1] - filtered_magnetic_signal[0, 0]
+    )
     maximum_possible_twitch_frequency = 7  # pylint:disable=invalid-name # (Eli 9/1/20): I can't think of a shorter name to describe this concept fully # Hz
     minimum_required_samples_between_twitches = int(  # pylint:disable=invalid-name # (Eli 9/1/20): I can't think of a shorter name to describe this concept fully
         round(
@@ -69,33 +72,39 @@ def peak_detector(
     )
 
     # find required height of peaks
-    max_height = np.max(gmr_signal)
-    min_height = np.min(gmr_signal)
+    max_height = np.max(magnetic_signal)
+    min_height = np.min(magnetic_signal)
     max_prominence = abs(max_height - min_height)
     # find peaks and valleys
     peak_indices, _ = signal.find_peaks(
-        gmr_signal * peak_invertor_factor,
+        magnetic_signal * peak_invertor_factor,
         width=minimum_required_samples_between_twitches / 2,
         distance=minimum_required_samples_between_twitches,
         prominence=max_prominence / 4,
     )
     valley_indices, properties = signal.find_peaks(
-        gmr_signal * valley_invertor_factor,
+        magnetic_signal * valley_invertor_factor,
         width=minimum_required_samples_between_twitches / 2,
         distance=minimum_required_samples_between_twitches,
         prominence=max_prominence / 4,
     )
-    left_valley_bases = properties["left_bases"]
-    right_valley_bases = properties["right_bases"]
-    # TODO Tanner (11/3/20): move this loop to find_twitch_indices
-    for i in range(1, len(valley_indices)):
-        if (
-            left_valley_bases[i] == left_valley_bases[i - 1]
-            and right_valley_bases[i] == right_valley_bases[i - 1]
-        ):
-            valley_indices = np.delete(valley_indices, i)
-            i -= 1
+    left_ips = properties["left_ips"]
+    right_ips = properties["right_ips"]
 
+    # TODO Tanner (11/3/20): move this loop to find_twitch_indices
+    # Patches error in B6 file for when two valleys are found in a single valley. If this is true left_bases, right_bases, prominences, and raw magnetic sensor data will also be equivalent to their previous value. This if statement indicates that the valley should be disregarded if the interpolated values on left and right intersection points of a horizontal line at the an evaluation height are equivalent. This would mean that the left and right sides of the peak and its neighbor peak align, indicating that it just one peak rather than two.
+    # https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.peak_widths.html#scipy.signal.peak_widths
+    for i in range(1, len(valley_indices)):
+        if left_ips[i] == left_ips[i - 1] and right_ips[i] == right_ips[i - 1]:
+            valley_idx = valley_indices[i]
+            valley_idx_last = valley_indices[i - 1]
+            if magnetic_signal[valley_idx_last] == magnetic_signal[valley_idx]:
+                valley_indices = np.delete(valley_indices, i)
+                i -= 1
+            else:
+                raise NotImplementedError(
+                    "The only examples observed so far where two peaks were detected were due to the values/heights of the peaks being identical. In that case the decision was made to always choose the earlier peak. This error is a defensive assertion against the future possibility that there might be a case in the future where the values of the two peaks are unequal---in which case we would need to revisit how we would like to handle that outcome."
+                )
     return peak_indices, valley_indices
 
 
@@ -108,7 +117,7 @@ def create_avg_dict(
         metric: a 1D array of integer values of a specific metric results
 
     Returns:
-        a dictionary of the average statistics of that metric
+        a dictionary of the average statistics of that metric in which the metrics are the key and average statistics are the value
     """
     dictionary: Dict[str, Union[float, int]] = dict()
 
@@ -128,7 +137,16 @@ def data_metrics(
     peak_and_valley_indices: Tuple[NDArray[int], NDArray[int]],
     filtered_data: NDArray[(2, Any), int],
 ) -> Tuple[
-    Dict[int, Dict[UUID, Union[float, int]]],
+    Dict[
+        int,
+        Dict[
+            UUID,  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failture
+            Union[
+                Dict[int, Dict[UUID, Union[Tuple[int, int], int]]],
+                Union[float, int],
+            ],
+        ],  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failture
+    ],
     Dict[
         UUID,
         Union[Dict[str, Union[float, int]], Dict[int, Dict[str, Union[float, int]]]],
@@ -137,15 +155,23 @@ def data_metrics(
     """Find all data metrics for individual twitches and averages.
 
     Args:
-        peakind: a tuple of integer values representing the time indices of peaks and valleys within the data
+        peak_and_valley_indices: a tuple of integer value arrays representing the time indices of peaks and valleys within the data
         filtered_data: a 2D array of the time and voltage data after it has gone through noise cancellation
 
     Returns:
-        per_twitch_dict: a dictionary of individual peak metrics
+        per_twitch_dict: a dictionary of individual peak metrics in which the twitch timepoint is accompanied by a dictionary in which the UUIDs for each twitch metric are the key and with its accompanying value as the value. For the Twitch Width metric UUID, another dictionary is stored in which the key is the percentage of the way down and the value is another dictionary in which the UUIDs for the rising coord, falling coord or width value are stored with the value as an int for the width value or a tuple of ints for the x/y coordinates
         aggregate_dict: a dictionary of entire metric statistics. Most metrics have the stats underneath the UUID, but for twitch widths, there is an additional dictionary where the percent of repolarization is the key
     """
     # create main dictionaries
-    main_twitch_dict: Dict[int, Dict[UUID, Union[float, int]]] = dict()
+    main_twitch_dict: Dict[
+        int,
+        Dict[
+            UUID,
+            Union[
+                Dict[int, Dict[UUID, Union[Tuple[int, int], int]]], Union[float, int]
+            ],
+        ],
+    ] = dict()
     aggregate_dict: Dict[
         UUID,
         Union[Dict[str, Union[float, int]], Dict[int, Dict[str, Union[float, int]]]],
@@ -173,6 +199,7 @@ def data_metrics(
         combined_twitch_periods.astype(np.float) / CENTIMILLISECONDS_PER_SECOND
     )
     frequency_averages_dict = create_avg_dict(twitch_frequencies, round_to_int=False)
+
     # find aggregate values of period data
     period_averages_dict = create_avg_dict(combined_twitch_periods)
 
@@ -244,7 +271,7 @@ def calculate_twitch_period(
         filtered_data: a 2D array (time vs value) of the data
 
     Returns:
-        an array of integers that are the peeriod of each twitch
+        an array of integers that are the period of each twitch
     """
     list_of_twitch_indices = list(twitch_indices.keys())
     idx_of_first_twitch = np.where(all_peak_indices == list_of_twitch_indices[0])[0][0]
@@ -274,27 +301,17 @@ def find_twitch_indices(
         filtered_data: a 2D array of the data after being noise filtered
 
     Returns:
-        a 1D array of integers representing the time points of all the twitches
+        a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUIDs of prior/subsequent peaks and valleys and their index values.
     """
     peak_indices, valley_indices = peak_and_valley_indices
-    if len(peak_indices) < MIN_NUMBER_PEAKS:
-        raise TooFewPeaksDetectedError(
-            f"A minimum of {MIN_NUMBER_PEAKS} peaks is required to extract twitch metrics, however only {len(peak_indices)} peak(s) were detected"
-        )
-    if len(valley_indices) < MIN_NUMBER_VALLEYS:
-        raise TooFewPeaksDetectedError(
-            f"A minimum of {MIN_NUMBER_VALLEYS} valleys is required to extract twitch metrics, however only {len(valley_indices)} valley(s) were detected"
-        )
+
+    _too_few_peaks_or_valleys(peak_indices, valley_indices)
+
     twitches: Dict[int, Dict[UUID, Optional[int]]] = {}
 
     starts_with_peak = peak_indices[0] < valley_indices[0]
     prev_feature_is_peak = starts_with_peak
-    peak_idx = 0
-    valley_idx = 0
-    if starts_with_peak:
-        peak_idx += 1
-    else:
-        valley_idx += 1
+    peak_idx, valley_idx = _find_start_indices(starts_with_peak)
 
     # check for two back-to-back features
     while peak_idx < len(peak_indices) and valley_idx < len(valley_indices):
@@ -352,6 +369,45 @@ def find_twitch_indices(
     return twitches
 
 
+def _too_few_peaks_or_valleys(
+    peak_indices: NDArray[int], valley_indices: NDArray[int]
+) -> None:
+    """Raise an error if there are too few peaks or valleys detected.
+
+    Args:
+        peak_indices: a 1D array of integers representing the indices of the peaks
+        valley_indices: a 1D array of integeres representing the indices of the valleys
+    """
+    if len(peak_indices) < MIN_NUMBER_PEAKS:
+        raise TooFewPeaksDetectedError(
+            f"A minimum of {MIN_NUMBER_PEAKS} peaks is required to extract twitch metrics, however only {len(peak_indices)} peak(s) were detected"
+        )
+    if len(valley_indices) < MIN_NUMBER_VALLEYS:
+        raise TooFewPeaksDetectedError(
+            f"A minimum of {MIN_NUMBER_VALLEYS} valleys is required to extract twitch metrics, however only {len(valley_indices)} valley(s) were detected"
+        )
+
+
+def _find_start_indices(starts_with_peak: bool) -> Tuple[int, int]:
+    """Find start indices for peaks and valleys.
+
+    Args:
+        starts_with_peak: bool indicating whether or not a peak rather than a valley comes first
+
+    Returns:
+        peak_idx: peak start index
+        valley_idx: valley start index
+    """
+    peak_idx = 0
+    valley_idx = 0
+    if starts_with_peak:
+        peak_idx += 1
+    else:
+        valley_idx += 1
+
+    return peak_idx, valley_idx
+
+
 def calculate_amplitudes(
     twitch_indices: Dict[int, Dict[UUID, Optional[int]]],
     filtered_data: NDArray[(2, Any), int],
@@ -359,7 +415,7 @@ def calculate_amplitudes(
     """Get the amplitudes for all twitches.
 
     Args:
-        twitch_indices: a 1D array of all the time values of the peaks of interest
+        twitch_indices: a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUID of prior/subsequent peaks and valleys and their index values.
         filtered_data: a 2D array of the time and value (magnetic, voltage, displacement, force...) data after it has gone through noise filtering
 
     Returns:
@@ -415,7 +471,7 @@ def interpolate_y_for_x_between_two_points(  # pylint:disable=invalid-name # (El
     x_2: Union[int, float],
     y_2: Union[int, float],
 ) -> Union[int, float]:
-    """Find a value of x between two points that matches the desired y value.
+    """Find a value of y between two points that matches the desired x value.
 
     Uses linear interpolation, based on point-slope formula.
     """
@@ -430,7 +486,7 @@ def calculate_twitch_widths(
     """Determine twitch width between 10-90% down to the nearby valleys.
 
     Args:
-        twitch_indices: a 1D array of all the time values of the peaks of interest
+        twitch_indices: a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUIDs of prior/subsequent peaks and valleys and their index values.
         filtered_data: a 2D array of the time and value (magnetic, voltage, displacement, force...) data after it has gone through noise filtering
 
     Returns:
@@ -503,7 +559,16 @@ def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20)
     filtered_data: NDArray[(2, Any), int],
     per_twitch_widths: List[Dict[int, Dict[UUID, Union[Tuple[int, int], int]]]],
 ) -> NDArray[int]:
-    """Calculate the area under the curve (AUC) for twitches."""
+    """Calculate the area under the curve (AUC) for twitches.
+
+    Args:
+        twitch_indices: a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUIDs of prior/subsequent peaks and valleys and their index values.
+        filtered_data: a 2D array of the time and value (magnetic, voltage, displacement, force...) data after it has gone through noise filtering
+        per_twitch_widths: a list of dictionaries where the first key is the percentage of the way down to the nearby valleys, the second key is a UUID representing either the value of the width, or the rising or falling coordinates. The final value is either an int representing the width value or a tuple of ints for the x/y coordinates
+
+    Returns:
+        a 1D array of integers which represent the area under the curve for each twitch
+    """
     width_percent = 90  # what percent of repolarization to use as the bottom limit for calculating AUC
     auc_per_twitch: List[int] = list()
     value_series = filtered_data[1, :]
@@ -521,28 +586,25 @@ def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20)
             iter_twitch_indices_info[SUBSEQUENT_VALLEY_INDEX_UUID]
         ]
         rising_coords = width_info[width_percent][WIDTH_RISING_COORDS_UUID]
+        falling_coords = width_info[width_percent][WIDTH_FALLING_COORDS_UUID]
+
         if not isinstance(
             rising_coords, tuple
         ):  # Eli (9/1/20): this appears needed to make mypy happy
             raise NotImplementedError(
                 f"Rising coordinates under the key {WIDTH_RISING_COORDS_UUID} must be a tuple."
             )
-        rising_x, rising_y = rising_coords
-        falling_coords = width_info[width_percent][WIDTH_FALLING_COORDS_UUID]
+
         if not isinstance(
             falling_coords, tuple
         ):  # Eli (9/1/20): this appears needed to make mypy happy
             raise NotImplementedError(
                 f"Falling coordinates under the key {WIDTH_FALLING_COORDS_UUID} must be a tuple."
             )
+
+        rising_x, rising_y = rising_coords
         falling_x, falling_y = falling_coords
-        interp_y_for_lower_bound = partial(
-            interpolate_y_for_x_between_two_points,
-            x_1=rising_x,
-            y_1=rising_y,
-            x_2=falling_x,
-            y_2=falling_y,
-        )
+
         auc_total: Union[float, int] = 0
 
         # calculate area of rising side
@@ -555,21 +617,30 @@ def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20)
             right_x = time_series[rising_idx]
             left_y = value_series[rising_idx - 1]
             right_y = value_series[rising_idx]
-            trapezoid_h = right_x - left_x
-            trapezoid_left_side = abs(left_y - interp_y_for_lower_bound(left_x))
-            trapezoid_right_side = abs(right_y - interp_y_for_lower_bound(right_x))
 
-            auc_total += (trapezoid_left_side + trapezoid_right_side) / 2 * trapezoid_h
+            auc_total += _calculate_trapezoid_area(
+                left_x,
+                right_x,
+                left_y,
+                right_y,
+                rising_coords,
+                falling_coords,
+            )
             rising_idx -= 1
         # final trapezoid at the boundary of the interpolated twitch width point
         left_x = rising_x
         right_x = time_series[rising_idx]
         left_y = rising_y
         right_y = value_series[rising_idx]
-        trapezoid_h = right_x - left_x
-        trapezoid_left_side = abs(left_y - interp_y_for_lower_bound(left_x))
-        trapezoid_right_side = abs(right_y - interp_y_for_lower_bound(right_x))
-        auc_total += (trapezoid_left_side + trapezoid_right_side) / 2 * trapezoid_h
+
+        auc_total += _calculate_trapezoid_area(
+            left_x,
+            right_x,
+            left_y,
+            right_y,
+            rising_coords,
+            falling_coords,
+        )
 
         # calculate area of falling side
         falling_idx = iter_twitch_peak_idx
@@ -581,10 +652,15 @@ def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20)
             right_x = time_series[falling_idx + 1]
             left_y = value_series[falling_idx]
             right_y = value_series[falling_idx + 1]
-            trapezoid_h = right_x - left_x
-            trapezoid_left_side = abs(left_y - interp_y_for_lower_bound(left_x))
-            trapezoid_right_side = abs(right_y - interp_y_for_lower_bound(right_x))
-            auc_total += (trapezoid_left_side + trapezoid_right_side) / 2 * trapezoid_h
+
+            auc_total += _calculate_trapezoid_area(
+                left_x,
+                right_x,
+                left_y,
+                right_y,
+                rising_coords,
+                falling_coords,
+            )
             falling_idx += 1
 
         # final trapezoid at the boundary of the interpolated twitch width point
@@ -592,11 +668,46 @@ def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20)
         right_x = falling_x
         left_y = value_series[rising_idx]
         right_y = falling_y
-        trapezoid_h = right_x - left_x
-        trapezoid_left_side = abs(left_y - interp_y_for_lower_bound(left_x))
-        trapezoid_right_side = abs(right_y - interp_y_for_lower_bound(right_x))
-        auc_total += (trapezoid_left_side + trapezoid_right_side) / 2 * trapezoid_h
 
+        auc_total += _calculate_trapezoid_area(
+            left_x,
+            right_x,
+            left_y,
+            right_y,
+            rising_coords,
+            falling_coords,
+        )
         auc_per_twitch.append(int(round(auc_total, 0)))
 
     return np.asarray(auc_per_twitch, dtype=np.int64)
+
+
+def _calculate_trapezoid_area(
+    left_x: int,
+    right_x: int,
+    left_y: int,
+    right_y: int,
+    rising_coords: Tuple[int, int],
+    falling_coords: Tuple[int, int],
+) -> Union[int, float]:
+    """Calculate the area under the trapezoid.
+
+    Returns: area of the trapezoid
+    """
+    rising_x, rising_y = rising_coords
+    falling_x, falling_y = falling_coords
+
+    interp_y_for_lower_bound = partial(
+        interpolate_y_for_x_between_two_points,
+        x_1=rising_x,
+        y_1=rising_y,
+        x_2=falling_x,
+        y_2=falling_y,
+    )
+
+    trapezoid_h = right_x - left_x
+    trapezoid_left_side = abs(left_y - interp_y_for_lower_bound(left_x))
+    trapezoid_right_side = abs(right_y - interp_y_for_lower_bound(right_x))
+    auc_total = (trapezoid_left_side + trapezoid_right_side) / 2 * trapezoid_h
+
+    return auc_total

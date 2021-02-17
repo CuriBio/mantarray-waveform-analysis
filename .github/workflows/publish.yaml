@@ -23,7 +23,7 @@ jobs:
           - "ubuntu-20.04"
           - "windows-2019"
           - "macos-10.15"
-          - "macos-11.0"
+          # - "macos-11.0"
         python-version:
             - 3.7
             - 3.8
@@ -66,7 +66,7 @@ jobs:
         run: if [$(git ls-remote --tags origin | grep ${{ steps.extract_version.outputs.package-version }}) = '']; then echo Tag does not exist on remote; else echo Tag already exists on remote && exit 1; fi
 
       - name: Cache Pre-commit hooks
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.4
         env:
           cache-name: cache-pre-commit-hooks
         if: matrix.IS_FASTEST_JOB == true
@@ -135,11 +135,11 @@ jobs:
 
       - name: Run Tests with randomly generated seed
         if: github.event.inputs.randomlyseed == ''
-        run: pytest -xsvv --cov-report=xml --full-ci --include-slow-tests
+        run: pytest -xsvv --cov-report=xml --full-ci --include-slow-tests -n auto
 
       - name: Run Tests with supplied pytest-randomly seed
         if: github.event.inputs.randomlyseed != ''
-        run: pytest -xsvv --cov-report=xml --full-ci --include-slow-tests --randomly-seed=${{ github.event.inputs.randomlyseed }}
+        run: pytest -xsvv --cov-report=xml --full-ci --include-slow-tests -n auto --randomly-seed=${{ github.event.inputs.randomlyseed }}
 
       - name: Confirm Sphinx Docs build correctly
         # only check Sphinx docs build on the fastest job
@@ -189,7 +189,8 @@ jobs:
         os:
           - "ubuntu-20.04"
           - "windows-2019"
-          - "macos-11.0"
+          - "macos-10.15"
+          # - "macos-11.0"
         python-version:
             - 3.7
             - 3.8
@@ -259,7 +260,7 @@ jobs:
           - "ubuntu-20.04"
           - "windows-2019"
           - "macos-10.15"
-          - "macos-11.0"
+          # - "macos-11.0"
         python-version:
             - 3.7
             - 3.8
@@ -330,11 +331,11 @@ jobs:
 
       - name: Run Tests with randomly generated seed
         if: github.event.inputs.randomlyseed == ''
-        run: pytest -xsvv --full-ci --include-slow-tests --cov-fail-under=0
+        run: pytest -xsvv --full-ci --include-slow-tests -n auto
 
       - name: Run Tests with supplied pytest-randomly seed
         if: github.event.inputs.randomlyseed != ''
-        run: pytest -xsvv --full-ci --include-slow-tests --randomly-seed=${{ github.event.inputs.randomlyseed }}--cov-fail-under=0
+        run: pytest -xsvv --full-ci --include-slow-tests -n auto --randomly-seed=${{ github.event.inputs.randomlyseed }}
 
   publish_to_pypi:
     needs: [install_from_test_pypi]
@@ -344,7 +345,8 @@ jobs:
         os:
           - "ubuntu-20.04"
           - "windows-2019"
-          - "macos-11.0"
+          - "macos-10.15"
+          # - "macos-11.0"
         python-version:
             - 3.7
             - 3.8
@@ -415,7 +417,7 @@ jobs:
           - "ubuntu-20.04"
           - "windows-2019"
           - "macos-10.15"
-          - "macos-11.0"
+          # - "macos-11.0"
         python-version:
             - 3.7
             - 3.8
@@ -486,11 +488,11 @@ jobs:
 
       - name: Run Tests with randomly generated seed
         if: github.event.inputs.randomlyseed == ''
-        run: pytest -xsvv --full-ci --include-slow-tests --cov-fail-under=0
+        run: pytest -xsvv --full-ci --include-slow-tests -n auto
 
       - name: Run Tests with supplied pytest-randomly seed
         if: github.event.inputs.randomlyseed != ''
-        run: pytest -xsvv --full-ci --include-slow-tests --randomly-seed=${{ github.event.inputs.randomlyseed }} --cov-fail-under=0
+        run: pytest -xsvv --full-ci --include-slow-tests -n auto --randomly-seed=${{ github.event.inputs.randomlyseed }}
 
   create_tag:
     needs: [install_from_pypi]
