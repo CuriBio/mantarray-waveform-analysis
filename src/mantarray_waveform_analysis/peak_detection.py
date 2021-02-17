@@ -98,12 +98,13 @@ def peak_detector(
         if left_ips[i] == left_ips[i - 1] and right_ips[i] == right_ips[i - 1]:
             valley_idx = valley_indices[i]
             valley_idx_last = valley_indices[i - 1]
-            if magnetic_signal[valley_idx] > magnetic_signal[valley_idx_last]:
-                index_to_delete = i - 1
+            if magnetic_signal[valley_idx_last] == magnetic_signal[valley_idx]:
+                valley_indices = np.delete(valley_indices, i)
+                i -= 1
             else:
-                index_to_delete = i
-            valley_indices = np.delete(valley_indices, index_to_delete)
-            i -= 1
+                NotImplementedError(
+                    "It is assumed that both peaks are equal in their height if the interpolated values on the right and left intersection points equal the right and left intersection points of the peak directly before it."
+                )
     return peak_indices, valley_indices
 
 
