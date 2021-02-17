@@ -1,7 +1,7 @@
 Changelog for Mantarray Waveform Analysis
 =========================================
 
-0.6.10 (2021-01-10)
+0.5.11 (2021-02-17)
 ------------------
 
 - Fixed TwoValleysInARowError present in h5 file due to ``peak_detector`` function
