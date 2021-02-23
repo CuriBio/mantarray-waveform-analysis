@@ -519,6 +519,7 @@ jobs:
         run: |
           echo "About to tag with: v${{ steps.extract_version.outputs.package-version }}"
           git tag "v${{ steps.extract_version.outputs.package-version }}"
+          git tag -l
 
       - name: Pushing Tag
         if: github.event.inputs.dry_run != '1'
