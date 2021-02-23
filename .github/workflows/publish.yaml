@@ -177,6 +177,12 @@ jobs:
         if: matrix.IS_FASTEST_JOB == true
         run: python setup.py sdist
 
+      - name: Confirm no modifications to the repository files occurred when running the test suite
+        if: matrix.IS_FASTEST_JOB == true # only enable pre-commit on the fastest job
+        env:
+          PRE_COMMIT_HOME: ./.precommit_cache
+        run: pre-commit run git-dirty -a
+
       - name: Upload build artifact
         uses: actions/upload-artifact@v2
         with:
@@ -298,6 +304,12 @@ jobs:
           pip -V
           pip freeze
 
+      - name: Download built dist folder from previous step
+        uses: actions/download-artifact@v2
+        with:
+          name: dist--${{ matrix.os }}--${{ matrix.python-version }}
+          path: dist
+
       - name: Extract package info # Adapted from: https://stackoverflow.com/questions/58033366/how-to-get-current-branch-within-github-actions
         shell: bash
         run: |
@@ -309,24 +321,19 @@ jobs:
         if: github.event.inputs.dry_run != '1'
         run: python .github/workflows/extract_package_info.py install_from_test_pypi
 
-      # Tanner (11/4/20): We need to install packages in requirements-dev to install cython before building from local repo
-      - name: Install Dev Dependencies if downloading from from Test PyPI
-        if: github.event.inputs.dry_run == '1'
-        run: pip install -r requirements-dev.txt
+      # # Tanner (11/4/20): We need to install packages in requirements-dev to install cython before building from local repo
+      # - name: Install Dev Dependencies if downloading from from Test PyPI
+      #   if: github.event.inputs.dry_run == '1'
+      #   run: pip install -r requirements-dev.txt
 
-      - name: Install Main Package From Local repo as test since not publishing to PyPI
+      - name: Install Main Package From built wheel file as test since not publishing to PyPI
         if: github.event.inputs.dry_run == '1'
-        run: |
-          echo Extracted package name that would have been used when publishing: ${{ steps.extract_package_info.outputs.package-name }}
-          echo Extracted package version that would have been used when publishing: ${{ steps.extract_package_info.outputs.package-version }}
-          pip install -e .
+        run: python .github/workflows/extract_package_info.py install_from_dist
 
       - name: Confirm no import errors when opening package
         run: python -c "import ${{ steps.extract_package_info.outputs.package-name }}"
 
-      # Tanner (11/4/20): We need to install packages in requirements-dev after confirming no import errors if downloading from test pypi causes any errors
-      - name: Install Dev Dependencies if downloading from from Test PyPI
-        if: github.event.inputs.dry_run != '1'
+      - name: Install Dev Dependencies
         run: pip install -r requirements-dev.txt
 
       - name: Log full installed packages
