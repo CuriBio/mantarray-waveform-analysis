@@ -34,7 +34,7 @@ jobs:
         include:
           # only enable coverage on the fastest job
           - os: "ubuntu-20.04"
-            python-version: "3.8" # pylint doesn't support 3.9 yet
+            python-version: "3.9"
             IS_FASTEST_JOB: true
 
     name: Test code before publishing in Python ${{ matrix.python-version }} on ${{ matrix.os }}
@@ -321,11 +321,6 @@ jobs:
         if: github.event.inputs.dry_run != '1'
         run: python .github/workflows/extract_package_info.py install_from_test_pypi
 
-      # # Tanner (11/4/20): We need to install packages in requirements-dev to install cython before building from local repo
-      # - name: Install Dev Dependencies if downloading from from Test PyPI
-      #   if: github.event.inputs.dry_run == '1'
-      #   run: pip install -r requirements-dev.txt
-
       - name: Install Main Package From built wheel file as test since not publishing to PyPI
         if: github.event.inputs.dry_run == '1'
         run: python .github/workflows/extract_package_info.py install_from_dist
@@ -462,6 +457,12 @@ jobs:
           pip -V
           pip freeze
 
+      - name: Download built dist folder from previous step
+        uses: actions/download-artifact@v2
+        with:
+          name: dist--${{ matrix.os }}--${{ matrix.python-version }}
+          path: dist
+
       - name: Extract package info # Adapted from: https://stackoverflow.com/questions/58033366/how-to-get-current-branch-within-github-actions
         shell: bash
         run: |
@@ -473,24 +474,14 @@ jobs:
         if: github.event.inputs.dry_run != '1'
         run: python .github/workflows/extract_package_info.py install_from_pypi
 
-      # Tanner (11/4/20): We need to install packages in requirements-dev to install cython before building from local repo
-      - name: Install Dev Dependencies if downloading from from PyPI
+      - name: Install Main Package From built wheel file as test since not publishing to PyPI
         if: github.event.inputs.dry_run == '1'
-        run: pip install -r requirements-dev.txt
-
-      - name: Install Main Package From Local repo as test since not publishing to PyPI
-        if: github.event.inputs.dry_run == '1'
-        run: |
-          echo Extracted package name that would have been used when publishing: ${{ steps.extract_package_info.outputs.package-name }}
-          echo Extracted package version that would have been used when publishing: ${{ steps.extract_package_info.outputs.package-version }}
-          pip install -e .
+        run: python .github/workflows/extract_package_info.py install_from_dist
 
       - name: Confirm no import errors when opening package
         run: python -c "import ${{ steps.extract_package_info.outputs.package-name }}"
 
-      # Tanner (11/4/20): We need to install packages in requirements-dev after confirming no import errors if downloading from pypi causes any errors
-      - name: Install Dev Dependencies if downloading from from PyPI
-        if: github.event.inputs.dry_run != '1'
+      - name: Install Dev Dependencies
         run: pip install -r requirements-dev.txt
 
       - name: Log full installed packages
