@@ -518,7 +518,7 @@ jobs:
       - name: Tagging commit
         run: |
           echo "About to tag with: ${{ steps.extract_version.outputs.package-version }}"
-          git tag "${{ steps.extract_version.outputs.package-version }}"
+          git tag "v${{ steps.extract_version.outputs.package-version }}"
 
       - name: Pushing Tag
         if: github.event.inputs.dry_run != '1'
