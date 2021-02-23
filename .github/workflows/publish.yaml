@@ -8,10 +8,13 @@ on:
         description: 'Pytest Randomly Seed'
         required: false
         default: ''
-      publish_to_pypi:
-        description: 'Publish to PyPi'
+      dry_run:
+        description: 'Do a dry run and do not publish'
         required: false
         default: '0'
+  push:
+    # branches:
+    #   - main
 
 jobs:
   test:
@@ -62,7 +65,7 @@ jobs:
           echo "Version: ${{ steps.extract_version.outputs.package-version }}"
 
       - name: Confirming tag not already present on remote (if publishing)
-        if: github.event.inputs.publish_to_pypi == '1' && matrix.IS_FASTEST_JOB == true
+        if: github.event.inputs.dry_run != '1' && matrix.IS_FASTEST_JOB == true
         run: if [$(git ls-remote --tags origin | grep ${{ steps.extract_version.outputs.package-version }}) = '']; then echo Tag does not exist on remote; else echo Tag already exists on remote && exit 1; fi
 
       - name: Cache Pre-commit hooks
@@ -102,7 +105,7 @@ jobs:
         run: if [ "${{ steps.extract_branch.outputs.sha-of-current-branch}}" = "${{ steps.extract_branch.outputs.sha-of-main-branch}}" ] ; then echo "Running on main branch."; else echo "Not running on main branch."; fi
 
       - name: Fail if attempting to publish from a branch other than main
-        if: runner.os == 'Linux' && github.event.inputs.publish_to_pypi == '1'
+        if: runner.os == 'Linux' && github.event.inputs.dry_run != '1'
         run: if [ "${{ steps.extract_branch.outputs.sha-of-current-branch}}" = "${{ steps.extract_branch.outputs.sha-of-main-branch}}" ] ; then echo "Running on main branch, can proceed to publish."; else exit 1; fi
 
       - name: Activate virtual environment (Linux/MacOS)
@@ -237,7 +240,7 @@ jobs:
           path: dist
 
       - name: Uploading to Test PyPI
-        if: github.event.inputs.publish_to_pypi == '1'
+        if: github.event.inputs.dry_run != '1'
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
@@ -245,7 +248,7 @@ jobs:
         run: twine upload --repository testpypi dist/*
 
       - name: Sleep for 360 seconds to allow Test PyPI Index to update before proceeding to the next step
-        if: github.event.inputs.publish_to_pypi == '1'
+        if: github.event.inputs.dry_run != '1'
         uses: juliangruber/sleep-action@v1
         with:
           time: 360s
@@ -303,16 +306,16 @@ jobs:
         id: extract_package_info
 
       - name: Install Main Package From Test PyPI
-        if: github.event.inputs.publish_to_pypi == '1'
+        if: github.event.inputs.dry_run != '1'
         run: python .github/workflows/extract_package_info.py install_from_test_pypi
 
       # Tanner (11/4/20): We need to install packages in requirements-dev to install cython before building from local repo
       - name: Install Dev Dependencies if downloading from from Test PyPI
-        if: github.event.inputs.publish_to_pypi != '1'
+        if: github.event.inputs.dry_run == '1'
         run: pip install -r requirements-dev.txt
 
       - name: Install Main Package From Local repo as test since not publishing to PyPI
-        if: github.event.inputs.publish_to_pypi != '1'
+        if: github.event.inputs.dry_run == '1'
         run: |
           echo Extracted package name that would have been used when publishing: ${{ steps.extract_package_info.outputs.package-name }}
           echo Extracted package version that would have been used when publishing: ${{ steps.extract_package_info.outputs.package-version }}
@@ -323,7 +326,7 @@ jobs:
 
       # Tanner (11/4/20): We need to install packages in requirements-dev after confirming no import errors if downloading from test pypi causes any errors
       - name: Install Dev Dependencies if downloading from from Test PyPI
-        if: github.event.inputs.publish_to_pypi == '1'
+        if: github.event.inputs.dry_run != '1'
         run: pip install -r requirements-dev.txt
 
       - name: Log full installed packages
@@ -393,7 +396,7 @@ jobs:
           path: dist
 
       - name: Uploading to PyPi
-        if: github.event.inputs.publish_to_pypi == '1'
+        if: github.event.inputs.dry_run != '1'
         env:
           TWINE_USERNAME: ${{ secrets.PYPI_USERNAME }}
           TWINE_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
@@ -401,7 +404,7 @@ jobs:
         run: twine upload dist/*
 
       - name: Sleep for 360 seconds to allow PyPI Index to update before proceeding to the next step
-        if: github.event.inputs.publish_to_pypi == '1'
+        if: github.event.inputs.dry_run != '1'
         uses: juliangruber/sleep-action@v1
         with:
           time: 360s
@@ -460,16 +463,16 @@ jobs:
         id: extract_package_info
 
       - name: Install Main Package From PyPI
-        if: github.event.inputs.publish_to_pypi == '1'
+        if: github.event.inputs.dry_run != '1'
         run: python .github/workflows/extract_package_info.py install_from_pypi
 
       # Tanner (11/4/20): We need to install packages in requirements-dev to install cython before building from local repo
       - name: Install Dev Dependencies if downloading from from PyPI
-        if: github.event.inputs.publish_to_pypi != '1'
+        if: github.event.inputs.dry_run == '1'
         run: pip install -r requirements-dev.txt
 
       - name: Install Main Package From Local repo as test since not publishing to PyPI
-        if: github.event.inputs.publish_to_pypi != '1'
+        if: github.event.inputs.dry_run == '1'
         run: |
           echo Extracted package name that would have been used when publishing: ${{ steps.extract_package_info.outputs.package-name }}
           echo Extracted package version that would have been used when publishing: ${{ steps.extract_package_info.outputs.package-version }}
@@ -480,7 +483,7 @@ jobs:
 
       # Tanner (11/4/20): We need to install packages in requirements-dev after confirming no import errors if downloading from pypi causes any errors
       - name: Install Dev Dependencies if downloading from from PyPI
-        if: github.event.inputs.publish_to_pypi == '1'
+        if: github.event.inputs.dry_run != '1'
         run: pip install -r requirements-dev.txt
 
       - name: Log full installed packages
@@ -520,5 +523,5 @@ jobs:
           git tag "${{ steps.extract_version.outputs.package-version }}"
 
       - name: Pushing Tag
-        if: github.event.inputs.publish_to_pypi == '1'
+        if: github.event.inputs.dry_run != '1'
         run: git push --tags
