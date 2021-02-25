@@ -17,6 +17,7 @@ from scipy import signal
 from .constants import AMPLITUDE_UUID
 from .constants import AUC_UUID
 from .constants import CENTIMILLISECONDS_PER_SECOND
+from .constants import CONTRACTION_VELOCITY_UUID
 from .constants import MIN_NUMBER_PEAKS
 from .constants import MIN_NUMBER_VALLEYS
 from .constants import PRIOR_PEAK_INDEX_UUID
@@ -231,10 +232,17 @@ def data_metrics(
         width_stats_dict[iter_percent] = iter_stats_dict
 
     aggregate_dict[WIDTH_UUID] = width_stats_dict
+
     # calculate auc
     auc_per_twitch: NDArray[int] = calculate_area_under_curve(
         twitch_indices, filtered_data, widths
     )
+
+    # calculate twitch contraction/relaxation velocities
+    contraction_velocity = calculate_twitch_velocity(
+        twitch_indices, filtered_data, widths, True
+    )
+
     # find aggregate values of area under curve data
     auc_averages_dict = create_avg_dict(auc_per_twitch)
 
@@ -251,11 +259,61 @@ def data_metrics(
                     WIDTH_UUID: widths[i],
                     AUC_UUID: auc_per_twitch[i],
                     TWITCH_FREQUENCY_UUID: twitch_frequencies[i],
+                    CONTRACTION_VELOCITY_UUID: contraction_velocity[i],
                 }
             }
         )
 
     return main_twitch_dict, aggregate_dict
+
+
+def calculate_twitch_velocity(
+    twitch_indices: NDArray[int],
+    filtered_data: NDArray[(2, Any), int],
+    widths: List[Dict[int, Dict[UUID, Union[Tuple[int, int], int]]]],
+    is_contraction: bool = True,
+) -> NDArray[Any]:
+    """Find the velocity for each twitch.
+
+    Args:
+        twitch_indices: a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUID of prior/subsequent peaks and valleys and their index values.
+        filtered_data: a 2D array (time vs value) of the data
+        widths: a list of dictionaries where the first key is the percentage of the way down to the nearby valleys, the second key is a UUID representing either the value of the width, or the rising or falling coordinates. The final value is either an int (for value) or a tuple of ints for the x/y coordinates
+        is_contraction: a boolean indicating if twitch velocities to be calculating are for the twitch contraction or relaxation
+
+    Returns:
+        an array of integers that are the velocities of each twitch
+    """
+    list_of_twitch_indices = list(twitch_indices.keys())
+    # print(list_of_twitch_indices)
+    num_twitches = len(list_of_twitch_indices)
+    coord_type = WIDTH_RISING_COORDS_UUID
+    if not is_contraction:
+        coord_type = WIDTH_FALLING_COORDS_UUID
+
+    iter_list_of_velocities: List[Union[float, int]] = []
+    for twitch in range(num_twitches):
+        iter_width_value_90 = widths[twitch][90][coord_type]
+        iter_width_value_10 = widths[twitch][10][coord_type]
+        magnetic_value = filtered_data[1][list_of_twitch_indices[twitch]]
+        if not isinstance(iter_width_value_90, tuple):  # making mypy happy
+            raise NotImplementedError(
+                f"The width value under twitch {twitch} must be a Tuple. It was: {iter_width_value_90}"
+            )
+        if not isinstance(iter_width_value_10, tuple):  # making mypy happy
+            raise NotImplementedError(
+                f"The width value under twitch {twitch} must be a Tuple. It was: {iter_width_value_10}"
+            )
+        velocity = abs(
+            magnetic_value / (iter_width_value_90[0] - iter_width_value_10[0])
+        )
+        # print(twitch)
+        # print(magnetic_value)
+        # print(iter_width_value_90[0])
+        # print(iter_width_value_10[0])
+        # print(velocity)
+        iter_list_of_velocities.append(velocity)
+    return np.asarray(iter_list_of_velocities)
 
 
 def calculate_twitch_period(
@@ -266,7 +324,7 @@ def calculate_twitch_period(
     """Find the distance between each twitch at its peak.
 
     Args:
-        twitch_indices: a 1D array of the indices in the data array that the twitch peaks are at
+        twitch_indices:a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUID of prior/subsequent peaks and valleys and their index values.
         all_peak_indices: a 1D array of the indices in teh data array that all peaks are at
         filtered_data: a 2D array (time vs value) of the data
 
