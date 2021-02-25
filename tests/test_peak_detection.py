@@ -10,6 +10,7 @@ from mantarray_waveform_analysis import MIN_NUMBER_VALLEYS
 from mantarray_waveform_analysis import peak_detector
 from mantarray_waveform_analysis import PRIOR_PEAK_INDEX_UUID
 from mantarray_waveform_analysis import PRIOR_VALLEY_INDEX_UUID
+from mantarray_waveform_analysis import RELAXATION_VELOCITY_UUID
 from mantarray_waveform_analysis import SUBSEQUENT_PEAK_INDEX_UUID
 from mantarray_waveform_analysis import SUBSEQUENT_VALLEY_INDEX_UUID
 from mantarray_waveform_analysis import TooFewPeaksDetectedError
@@ -252,7 +253,7 @@ def test_maiden_voyage_data_period(maiden_voyage_data):
 
 
 def test_new_A1_contraction_velocity(new_A1):
-    per_twitch_dict, _ = _get_data_metrics(new_A1)
+    per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A1)
 
     # test data_metrics per beat dictionary
     assert_percent_diff(per_twitch_dict[105000][CONTRACTION_VELOCITY_UUID], 16.8487)
@@ -260,11 +261,49 @@ def test_new_A1_contraction_velocity(new_A1):
     assert_percent_diff(per_twitch_dict[266000][CONTRACTION_VELOCITY_UUID], 17.9984)
 
     # test data_metrics aggregate dictionary
-    # assert aggregate_metrics_dict[CONTRACTION_VELOCITY_UUID]["n"] is not None
-    # assert_percent_diff(aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["mean"], 103286)
-    # assert_percent_diff(aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["std"], 1855)
-    # assert aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["min"] == 100953
-    # assert aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["max"] == 106274
+    assert aggregate_metrics_dict[CONTRACTION_VELOCITY_UUID]["n"] == 11
+    assert_percent_diff(
+        aggregate_metrics_dict[CONTRACTION_VELOCITY_UUID]["mean"], 17.044979125669332
+    )
+    assert_percent_diff(
+        aggregate_metrics_dict[CONTRACTION_VELOCITY_UUID]["std"], 0.6928171437512728
+    )
+    assert_percent_diff(
+        aggregate_metrics_dict[CONTRACTION_VELOCITY_UUID]["min"], 15.784801034334148
+    )
+    assert_percent_diff(
+        aggregate_metrics_dict[CONTRACTION_VELOCITY_UUID]["max"], 18.42760315174108
+    )
+
+
+def test_new_A1_relaxation_velocity(new_A1):
+    per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A1)
+
+    # test data_metrics per beat dictionary
+    assert_percent_diff(
+        per_twitch_dict[105000][RELAXATION_VELOCITY_UUID], 10.02084557992313
+    )
+    assert_percent_diff(
+        per_twitch_dict[186000][RELAXATION_VELOCITY_UUID], 9.89891891891892
+    )
+    assert_percent_diff(
+        per_twitch_dict[266000][RELAXATION_VELOCITY_UUID], 10.97547065058295
+    )
+
+    # test data_metrics aggregate dictionary
+    assert aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["n"] == 11
+    assert_percent_diff(
+        aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["mean"], 10.733331506690496
+    )
+    assert_percent_diff(
+        aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["std"], 0.6688237983493761
+    )
+    assert_percent_diff(
+        aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["min"], 9.89891891891892
+    )
+    assert_percent_diff(
+        aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["max"], 11.766091219096333
+    )
 
 
 def test_new_A1_amplitude(new_A1):

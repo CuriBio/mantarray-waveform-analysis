@@ -22,6 +22,7 @@ from .constants import MIN_NUMBER_PEAKS
 from .constants import MIN_NUMBER_VALLEYS
 from .constants import PRIOR_PEAK_INDEX_UUID
 from .constants import PRIOR_VALLEY_INDEX_UUID
+from .constants import RELAXATION_VELOCITY_UUID
 from .constants import SUBSEQUENT_PEAK_INDEX_UUID
 from .constants import SUBSEQUENT_VALLEY_INDEX_UUID
 from .constants import TWITCH_FREQUENCY_UUID
@@ -130,7 +131,6 @@ def create_avg_dict(
     if round_to_int:
         for iter_key in ("mean", "std", "min", "max"):
             dictionary[iter_key] = int(round(dictionary[iter_key]))
-
     return dictionary
 
 
@@ -242,6 +242,18 @@ def data_metrics(
     contraction_velocity = calculate_twitch_velocity(
         twitch_indices, filtered_data, widths, True
     )
+    contraction_velocity_averages = create_avg_dict(
+        contraction_velocity, round_to_int=False
+    )
+    aggregate_dict[CONTRACTION_VELOCITY_UUID] = contraction_velocity_averages
+
+    relaxation_velocity = calculate_twitch_velocity(
+        twitch_indices, filtered_data, widths, False
+    )
+    relaxation_velocity_averages = create_avg_dict(
+        relaxation_velocity, round_to_int=False
+    )
+    aggregate_dict[RELAXATION_VELOCITY_UUID] = relaxation_velocity_averages
 
     # find aggregate values of area under curve data
     auc_averages_dict = create_avg_dict(auc_per_twitch)
@@ -260,6 +272,7 @@ def data_metrics(
                     AUC_UUID: auc_per_twitch[i],
                     TWITCH_FREQUENCY_UUID: twitch_frequencies[i],
                     CONTRACTION_VELOCITY_UUID: contraction_velocity[i],
+                    RELAXATION_VELOCITY_UUID: relaxation_velocity[i],
                 }
             }
         )
@@ -285,7 +298,6 @@ def calculate_twitch_velocity(
         an array of integers that are the velocities of each twitch
     """
     list_of_twitch_indices = list(twitch_indices.keys())
-    # print(list_of_twitch_indices)
     num_twitches = len(list_of_twitch_indices)
     coord_type = WIDTH_RISING_COORDS_UUID
     if not is_contraction:
@@ -307,11 +319,6 @@ def calculate_twitch_velocity(
         velocity = abs(
             magnetic_value / (iter_width_value_90[0] - iter_width_value_10[0])
         )
-        # print(twitch)
-        # print(magnetic_value)
-        # print(iter_width_value_90[0])
-        # print(iter_width_value_10[0])
-        # print(velocity)
         iter_list_of_velocities.append(velocity)
     return np.asarray(iter_list_of_velocities)
 
