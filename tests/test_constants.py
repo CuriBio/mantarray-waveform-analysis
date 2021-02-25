@@ -8,6 +8,7 @@ from mantarray_waveform_analysis import BESSEL_LOWPASS_10_UUID
 from mantarray_waveform_analysis import BESSEL_LOWPASS_30_UUID
 from mantarray_waveform_analysis import BUTTERWORTH_LOWPASS_30_UUID
 from mantarray_waveform_analysis import CENTIMILLISECONDS_PER_SECOND
+from mantarray_waveform_analysis import CONTRACTION_VELOCITY_UUID
 from mantarray_waveform_analysis import FILTER_CHARACTERISTICS
 from mantarray_waveform_analysis import MIDSCALE_CODE
 from mantarray_waveform_analysis import MIN_NUMBER_PEAKS
@@ -15,6 +16,7 @@ from mantarray_waveform_analysis import MIN_NUMBER_VALLEYS
 from mantarray_waveform_analysis import PRIOR_PEAK_INDEX_UUID
 from mantarray_waveform_analysis import PRIOR_VALLEY_INDEX_UUID
 from mantarray_waveform_analysis import RAW_TO_SIGNED_CONVERSION_VALUE
+from mantarray_waveform_analysis import RELAXATION_VELOCITY_UUID
 from mantarray_waveform_analysis import SUBSEQUENT_PEAK_INDEX_UUID
 from mantarray_waveform_analysis import SUBSEQUENT_VALLEY_INDEX_UUID
 from mantarray_waveform_analysis import TWITCH_FREQUENCY_UUID
@@ -74,6 +76,10 @@ def test_data_metric_uuids():
     assert WIDTH_RISING_COORDS_UUID == uuid.UUID("2a16acb6-4df7-4064-9d47-5d27ea7a98ad")
     assert WIDTH_FALLING_COORDS_UUID == uuid.UUID(
         "26e5637d-42c9-4060-aa5d-52209b349c84"
+    )
+    assert RELAXATION_VELOCITY_UUID == uuid.UUID("0fcc0dc3-f9aa-4f1b-91b3-e5b5924279a9")
+    assert CONTRACTION_VELOCITY_UUID == uuid.UUID(
+        "73961e7c-17ec-42b0-b503-a23195ec249c"
     )
 
     assert PRIOR_PEAK_INDEX_UUID == uuid.UUID("80df90dc-21f8-4cad-a164-89436909b30a")

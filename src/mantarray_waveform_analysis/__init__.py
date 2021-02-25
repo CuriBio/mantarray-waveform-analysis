@@ -9,12 +9,14 @@ from .constants import BESSEL_LOWPASS_10_UUID
 from .constants import BESSEL_LOWPASS_30_UUID
 from .constants import BUTTERWORTH_LOWPASS_30_UUID
 from .constants import CENTIMILLISECONDS_PER_SECOND
+from .constants import CONTRACTION_VELOCITY_UUID
 from .constants import MIDSCALE_CODE
 from .constants import MIN_NUMBER_PEAKS
 from .constants import MIN_NUMBER_VALLEYS
 from .constants import PRIOR_PEAK_INDEX_UUID
 from .constants import PRIOR_VALLEY_INDEX_UUID
 from .constants import RAW_TO_SIGNED_CONVERSION_VALUE
+from .constants import RELAXATION_VELOCITY_UUID
 from .constants import SUBSEQUENT_PEAK_INDEX_UUID
 from .constants import SUBSEQUENT_VALLEY_INDEX_UUID
 from .constants import TWITCH_FREQUENCY_UUID
@@ -92,4 +94,6 @@ __all__ = [
     "MIN_NUMBER_VALLEYS",
     "BESSEL_LOWPASS_30_UUID",
     "BUTTERWORTH_LOWPASS_30_UUID",
+    "RELAXATION_VELOCITY_UUID",
+    "CONTRACTION_VELOCITY_UUID",
 ]
