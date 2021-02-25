@@ -284,7 +284,7 @@ def calculate_twitch_velocity(
     twitch_indices: NDArray[int],
     filtered_data: NDArray[(2, Any), int],
     widths: List[Dict[int, Dict[UUID, Union[Tuple[int, int], int]]]],
-    is_contraction: bool = True,
+    is_contraction: bool,
 ) -> NDArray[Any]:
     """Find the velocity for each twitch.
 
@@ -303,21 +303,24 @@ def calculate_twitch_velocity(
     if not is_contraction:
         coord_type = WIDTH_FALLING_COORDS_UUID
 
+    twitch_base = TWITCH_WIDTH_PERCENTS[-1]
+    twitch_top = TWITCH_WIDTH_PERCENTS[0]
+
     iter_list_of_velocities: List[Union[float, int]] = []
     for twitch in range(num_twitches):
-        iter_width_value_90 = widths[twitch][90][coord_type]
-        iter_width_value_10 = widths[twitch][10][coord_type]
+        iter_width_value_base = widths[twitch][twitch_base][coord_type]
+        iter_width_value_top = widths[twitch][twitch_top][coord_type]
         magnetic_value = filtered_data[1][list_of_twitch_indices[twitch]]
-        if not isinstance(iter_width_value_90, tuple):  # making mypy happy
+        if not isinstance(iter_width_value_base, tuple):  # making mypy happy
             raise NotImplementedError(
-                f"The width value under twitch {twitch} must be a Tuple. It was: {iter_width_value_90}"
+                f"The width value under twitch {twitch} must be a Tuple. It was: {iter_width_value_base}"
             )
-        if not isinstance(iter_width_value_10, tuple):  # making mypy happy
+        if not isinstance(iter_width_value_top, tuple):  # making mypy happy
             raise NotImplementedError(
-                f"The width value under twitch {twitch} must be a Tuple. It was: {iter_width_value_10}"
+                f"The width value under twitch {twitch} must be a Tuple. It was: {iter_width_value_top}"
             )
         velocity = abs(
-            magnetic_value / (iter_width_value_90[0] - iter_width_value_10[0])
+            magnetic_value / (iter_width_value_top[0] - iter_width_value_base[0])
         )
         iter_list_of_velocities.append(velocity)
     return np.asarray(iter_list_of_velocities)
