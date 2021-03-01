@@ -37,6 +37,8 @@ from .exceptions import TwoValleysInARowError
 
 
 TWITCH_WIDTH_PERCENTS = range(10, 95, 5)
+TWITCH_WIDTH_INDEX_OF_CONTRACTION_VELOCITY_START = TWITCH_WIDTH_PERCENTS.index(10)
+TWITCH_WIDTH_INDEX_OF_CONTRACTION_VELOCITY_END = TWITCH_WIDTH_PERCENTS.index(90)
 
 
 def peak_detector(
@@ -295,7 +297,7 @@ def calculate_twitch_velocity(
         is_contraction: a boolean indicating if twitch velocities to be calculating are for the twitch contraction or relaxation
 
     Returns:
-        an array of integers that are the velocities of each twitch
+        an array of floats that are the velocities of each twitch
     """
     list_of_twitch_indices = list(twitch_indices.keys())
     num_twitches = len(list_of_twitch_indices)
@@ -303,8 +305,8 @@ def calculate_twitch_velocity(
     if not is_contraction:
         coord_type = WIDTH_FALLING_COORDS_UUID
 
-    twitch_base = TWITCH_WIDTH_PERCENTS[-1]
-    twitch_top = TWITCH_WIDTH_PERCENTS[0]
+    twitch_base = TWITCH_WIDTH_PERCENTS[TWITCH_WIDTH_INDEX_OF_CONTRACTION_VELOCITY_END]
+    twitch_top = TWITCH_WIDTH_PERCENTS[TWITCH_WIDTH_INDEX_OF_CONTRACTION_VELOCITY_START]
 
     iter_list_of_velocities: List[Union[float, int]] = []
     for twitch in range(num_twitches):
