@@ -256,23 +256,27 @@ def test_new_A1_contraction_velocity(new_A1):
     per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A1)
 
     # test data_metrics per beat dictionary
-    assert_percent_diff(per_twitch_dict[105000][CONTRACTION_VELOCITY_UUID], 16.8487)
-    assert_percent_diff(per_twitch_dict[186000][CONTRACTION_VELOCITY_UUID], 15.7848)
-    assert_percent_diff(per_twitch_dict[266000][CONTRACTION_VELOCITY_UUID], 17.9984)
+    assert_percent_diff(
+        per_twitch_dict[105000][CONTRACTION_VELOCITY_UUID], 6.474188398084087
+    )
+    assert_percent_diff(per_twitch_dict[186000][CONTRACTION_VELOCITY_UUID], 5.99059)
+    assert_percent_diff(
+        per_twitch_dict[266000][CONTRACTION_VELOCITY_UUID], 6.800115874855156
+    )
 
     # test data_metrics aggregate dictionary
     assert aggregate_metrics_dict[CONTRACTION_VELOCITY_UUID]["n"] == 11
     assert_percent_diff(
-        aggregate_metrics_dict[CONTRACTION_VELOCITY_UUID]["mean"], 17.044979125669332
+        aggregate_metrics_dict[CONTRACTION_VELOCITY_UUID]["mean"], 6.440001805351568
     )
     assert_percent_diff(
-        aggregate_metrics_dict[CONTRACTION_VELOCITY_UUID]["std"], 0.6928171437512728
+        aggregate_metrics_dict[CONTRACTION_VELOCITY_UUID]["std"], 0.2531719477692566
     )
     assert_percent_diff(
-        aggregate_metrics_dict[CONTRACTION_VELOCITY_UUID]["min"], 15.784801034334148
+        aggregate_metrics_dict[CONTRACTION_VELOCITY_UUID]["min"], 5.990590432409137
     )
     assert_percent_diff(
-        aggregate_metrics_dict[CONTRACTION_VELOCITY_UUID]["max"], 18.42760315174108
+        aggregate_metrics_dict[CONTRACTION_VELOCITY_UUID]["max"], 6.905701940184699
     )
 
 
@@ -281,28 +285,28 @@ def test_new_A1_relaxation_velocity(new_A1):
 
     # test data_metrics per beat dictionary
     assert_percent_diff(
-        per_twitch_dict[105000][RELAXATION_VELOCITY_UUID], 10.02084557992313
+        per_twitch_dict[105000][RELAXATION_VELOCITY_UUID], 3.8382997965182004
     )
     assert_percent_diff(
-        per_twitch_dict[186000][RELAXATION_VELOCITY_UUID], 9.89891891891892
+        per_twitch_dict[186000][RELAXATION_VELOCITY_UUID], 3.7836936936936936
     )
     assert_percent_diff(
-        per_twitch_dict[266000][RELAXATION_VELOCITY_UUID], 10.97547065058295
+        per_twitch_dict[266000][RELAXATION_VELOCITY_UUID], 4.144501085146116
     )
 
     # test data_metrics aggregate dictionary
     assert aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["n"] == 11
     assert_percent_diff(
-        aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["mean"], 10.733331506690496
+        aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["mean"], 4.053570198234518
     )
     assert_percent_diff(
-        aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["std"], 0.6688237983493761
+        aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["std"], 0.23419699561645954
     )
     assert_percent_diff(
-        aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["min"], 9.89891891891892
+        aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["min"], 3.7407880918679512
     )
     assert_percent_diff(
-        aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["max"], 11.766091219096333
+        aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["max"], 4.495471014492754
     )
 
 

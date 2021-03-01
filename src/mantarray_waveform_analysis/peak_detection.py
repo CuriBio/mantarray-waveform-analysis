@@ -241,17 +241,13 @@ def data_metrics(
     )
 
     # calculate twitch contraction/relaxation velocities
-    contraction_velocity = calculate_twitch_velocity(
-        twitch_indices, filtered_data, widths, True
-    )
+    contraction_velocity = calculate_twitch_velocity(twitch_indices, widths, True)
     contraction_velocity_averages = create_avg_dict(
         contraction_velocity, round_to_int=False
     )
     aggregate_dict[CONTRACTION_VELOCITY_UUID] = contraction_velocity_averages
 
-    relaxation_velocity = calculate_twitch_velocity(
-        twitch_indices, filtered_data, widths, False
-    )
+    relaxation_velocity = calculate_twitch_velocity(twitch_indices, widths, False)
     relaxation_velocity_averages = create_avg_dict(
         relaxation_velocity, round_to_int=False
     )
@@ -284,7 +280,6 @@ def data_metrics(
 
 def calculate_twitch_velocity(
     twitch_indices: NDArray[int],
-    filtered_data: NDArray[(2, Any), int],
     widths: List[Dict[int, Dict[UUID, Union[Tuple[int, int], int]]]],
     is_contraction: bool,
 ) -> NDArray[Any]:
@@ -292,7 +287,6 @@ def calculate_twitch_velocity(
 
     Args:
         twitch_indices: a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUID of prior/subsequent peaks and valleys and their index values.
-        filtered_data: a 2D array (time vs value) of the data
         widths: a list of dictionaries where the first key is the percentage of the way down to the nearby valleys, the second key is a UUID representing either the value of the width, or the rising or falling coordinates. The final value is either an int (for value) or a tuple of ints for the x/y coordinates
         is_contraction: a boolean indicating if twitch velocities to be calculating are for the twitch contraction or relaxation
 
@@ -310,19 +304,20 @@ def calculate_twitch_velocity(
 
     iter_list_of_velocities: List[Union[float, int]] = []
     for twitch in range(num_twitches):
-        iter_width_value_base = widths[twitch][twitch_base][coord_type]
-        iter_width_value_top = widths[twitch][twitch_top][coord_type]
-        magnetic_value = filtered_data[1][list_of_twitch_indices[twitch]]
-        if not isinstance(iter_width_value_base, tuple):  # making mypy happy
+        iter_coord_base = widths[twitch][twitch_base][coord_type]
+        iter_coord_top = widths[twitch][twitch_top][coord_type]
+
+        if not isinstance(iter_coord_base, tuple):  # making mypy happy
             raise NotImplementedError(
-                f"The width value under twitch {twitch} must be a Tuple. It was: {iter_width_value_base}"
+                f"The width value under twitch {twitch} must be a Tuple. It was: {iter_coord_base}"
             )
-        if not isinstance(iter_width_value_top, tuple):  # making mypy happy
+        if not isinstance(iter_coord_top, tuple):  # making mypy happy
             raise NotImplementedError(
-                f"The width value under twitch {twitch} must be a Tuple. It was: {iter_width_value_top}"
+                f"The width value under twitch {twitch} must be a Tuple. It was: {iter_coord_top}"
             )
         velocity = abs(
-            magnetic_value / (iter_width_value_top[0] - iter_width_value_base[0])
+            (iter_coord_top[1] - iter_coord_base[1])
+            / (iter_coord_top[0] - iter_coord_base[0])
         )
         iter_list_of_velocities.append(velocity)
     return np.asarray(iter_list_of_velocities)
