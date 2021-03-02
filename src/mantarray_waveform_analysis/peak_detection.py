@@ -10,6 +10,7 @@ from typing import Tuple
 from typing import Union
 from uuid import UUID
 
+from nptying import Float64
 from nptyping import NDArray
 import numpy as np
 from scipy import signal
@@ -114,7 +115,7 @@ def peak_detector(
 
 def create_avg_dict(
     metric: NDArray[int], round_to_int: bool = True
-) -> Dict[str, Union[float, int]]:
+) -> Dict[str, Union[Float64, int]]:
     """Calculate the average values of a specific metric.
 
     Args:
@@ -123,7 +124,7 @@ def create_avg_dict(
     Returns:
         a dictionary of the average statistics of that metric in which the metrics are the key and average statistics are the value
     """
-    dictionary: Dict[str, Union[float, int]] = dict()
+    dictionary: Dict[str, Union[Float64, int]] = dict()
 
     dictionary["n"] = len(metric)
     dictionary["mean"] = np.mean(metric)
@@ -199,7 +200,7 @@ def data_metrics(
     )
 
     twitch_frequencies = 1 / (
-        combined_twitch_periods.astype(np.float) / CENTIMILLISECONDS_PER_SECOND
+        combined_twitch_periods.astype(float) / CENTIMILLISECONDS_PER_SECOND
     )
     frequency_averages_dict = create_avg_dict(twitch_frequencies, round_to_int=False)
 
@@ -282,7 +283,7 @@ def calculate_twitch_velocity(
     twitch_indices: NDArray[int],
     widths: List[Dict[int, Dict[UUID, Union[Tuple[int, int], int]]]],
     is_contraction: bool,
-) -> NDArray[Any]:
+) -> NDArray[float]:
     """Find the velocity for each twitch.
 
     Args:
@@ -320,7 +321,7 @@ def calculate_twitch_velocity(
             / (iter_coord_top[0] - iter_coord_base[0])
         )
         iter_list_of_velocities.append(velocity)
-    return np.asarray(iter_list_of_velocities)
+    return np.asarray(iter_list_of_velocities, dtype=float)
 
 
 def calculate_twitch_period(
