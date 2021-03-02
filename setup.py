@@ -30,7 +30,7 @@ if USE_CYTHON:
 
 setup(
     name="mantarray_waveform_analysis",
-    version="0.6.11",
+    version="0.6.0",
     description="Tools for analyzing waveforms produced by a Mantarray Instrument",
     url="https://github.com/CuriBio/mantarray-waveform-analysis",
     author="Curi Bio",

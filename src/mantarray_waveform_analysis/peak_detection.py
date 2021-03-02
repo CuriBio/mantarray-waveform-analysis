@@ -10,7 +10,7 @@ from typing import Tuple
 from typing import Union
 from uuid import UUID
 
-from nptying import Float64
+from nptyping import Float64
 from nptyping import NDArray
 import numpy as np
 from scipy import signal

@@ -1,7 +1,7 @@
 Changelog for Mantarray Waveform Analysis
 =========================================
 
-0.6.11 (2021-03-01)
+0.6.0 (2021-03-01)
 ------------------
 
 - Added twitch contraction and relaxation velocity metrics to metric dicitonaries
