@@ -30,7 +30,7 @@ if USE_CYTHON:
 
 setup(
     name="mantarray_waveform_analysis",
-    version="0.5.11",
+    version="0.6.0",
     description="Tools for analyzing waveforms produced by a Mantarray Instrument",
     url="https://github.com/CuriBio/mantarray-waveform-analysis",
     author="Curi Bio",
@@ -39,10 +39,10 @@ setup(
     packages=find_packages("src"),
     package_dir={"": "src"},
     install_requires=[
-        "numpy>=1.19.1",
-        "scipy>=1.5.2",
-        "nptyping>=1.3.0",
-        "attrs>=19.3.0",
+        "numpy>=1.20.1",
+        "scipy>=1.6.1",
+        "nptyping>=1.4.0",
+        "attrs>=20.3.0",
     ],
     zip_safe=False,
     include_package_data=True,
