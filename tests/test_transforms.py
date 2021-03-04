@@ -187,12 +187,12 @@ def test_apply_noise_filtering__bessel_bandpass(
 
 def test_calculate_voltage_from_gmr__returns_correct_values():
     test_data = np.array(
-        [-0x800000, MIDSCALE_CODE - RAW_TO_SIGNED_CONVERSION_VALUE, 0x7FFFFF]
+        [-0x80000, MIDSCALE_CODE - RAW_TO_SIGNED_CONVERSION_VALUE, 0x7FFFFF]
     )
     test_data = np.vstack((np.zeros(3), test_data))
     original_test_data = copy.deepcopy(test_data)
-    reference_voltage = 3.3
-    adc_gain = 32
+    reference_voltage = 2.5
+    adc_gain = 2
 
     actual_converted_data = calculate_voltage_from_gmr(
         test_data, reference_voltage=reference_voltage, adc_gain=adc_gain
@@ -203,10 +203,28 @@ def test_calculate_voltage_from_gmr__returns_correct_values():
 
     assert isinstance(actual_converted_data, NDArray[(2, Any), np.float32])
 
-    expected_data = [-(reference_voltage / adc_gain), 0, (reference_voltage / adc_gain)]
+    expected_first_val = (
+        test_data[1, 0].astype(np.float32)
+        * 1000
+        * reference_voltage
+        * RAW_TO_SIGNED_CONVERSION_VALUE
+        / adc_gain
+    )
+    expected_last_val = (
+        test_data[1, 2].astype(np.float32)
+        * 1000
+        * reference_voltage
+        * RAW_TO_SIGNED_CONVERSION_VALUE
+        / adc_gain
+    )
+
+    expected_first_val = expected_first_val.astype(np.float32)
+    expected_last_val = expected_last_val.astype(np.float32)
+
+    expected_data = [expected_first_val, 0, expected_last_val]
 
     np.testing.assert_almost_equal(
-        actual_converted_data[1, :], expected_data, decimal=6
+        actual_converted_data[1, :], expected_data, decimal=0
     )
 
 

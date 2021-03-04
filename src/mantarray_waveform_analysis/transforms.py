@@ -185,24 +185,21 @@ def apply_noise_filtering(
 
 def calculate_voltage_from_gmr(
     gmr_data: NDArray[(2, Any), int],
-    reference_voltage: Union[float, int] = 3.3,
-    adc_gain: int = 32,
+    reference_voltage: Union[float, int] = 2.5,
+    adc_gain: int = 2,
 ) -> NDArray[(2, Any), np.float32]:
     """Convert 'signed' 24-bit values from an ADC to measured voltage.
 
     Args:
         gmr_data: time and GMR numpy array. Typically coming from filtered_gmr_data
-        reference_voltage: Almost always leave as default of 3.3V
-        adc_gain: Current implementation of Mantarray is constant value of 32, but may change in the future. Value can be obtained from HDF5 metadata
+        reference_voltage: Almost always leave as default of 2.5V
+        adc_gain: Current implementation of Mantarray is constant value of 2, but may change in the future. Value can be obtained from HDF5 metadata
 
     Returns:
         A 2D array of time vs Voltage
     """
-    voltage = (
-        gmr_data[1, :].astype(np.float32)
-        * (1 / RAW_TO_SIGNED_CONVERSION_VALUE)
-        * (reference_voltage / adc_gain)
-    )
+    millivolts_per_lsb = 1000 * reference_voltage * RAW_TO_SIGNED_CONVERSION_VALUE
+    voltage = gmr_data[1, :].astype(np.float32) * millivolts_per_lsb * (1 / adc_gain)
     return np.vstack((gmr_data[0, :].astype(np.float32), voltage))
 
 
