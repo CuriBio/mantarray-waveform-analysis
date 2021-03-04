@@ -11,6 +11,7 @@ from mantarray_waveform_analysis import BESSEL_LOWPASS_10_UUID
 from mantarray_waveform_analysis import BESSEL_LOWPASS_30_UUID
 from mantarray_waveform_analysis import BUTTERWORTH_LOWPASS_30_UUID
 from mantarray_waveform_analysis import calculate_displacement_from_voltage
+from mantarray_waveform_analysis import calculate_force_from_displacement
 from mantarray_waveform_analysis import calculate_voltage_from_gmr
 from mantarray_waveform_analysis import create_filter
 from mantarray_waveform_analysis import FILTER_CHARACTERISTICS
@@ -228,7 +229,7 @@ def test_calculate_voltage_from_gmr__returns_correct_values():
     )
 
 
-def test_calculate_displacement_from_magnetic_flux_density():
+def test_calculate_displacement_from_voltage():
     test_data = np.array([-1, 0, 1])
     test_data = np.vstack((np.zeros(3), test_data))
     original_test_data = copy.deepcopy(test_data)
@@ -240,13 +241,14 @@ def test_calculate_displacement_from_magnetic_flux_density():
 
     assert isinstance(actual_converted_data, NDArray[(2, Any), np.float32])
 
-    millimeters_per_millitesla = 23.25
-    millivolts_per_millitesla = 1073.6
+    # converting test voltage to expected displacements
+    conversion_factor_displacement = 23.25
+    conversion_factor_mag_flux = 1073.6
     expected_first_val = (
-        test_data[1, 0] * millimeters_per_millitesla / millivolts_per_millitesla
+        test_data[1, 0] * conversion_factor_displacement / conversion_factor_mag_flux
     ).astype(np.float32)
     expected_last_val = (
-        test_data[1, 2] * millimeters_per_millitesla / millivolts_per_millitesla
+        test_data[1, 2] * conversion_factor_displacement / conversion_factor_mag_flux
     ).astype(np.float32)
 
     expected_data = [expected_first_val, 0, expected_last_val]
@@ -254,3 +256,34 @@ def test_calculate_displacement_from_magnetic_flux_density():
     np.testing.assert_almost_equal(
         actual_converted_data[1, :], expected_data, decimal=6
     )
+
+
+def test_calculate_force_from_displacement():
+    test_data = np.array([-1, 0, 1])
+    test_data = np.vstack((np.zeros(3), test_data))
+    original_test_data = copy.deepcopy(test_data)
+
+    actual_converted_data = calculate_force_from_displacement(test_data)
+
+    # confirm original data was not modified
+    np.testing.assert_array_equal(test_data, original_test_data)
+
+    assert isinstance(actual_converted_data, NDArray[(2, Any), np.float32])
+
+    # converting test displacement to expected force
+    conversion_factor = 0.000159
+    expected_first_val = (test_data[1, 0] * conversion_factor).astype(np.float32)
+    expected_last_val = (test_data[1, 2] * conversion_factor).astype(np.float32)
+
+    expected_data = [expected_first_val, 0, expected_last_val]
+
+    np.testing.assert_almost_equal(
+        actual_converted_data[1, :], expected_data, decimal=6
+    )
+
+
+#     To convert from displacement in millimeters to a change in force, the following formula should be used:
+
+# millinewtons_per_millimeter = 0.000159
+
+# sample_in_millinewtons = sample_in_millimeters*millinewtons_per_millimeter 	(4)

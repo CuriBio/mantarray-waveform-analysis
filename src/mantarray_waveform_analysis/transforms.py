@@ -226,3 +226,24 @@ def calculate_displacement_from_voltage(
     sample_in_millimeters = sample_in_milliteslas * millimeters_per_millitesla
 
     return np.vstack((time, sample_in_millimeters)).astype(np.float32)
+
+
+def calculate_force_from_displacement(
+    displacement_data: NDArray[(2, Any), np.float32],
+) -> NDArray[(2, Any), np.float32]:
+    """Convert displacement to force.
+
+    Args:
+        displacement_data: time and Displacement numpy array. Typically coming from calculate_displacement_from_voltage
+
+    Returns:
+        A 2D array of time vs Force
+    """
+    sample_in_millimeters = displacement_data[1, :]
+    time = displacement_data[0, :]
+
+    # calculate force
+    millinewtons_per_millimeter = 0.000159
+    sample_in_millinewtons = sample_in_millimeters * millinewtons_per_millimeter
+
+    return np.vstack((time, sample_in_millinewtons)).astype(np.float32)
