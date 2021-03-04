@@ -39,6 +39,7 @@ from .transforms import apply_empty_plate_calibration
 from .transforms import apply_noise_filtering
 from .transforms import apply_sensitivity_calibration
 from .transforms import calculate_displacement_from_voltage
+from .transforms import calculate_magnetic_flux_density_from_voltage
 from .transforms import calculate_voltage_from_gmr
 from .transforms import create_filter
 from .transforms import FILTER_CHARACTERISTICS
@@ -96,4 +97,5 @@ __all__ = [
     "BUTTERWORTH_LOWPASS_30_UUID",
     "RELAXATION_VELOCITY_UUID",
     "CONTRACTION_VELOCITY_UUID",
+    "calculate_magnetic_flux_density_from_voltage",
 ]

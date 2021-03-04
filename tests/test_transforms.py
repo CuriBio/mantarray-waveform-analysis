@@ -11,6 +11,7 @@ from mantarray_waveform_analysis import BESSEL_LOWPASS_10_UUID
 from mantarray_waveform_analysis import BESSEL_LOWPASS_30_UUID
 from mantarray_waveform_analysis import BUTTERWORTH_LOWPASS_30_UUID
 from mantarray_waveform_analysis import calculate_displacement_from_voltage
+from mantarray_waveform_analysis import calculate_magnetic_flux_density_from_voltage
 from mantarray_waveform_analysis import calculate_voltage_from_gmr
 from mantarray_waveform_analysis import create_filter
 from mantarray_waveform_analysis import FILTER_CHARACTERISTICS
@@ -225,6 +226,32 @@ def test_calculate_voltage_from_gmr__returns_correct_values():
 
     np.testing.assert_almost_equal(
         actual_converted_data[1, :], expected_data, decimal=0
+    )
+
+
+def test_calculate_magnetic_flux_density_from_voltage():
+    test_data = np.array(
+        [-0x80000, MIDSCALE_CODE - RAW_TO_SIGNED_CONVERSION_VALUE, 0x7FFFFF]
+    )
+    test_data = np.vstack((np.zeros(3), test_data))
+    original_test_data = copy.deepcopy(test_data)
+
+    actual_converted_data = calculate_magnetic_flux_density_from_voltage(test_data)
+
+    # confirm original data was not modified
+    np.testing.assert_array_equal(test_data, original_test_data)
+
+    assert isinstance(actual_converted_data, NDArray[(2, Any), np.float32])
+
+    millivolts_per_millitesla = 1073.6
+    expected_first_val = (test_data[1, 0] / millivolts_per_millitesla).astype(
+        np.float32
+    )
+    expected_last_val = (test_data[1, 2] / millivolts_per_millitesla).astype(np.float32)
+    expected_data = [expected_first_val, 0, expected_last_val]
+
+    np.testing.assert_almost_equal(
+        actual_converted_data[1, :], expected_data, decimal=6
     )
 
 

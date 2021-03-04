@@ -203,6 +203,24 @@ def calculate_voltage_from_gmr(
     return np.vstack((gmr_data[0, :].astype(np.float32), voltage))
 
 
+def calculate_magnetic_flux_density_from_voltage(
+    voltage_data: NDArray[(2, Any), np.float32],
+) -> NDArray[(2, Any), np.float32]:
+    """Convert voltage to magnetic flux density.
+
+    Args:
+        voltage_data: time and Voltage numpy array. Typically coming from calculate_voltage_from_gmr
+
+    Returns:
+        A 2D array of time vs magnetic flux density
+    """
+    sample_in_millivolts = voltage_data[1, :]
+    time = voltage_data[0, :]
+    millivolts_per_millitesla = 1073.6
+    sample_in_millitelsas = sample_in_millivolts / millivolts_per_millitesla
+    return np.vstack((time, sample_in_millitelsas)).astype(np.float32)
+
+
 def calculate_displacement_from_voltage(
     voltage_data: NDArray[(2, Any), np.float32],
 ) -> NDArray[(2, Any), np.float32]:
