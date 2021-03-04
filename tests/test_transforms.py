@@ -205,14 +205,14 @@ def test_calculate_voltage_from_gmr__returns_correct_values():
     assert isinstance(actual_converted_data, NDArray[(2, Any), np.float32])
 
     expected_first_val = (
-        test_data[1, 0].astype(np.float32)
+        test_data[1, 0]
         * 1000
         * reference_voltage
         * RAW_TO_SIGNED_CONVERSION_VALUE
         / adc_gain
     )
     expected_last_val = (
-        test_data[1, 2].astype(np.float32)
+        test_data[1, 2]
         * 1000
         * reference_voltage
         * RAW_TO_SIGNED_CONVERSION_VALUE
@@ -280,10 +280,3 @@ def test_calculate_force_from_displacement():
     np.testing.assert_almost_equal(
         actual_converted_data[1, :], expected_data, decimal=6
     )
-
-
-#     To convert from displacement in millimeters to a change in force, the following formula should be used:
-
-# millinewtons_per_millimeter = 0.000159
-
-# sample_in_millinewtons = sample_in_millimeters*millinewtons_per_millimeter 	(4)

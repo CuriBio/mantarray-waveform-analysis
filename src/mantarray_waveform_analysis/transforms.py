@@ -199,8 +199,10 @@ def calculate_voltage_from_gmr(
         A 2D array of time vs Voltage
     """
     millivolts_per_lsb = 1000 * reference_voltage * RAW_TO_SIGNED_CONVERSION_VALUE
-    voltage = gmr_data[1, :].astype(np.float32) * millivolts_per_lsb * (1 / adc_gain)
-    return np.vstack((gmr_data[0, :].astype(np.float32), voltage))
+    sample_in_millivolts = (
+        gmr_data[1, :].astype(np.float32) * millivolts_per_lsb * (1 / adc_gain)
+    )
+    return np.vstack((gmr_data[0, :].astype(np.float32), sample_in_millivolts))
 
 
 def calculate_displacement_from_voltage(

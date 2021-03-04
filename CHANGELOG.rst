@@ -1,6 +1,12 @@
 Changelog for Mantarray Waveform Analysis
 =========================================
 
+0.7.0 (2021-03-04)
+------------------
+
+- Updated calculations to convert magnetic data to Force
+
+
 0.6.0 (2021-03-01)
 ------------------
 
