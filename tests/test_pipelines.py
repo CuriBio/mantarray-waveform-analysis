@@ -180,6 +180,27 @@ def test_Pipeline__get_sensitivity_calibrated_reference_gmr__calls_correct_metho
             "converting compressed displacement data to force",
         ),
         (
+            "wakka",
+            "calculate_voltage_from_gmr",
+            lambda the_pipeline: the_pipeline.get_voltage(),
+            [lambda the_pipeline: the_pipeline.get_noise_filtered_magnetic_data()],
+            "converting GMR data to voltage",
+        ),
+        (
+            "banjo",
+            "calculate_displacement_from_voltage",
+            lambda the_pipeline: the_pipeline.get_displacement(),
+            [lambda the_pipeline: the_pipeline.get_voltage()],
+            "converting voltage data to displacement",
+        ),
+        (
+            "hello",
+            "calculate_force_from_displacement",
+            lambda the_pipeline: the_pipeline.get_force(),
+            [lambda the_pipeline: the_pipeline.get_displacement()],
+            "converting displacement data to force",
+        ),
+        (
             "trampoline",
             "peak_detector",
             lambda the_pipeline: the_pipeline.get_peak_detection_results(),
@@ -192,7 +213,7 @@ def test_Pipeline__get_sensitivity_calibrated_reference_gmr__calls_correct_metho
             lambda the_pipeline: the_pipeline.get_magnetic_data_metrics(),
             [
                 lambda the_pipeline: the_pipeline.get_peak_detection_results(),
-                lambda the_pipeline: the_pipeline.get_compressed_force(),
+                lambda the_pipeline: the_pipeline.get_force(),
             ],
             "calculate data metrics on the traces from the raw magentic readings",
         ),

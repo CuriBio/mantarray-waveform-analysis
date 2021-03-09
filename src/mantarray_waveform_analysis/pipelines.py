@@ -54,6 +54,9 @@ class Pipeline:
         self._compressed_voltage: NDArray[(2, Any), np.float32]
         self._compressed_displacement: NDArray[(2, Any), np.float32]
         self._compressed_force: NDArray[(2, Any), np.float32]
+        self._voltage: NDArray[(2, Any), np.float32]
+        self._displacement: NDArray[(2, Any), np.float32]
+        self._force: NDArray[(2, Any), np.float32]
         self._peak_detection_results: Tuple[List[int], List[int]]
         self._magnetic_data_metrics: Tuple[  # pylint:disable=duplicate-code # Anna (1/7/21): long type definition causing failture
             Dict[
@@ -208,7 +211,7 @@ class Pipeline:
         except AttributeError:
             pass
         self._magnetic_data_metrics = data_metrics(
-            self.get_peak_detection_results(), self.get_compressed_force()
+            self.get_peak_detection_results(), self.get_force()
         )
         return self._magnetic_data_metrics
 
@@ -252,6 +255,30 @@ class Pipeline:
             self.get_compressed_displacement()
         )
         return self._compressed_force
+
+    def get_voltage(self) -> NDArray[(2, Any), np.float32]:
+        try:
+            return self._voltage
+        except AttributeError:
+            pass
+        self._voltage = calculate_voltage_from_gmr(self.get_noise_filtered_gmr())
+        return self._voltage
+
+    def get_displacement(self) -> NDArray[(2, Any), np.float32]:
+        try:
+            return self._displacement
+        except AttributeError:
+            pass
+        self._displacement = calculate_displacement_from_voltage(self.get_voltage())
+        return self._displacement
+
+    def get_force(self) -> NDArray[(2, Any), np.float32]:
+        try:
+            return self._force
+        except AttributeError:
+            pass
+        self._force = calculate_force_from_displacement(self.get_displacement())
+        return self._force
 
 
 @attr.s
