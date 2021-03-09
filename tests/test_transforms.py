@@ -189,7 +189,7 @@ def test_apply_noise_filtering__bessel_bandpass(
 
 def test_calculate_voltage_from_gmr__returns_correct_values():
     test_data = np.array(
-        [-0x80000, MIDSCALE_CODE - RAW_TO_SIGNED_CONVERSION_VALUE, 0x7FFFFF]
+        [-0x800000, MIDSCALE_CODE - RAW_TO_SIGNED_CONVERSION_VALUE, 0x7FFFFF]
     )
     test_data = np.vstack((np.zeros(3), test_data))
     original_test_data = copy.deepcopy(test_data)

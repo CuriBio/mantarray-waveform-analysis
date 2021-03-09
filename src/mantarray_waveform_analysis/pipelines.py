@@ -202,7 +202,7 @@ class Pipeline:
             ],
         ],
     ]:
-        """Calculate data metrics on noise filtered magnetic data."""
+        """Calculate data metrics on force data."""
         try:
             return self._magnetic_data_metrics
         except AttributeError:

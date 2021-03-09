@@ -194,7 +194,7 @@ def calculate_voltage_from_gmr(
     Args:
         gmr_data: time and GMR numpy array. Typically coming from filtered_gmr_data
         reference_voltage: Almost always leave as default of 2.5V
-        adc_gain: Current implementation of Mantarray is constant value of 2, but may change in the future. Value can be obtained from HDF5 metadata
+        adc_gain: Current implementation of Mantarray is constant value of 2, but may change in the future
 
     Returns:
         A 2D array of time vs Voltage
