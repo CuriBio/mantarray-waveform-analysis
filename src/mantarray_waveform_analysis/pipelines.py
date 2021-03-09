@@ -19,6 +19,7 @@ from .transforms import apply_empty_plate_calibration
 from .transforms import apply_noise_filtering
 from .transforms import apply_sensitivity_calibration
 from .transforms import calculate_displacement_from_voltage
+from .transforms import calculate_force_from_displacement
 from .transforms import calculate_voltage_from_gmr
 from .transforms import create_filter
 from .transforms import noise_cancellation
@@ -52,6 +53,7 @@ class Pipeline:
         self._compressed_magnetic_data: NDArray[(2, Any), int]
         self._compressed_voltage: NDArray[(2, Any), np.float32]
         self._compressed_displacement: NDArray[(2, Any), np.float32]
+        self._compressed_force: NDArray[(2, Any), np.float32]
         self._peak_detection_results: Tuple[List[int], List[int]]
         self._magnetic_data_metrics: Tuple[  # pylint:disable=duplicate-code # Anna (1/7/21): long type definition causing failture
             Dict[
@@ -206,7 +208,7 @@ class Pipeline:
         except AttributeError:
             pass
         self._magnetic_data_metrics = data_metrics(
-            self.get_peak_detection_results(), self.get_noise_filtered_magnetic_data()
+            self.get_peak_detection_results(), self.get_compressed_force()
         )
         return self._magnetic_data_metrics
 
@@ -240,6 +242,16 @@ class Pipeline:
             self.get_compressed_voltage()
         )
         return self._compressed_displacement
+
+    def get_compressed_force(self) -> NDArray[(2, Any), np.float32]:
+        try:
+            return self._compressed_force
+        except AttributeError:
+            pass
+        self._compressed_force = calculate_force_from_displacement(
+            self.get_compressed_displacement()
+        )
+        return self._compressed_force
 
 
 @attr.s
