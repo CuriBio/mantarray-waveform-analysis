@@ -16,6 +16,9 @@ from .constants import BESSEL_LOWPASS_30_UUID
 from .constants import BUTTERWORTH_LOWPASS_30_UUID
 from .constants import CENTIMILLISECONDS_PER_SECOND
 from .constants import MILLI_TO_BASE_CONVERSION
+from .constants import MILLIMETERS_PER_MILLITESLA
+from .constants import MILLINEWTONS_PER_MILLIMETER
+from .constants import MILLIVOLTS_PER_MILLITESLA
 from .constants import RAW_TO_SIGNED_CONVERSION_VALUE
 from .exceptions import FilterCreationNotImplementedError
 from .exceptions import UnrecognizedFilterUuidError
@@ -191,6 +194,8 @@ def calculate_voltage_from_gmr(
 ) -> NDArray[(2, Any), np.float32]:
     """Convert 'signed' 24-bit values from an ADC to measured voltage.
 
+    Conversion values were obtained 03/09/2021 by Kevin Grey
+
     Args:
         gmr_data: time and GMR numpy array. Typically coming from filtered_gmr_data
         reference_voltage: Almost always leave as default of 2.5V
@@ -212,22 +217,22 @@ def calculate_displacement_from_voltage(
 ) -> NDArray[(2, Any), np.float32]:
     """Convert voltage to displacement.
 
+    Conversion values were obtained 03/09/2021 by Kevin Grey
+
     Args:
         voltage_data: time and Voltage numpy array. Typically coming from calculate_voltage_from_gmr
 
     Returns:
-        A 2D array of time vs Displacement
+        A 2D array of time vs Displacement (meters)
     """
     sample_in_millivolts = voltage_data[1, :] * MILLI_TO_BASE_CONVERSION
     time = voltage_data[0, :]
 
     # calculate magnetic flux density
-    millivolts_per_millitesla = 1073.6
-    sample_in_milliteslas = sample_in_millivolts / millivolts_per_millitesla
+    sample_in_milliteslas = sample_in_millivolts / MILLIVOLTS_PER_MILLITESLA
 
     # calculate displacement
-    millimeters_per_millitesla = 23.25
-    sample_in_millimeters = sample_in_milliteslas * millimeters_per_millitesla
+    sample_in_millimeters = sample_in_milliteslas * MILLIMETERS_PER_MILLITESLA
     sample_in_meters = sample_in_millimeters / MILLI_TO_BASE_CONVERSION
 
     return np.vstack((time, sample_in_meters)).astype(np.float32)
@@ -238,18 +243,19 @@ def calculate_force_from_displacement(
 ) -> NDArray[(2, Any), np.float32]:
     """Convert displacement to force.
 
+    Conversion values were obtained 03/09/2021 by Kevin Grey
+
     Args:
         displacement_data: time and Displacement numpy array. Typically coming from calculate_displacement_from_voltage
 
     Returns:
-        A 2D array of time vs Force
+        A 2D array of time vs Force (Newtons)
     """
     sample_in_millimeters = displacement_data[1, :] * MILLI_TO_BASE_CONVERSION
     time = displacement_data[0, :]
 
     # calculate force
-    millinewtons_per_millimeter = 0.000159
-    sample_in_millinewtons = sample_in_millimeters * millinewtons_per_millimeter
+    sample_in_millinewtons = sample_in_millimeters * MILLINEWTONS_PER_MILLIMETER
 
     sample_in_newtons = sample_in_millinewtons / MILLI_TO_BASE_CONVERSION
     return np.vstack((time, sample_in_newtons)).astype(np.float32)

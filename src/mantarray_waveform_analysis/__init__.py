@@ -12,6 +12,9 @@ from .constants import CENTIMILLISECONDS_PER_SECOND
 from .constants import CONTRACTION_VELOCITY_UUID
 from .constants import MIDSCALE_CODE
 from .constants import MILLI_TO_BASE_CONVERSION
+from .constants import MILLIMETERS_PER_MILLITESLA
+from .constants import MILLINEWTONS_PER_MILLIMETER
+from .constants import MILLIVOLTS_PER_MILLITESLA
 from .constants import MIN_NUMBER_PEAKS
 from .constants import MIN_NUMBER_VALLEYS
 from .constants import PRIOR_PEAK_INDEX_UUID
@@ -101,4 +104,7 @@ __all__ = [
     "CONTRACTION_VELOCITY_UUID",
     "calculate_force_from_displacement",
     "MILLI_TO_BASE_CONVERSION",
+    "MILLIVOLTS_PER_MILLITESLA",
+    "MILLIMETERS_PER_MILLITESLA",
+    "MILLINEWTONS_PER_MILLIMETER",
 ]

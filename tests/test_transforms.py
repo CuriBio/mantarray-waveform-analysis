@@ -18,6 +18,9 @@ from mantarray_waveform_analysis import FILTER_CHARACTERISTICS
 from mantarray_waveform_analysis import FilterCreationNotImplementedError
 from mantarray_waveform_analysis import MIDSCALE_CODE
 from mantarray_waveform_analysis import MILLI_TO_BASE_CONVERSION
+from mantarray_waveform_analysis import MILLIMETERS_PER_MILLITESLA
+from mantarray_waveform_analysis import MILLINEWTONS_PER_MILLIMETER
+from mantarray_waveform_analysis import MILLIVOLTS_PER_MILLITESLA
 from mantarray_waveform_analysis import noise_cancellation
 from mantarray_waveform_analysis import RAW_TO_SIGNED_CONVERSION_VALUE
 from mantarray_waveform_analysis import UnrecognizedFilterUuidError
@@ -247,13 +250,11 @@ def test_calculate_displacement_from_voltage():
     assert isinstance(actual_converted_data, NDArray[(2, Any), np.float32])
 
     # converting test voltage to expected displacements
-    conversion_factor_displacement = 23.25
-    conversion_factor_mag_flux = 1073.6
     expected_first_val = (
-        test_data[1, 0] * conversion_factor_displacement / conversion_factor_mag_flux
+        test_data[1, 0] * MILLIMETERS_PER_MILLITESLA / MILLIVOLTS_PER_MILLITESLA
     ).astype(np.float32)
     expected_last_val = (
-        test_data[1, 2] * conversion_factor_displacement / conversion_factor_mag_flux
+        test_data[1, 2] * MILLIMETERS_PER_MILLITESLA / MILLIVOLTS_PER_MILLITESLA
     ).astype(np.float32)
 
     expected_data = [expected_first_val, 0, expected_last_val]
@@ -276,9 +277,12 @@ def test_calculate_force_from_displacement():
     assert isinstance(actual_converted_data, NDArray[(2, Any), np.float32])
 
     # converting test displacement to expected force
-    conversion_factor = 0.000159
-    expected_first_val = (test_data[1, 0] * conversion_factor).astype(np.float32)
-    expected_last_val = (test_data[1, 2] * conversion_factor).astype(np.float32)
+    expected_first_val = (test_data[1, 0] * MILLINEWTONS_PER_MILLIMETER).astype(
+        np.float32
+    )
+    expected_last_val = (test_data[1, 2] * MILLINEWTONS_PER_MILLIMETER).astype(
+        np.float32
+    )
 
     expected_data = [expected_first_val, 0, expected_last_val]
 
