@@ -15,6 +15,7 @@ from .constants import BESSEL_LOWPASS_10_UUID
 from .constants import BESSEL_LOWPASS_30_UUID
 from .constants import BUTTERWORTH_LOWPASS_30_UUID
 from .constants import CENTIMILLISECONDS_PER_SECOND
+from .constants import MILLI_TO_BASE_CONVERSION
 from .constants import RAW_TO_SIGNED_CONVERSION_VALUE
 from .exceptions import FilterCreationNotImplementedError
 from .exceptions import UnrecognizedFilterUuidError
@@ -202,7 +203,8 @@ def calculate_voltage_from_gmr(
     sample_in_millivolts = (
         gmr_data[1, :].astype(np.float32) * millivolts_per_lsb * (1 / adc_gain)
     )
-    return np.vstack((gmr_data[0, :].astype(np.float32), sample_in_millivolts))
+    sample_in_volts = sample_in_millivolts / MILLI_TO_BASE_CONVERSION
+    return np.vstack((gmr_data[0, :].astype(np.float32), sample_in_volts))
 
 
 def calculate_displacement_from_voltage(
@@ -216,7 +218,7 @@ def calculate_displacement_from_voltage(
     Returns:
         A 2D array of time vs Displacement
     """
-    sample_in_millivolts = voltage_data[1, :]
+    sample_in_millivolts = voltage_data[1, :] * MILLI_TO_BASE_CONVERSION
     time = voltage_data[0, :]
 
     # calculate magnetic flux density
@@ -226,8 +228,9 @@ def calculate_displacement_from_voltage(
     # calculate displacement
     millimeters_per_millitesla = 23.25
     sample_in_millimeters = sample_in_milliteslas * millimeters_per_millitesla
+    sample_in_meters = sample_in_millimeters / MILLI_TO_BASE_CONVERSION
 
-    return np.vstack((time, sample_in_millimeters)).astype(np.float32)
+    return np.vstack((time, sample_in_meters)).astype(np.float32)
 
 
 def calculate_force_from_displacement(
@@ -241,11 +244,12 @@ def calculate_force_from_displacement(
     Returns:
         A 2D array of time vs Force
     """
-    sample_in_millimeters = displacement_data[1, :]
+    sample_in_millimeters = displacement_data[1, :] * MILLI_TO_BASE_CONVERSION
     time = displacement_data[0, :]
 
     # calculate force
     millinewtons_per_millimeter = 0.000159
     sample_in_millinewtons = sample_in_millimeters * millinewtons_per_millimeter
 
-    return np.vstack((time, sample_in_millinewtons)).astype(np.float32)
+    sample_in_newtons = sample_in_millinewtons / MILLI_TO_BASE_CONVERSION
+    return np.vstack((time, sample_in_newtons)).astype(np.float32)

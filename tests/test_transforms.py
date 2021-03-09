@@ -17,6 +17,7 @@ from mantarray_waveform_analysis import create_filter
 from mantarray_waveform_analysis import FILTER_CHARACTERISTICS
 from mantarray_waveform_analysis import FilterCreationNotImplementedError
 from mantarray_waveform_analysis import MIDSCALE_CODE
+from mantarray_waveform_analysis import MILLI_TO_BASE_CONVERSION
 from mantarray_waveform_analysis import noise_cancellation
 from mantarray_waveform_analysis import RAW_TO_SIGNED_CONVERSION_VALUE
 from mantarray_waveform_analysis import UnrecognizedFilterUuidError
@@ -219,8 +220,12 @@ def test_calculate_voltage_from_gmr__returns_correct_values():
         / adc_gain
     )
 
-    expected_first_val = expected_first_val.astype(np.float32)
-    expected_last_val = expected_last_val.astype(np.float32)
+    expected_first_val = (expected_first_val / MILLI_TO_BASE_CONVERSION).astype(
+        np.float32
+    )
+    expected_last_val = (expected_last_val / MILLI_TO_BASE_CONVERSION).astype(
+        np.float32
+    )
 
     expected_data = [expected_first_val, 0, expected_last_val]
 

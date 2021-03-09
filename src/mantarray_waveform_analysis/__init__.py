@@ -11,6 +11,7 @@ from .constants import BUTTERWORTH_LOWPASS_30_UUID
 from .constants import CENTIMILLISECONDS_PER_SECOND
 from .constants import CONTRACTION_VELOCITY_UUID
 from .constants import MIDSCALE_CODE
+from .constants import MILLI_TO_BASE_CONVERSION
 from .constants import MIN_NUMBER_PEAKS
 from .constants import MIN_NUMBER_VALLEYS
 from .constants import PRIOR_PEAK_INDEX_UUID
@@ -99,4 +100,5 @@ __all__ = [
     "RELAXATION_VELOCITY_UUID",
     "CONTRACTION_VELOCITY_UUID",
     "calculate_force_from_displacement",
+    "MILLI_TO_BASE_CONVERSION",
 ]
