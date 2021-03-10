@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import uuid
 
+from mantarray_waveform_analysis import ADC_GAIN
 from mantarray_waveform_analysis import AMPLITUDE_UUID
 from mantarray_waveform_analysis import AUC_UUID
 from mantarray_waveform_analysis import BESSEL_BANDPASS_UUID
@@ -20,6 +21,7 @@ from mantarray_waveform_analysis import MIN_NUMBER_VALLEYS
 from mantarray_waveform_analysis import PRIOR_PEAK_INDEX_UUID
 from mantarray_waveform_analysis import PRIOR_VALLEY_INDEX_UUID
 from mantarray_waveform_analysis import RAW_TO_SIGNED_CONVERSION_VALUE
+from mantarray_waveform_analysis import REFERENCE_VOLTAGE
 from mantarray_waveform_analysis import RELAXATION_VELOCITY_UUID
 from mantarray_waveform_analysis import SUBSEQUENT_PEAK_INDEX_UUID
 from mantarray_waveform_analysis import SUBSEQUENT_VALLEY_INDEX_UUID
@@ -103,6 +105,8 @@ def test_gmr_conversion_factors():
     assert MILLIVOLTS_PER_MILLITESLA == 1073.6
     assert MILLIMETERS_PER_MILLITESLA == 23.25
     assert MILLINEWTONS_PER_MILLIMETER == 0.000159
+    assert REFERENCE_VOLTAGE == 2.5
+    assert ADC_GAIN == 2
 
 
 def test_peak_detection_vals():

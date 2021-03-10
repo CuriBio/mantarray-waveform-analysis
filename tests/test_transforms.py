@@ -3,6 +3,7 @@ import copy
 from typing import Any
 import uuid
 
+from mantarray_waveform_analysis import ADC_GAIN
 from mantarray_waveform_analysis import apply_empty_plate_calibration
 from mantarray_waveform_analysis import apply_noise_filtering
 from mantarray_waveform_analysis import apply_sensitivity_calibration
@@ -23,6 +24,7 @@ from mantarray_waveform_analysis import MILLINEWTONS_PER_MILLIMETER
 from mantarray_waveform_analysis import MILLIVOLTS_PER_MILLITESLA
 from mantarray_waveform_analysis import noise_cancellation
 from mantarray_waveform_analysis import RAW_TO_SIGNED_CONVERSION_VALUE
+from mantarray_waveform_analysis import REFERENCE_VOLTAGE
 from mantarray_waveform_analysis import UnrecognizedFilterUuidError
 from nptyping import Int
 from nptyping import NDArray
@@ -196,11 +198,9 @@ def test_calculate_voltage_from_gmr__returns_correct_values():
     )
     test_data = np.vstack((np.zeros(3), test_data))
     original_test_data = copy.deepcopy(test_data)
-    reference_voltage = 2.5
-    adc_gain = 2
 
     actual_converted_data = calculate_voltage_from_gmr(
-        test_data, reference_voltage=reference_voltage, adc_gain=adc_gain
+        test_data, reference_voltage=REFERENCE_VOLTAGE, adc_gain=ADC_GAIN
     )
 
     # confirm original data was not modified
@@ -211,16 +211,16 @@ def test_calculate_voltage_from_gmr__returns_correct_values():
     expected_first_val = (
         test_data[1, 0]
         * 1000
-        * reference_voltage
+        * REFERENCE_VOLTAGE
         * RAW_TO_SIGNED_CONVERSION_VALUE
-        / adc_gain
+        / ADC_GAIN
     )
     expected_last_val = (
         test_data[1, 2]
         * 1000
-        * reference_voltage
+        * REFERENCE_VOLTAGE
         * RAW_TO_SIGNED_CONVERSION_VALUE
-        / adc_gain
+        / ADC_GAIN
     )
 
     expected_first_val = (expected_first_val / MILLI_TO_BASE_CONVERSION).astype(

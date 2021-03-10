@@ -10,6 +10,7 @@ from nptyping import NDArray
 import numpy as np
 from scipy import signal
 
+from .constants import ADC_GAIN
 from .constants import BESSEL_BANDPASS_UUID
 from .constants import BESSEL_LOWPASS_10_UUID
 from .constants import BESSEL_LOWPASS_30_UUID
@@ -20,6 +21,7 @@ from .constants import MILLIMETERS_PER_MILLITESLA
 from .constants import MILLINEWTONS_PER_MILLIMETER
 from .constants import MILLIVOLTS_PER_MILLITESLA
 from .constants import RAW_TO_SIGNED_CONVERSION_VALUE
+from .constants import REFERENCE_VOLTAGE
 from .exceptions import FilterCreationNotImplementedError
 from .exceptions import UnrecognizedFilterUuidError
 
@@ -189,8 +191,8 @@ def apply_noise_filtering(
 
 def calculate_voltage_from_gmr(
     gmr_data: NDArray[(2, Any), int],
-    reference_voltage: Union[float, int] = 2.5,
-    adc_gain: int = 2,
+    reference_voltage: Union[float, int] = REFERENCE_VOLTAGE,
+    adc_gain: int = ADC_GAIN,
 ) -> NDArray[(2, Any), np.float32]:
     """Convert 'signed' 24-bit values from an ADC to measured voltage.
 
