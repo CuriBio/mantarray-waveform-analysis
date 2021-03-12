@@ -18,8 +18,8 @@ from .constants import BUTTERWORTH_LOWPASS_30_UUID
 from .constants import CENTIMILLISECONDS_PER_SECOND
 from .constants import MILLI_TO_BASE_CONVERSION
 from .constants import MILLIMETERS_PER_MILLITESLA
-from .constants import MILLINEWTONS_PER_MILLIMETER
 from .constants import MILLIVOLTS_PER_MILLITESLA
+from .constants import NEWTONS_PER_MILLIMETER
 from .constants import RAW_TO_SIGNED_CONVERSION_VALUE
 from .constants import REFERENCE_VOLTAGE
 from .exceptions import FilterCreationNotImplementedError
@@ -206,7 +206,7 @@ def calculate_voltage_from_gmr(
     Returns:
         A 2D array of time vs Voltage
     """
-    millivolts_per_lsb = 1000 * reference_voltage * RAW_TO_SIGNED_CONVERSION_VALUE
+    millivolts_per_lsb = 1000 * reference_voltage / RAW_TO_SIGNED_CONVERSION_VALUE
     sample_in_millivolts = (
         gmr_data[1, :].astype(np.float32) * millivolts_per_lsb * (1 / adc_gain)
     )
@@ -257,7 +257,7 @@ def calculate_force_from_displacement(
     time = displacement_data[0, :]
 
     # calculate force
-    sample_in_millinewtons = sample_in_millimeters * MILLINEWTONS_PER_MILLIMETER
+    sample_in_millinewtons = sample_in_millimeters * NEWTONS_PER_MILLIMETER
 
-    sample_in_newtons = sample_in_millinewtons / MILLI_TO_BASE_CONVERSION
+    sample_in_newtons = sample_in_millinewtons
     return np.vstack((time, sample_in_newtons)).astype(np.float32)

@@ -20,8 +20,8 @@ from mantarray_waveform_analysis import FilterCreationNotImplementedError
 from mantarray_waveform_analysis import MIDSCALE_CODE
 from mantarray_waveform_analysis import MILLI_TO_BASE_CONVERSION
 from mantarray_waveform_analysis import MILLIMETERS_PER_MILLITESLA
-from mantarray_waveform_analysis import MILLINEWTONS_PER_MILLIMETER
 from mantarray_waveform_analysis import MILLIVOLTS_PER_MILLITESLA
+from mantarray_waveform_analysis import NEWTONS_PER_MILLIMETER
 from mantarray_waveform_analysis import noise_cancellation
 from mantarray_waveform_analysis import RAW_TO_SIGNED_CONVERSION_VALUE
 from mantarray_waveform_analysis import REFERENCE_VOLTAGE
@@ -212,14 +212,14 @@ def test_calculate_voltage_from_gmr__returns_correct_values():
         test_data[1, 0]
         * 1000
         * REFERENCE_VOLTAGE
-        * RAW_TO_SIGNED_CONVERSION_VALUE
+        / RAW_TO_SIGNED_CONVERSION_VALUE
         / ADC_GAIN
     )
     expected_last_val = (
         test_data[1, 2]
         * 1000
         * REFERENCE_VOLTAGE
-        * RAW_TO_SIGNED_CONVERSION_VALUE
+        / RAW_TO_SIGNED_CONVERSION_VALUE
         / ADC_GAIN
     )
 
@@ -277,15 +277,14 @@ def test_calculate_force_from_displacement():
     assert isinstance(actual_converted_data, NDArray[(2, Any), np.float32])
 
     # converting test displacement to expected force
-    expected_first_val = (test_data[1, 0] * MILLINEWTONS_PER_MILLIMETER).astype(
-        np.float32
-    )
-    expected_last_val = (test_data[1, 2] * MILLINEWTONS_PER_MILLIMETER).astype(
-        np.float32
-    )
+    expected_first_val = (
+        test_data[1, 0] * NEWTONS_PER_MILLIMETER * MILLI_TO_BASE_CONVERSION
+    ).astype(np.float32)
+    expected_last_val = (
+        test_data[1, 2] * NEWTONS_PER_MILLIMETER * MILLI_TO_BASE_CONVERSION
+    ).astype(np.float32)
 
     expected_data = [expected_first_val, 0, expected_last_val]
-
     np.testing.assert_almost_equal(
         actual_converted_data[1, :], expected_data, decimal=6
     )

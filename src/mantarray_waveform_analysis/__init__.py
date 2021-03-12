@@ -14,10 +14,10 @@ from .constants import CONTRACTION_VELOCITY_UUID
 from .constants import MIDSCALE_CODE
 from .constants import MILLI_TO_BASE_CONVERSION
 from .constants import MILLIMETERS_PER_MILLITESLA
-from .constants import MILLINEWTONS_PER_MILLIMETER
 from .constants import MILLIVOLTS_PER_MILLITESLA
 from .constants import MIN_NUMBER_PEAKS
 from .constants import MIN_NUMBER_VALLEYS
+from .constants import NEWTONS_PER_MILLIMETER
 from .constants import PRIOR_PEAK_INDEX_UUID
 from .constants import PRIOR_VALLEY_INDEX_UUID
 from .constants import RAW_TO_SIGNED_CONVERSION_VALUE
@@ -108,7 +108,7 @@ __all__ = [
     "MILLI_TO_BASE_CONVERSION",
     "MILLIVOLTS_PER_MILLITESLA",
     "MILLIMETERS_PER_MILLITESLA",
-    "MILLINEWTONS_PER_MILLIMETER",
+    "NEWTONS_PER_MILLIMETER",
     "REFERENCE_VOLTAGE",
     "ADC_GAIN",
 ]
