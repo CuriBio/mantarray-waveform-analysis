@@ -150,18 +150,6 @@ def test_new_A1_period(new_A1):
     assert per_twitch_dict[266000][TWITCH_PERIOD_UUID] == 78000
 
 
-def test_new_A1_frequency_not_rounded(new_A1):
-    per_twitch_dict, aggregate_metrics_dict = _get_unrounded_data_metrics(new_A1)
-
-    assert aggregate_metrics_dict[TWITCH_FREQUENCY_UUID]["mean"] == approx(
-        1.2477183310516644
-    )
-    assert aggregate_metrics_dict[TWITCH_FREQUENCY_UUID]["std"] == approx(
-        0.026146910973044845
-    )
-    assert per_twitch_dict[105000][TWITCH_FREQUENCY_UUID] == approx(1.2345679)
-
-
 def test_new_A1_frequency(new_A1):
     per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A1)
 
@@ -344,14 +332,14 @@ def test_new_A1_amplitude_unrounded(new_A1):
 
     # test data_metrics aggregate dictionary
     assert aggregate_metrics_dict[AMPLITUDE_UUID]["n"] == 11
-    assert_percent_diff(aggregate_metrics_dict[AMPLITUDE_UUID]["mean"], 103286)
-    assert_percent_diff(aggregate_metrics_dict[AMPLITUDE_UUID]["std"], 1855)
+    assert aggregate_metrics_dict[AMPLITUDE_UUID]["mean"] == 103286.40909090909
+    assert aggregate_metrics_dict[AMPLITUDE_UUID]["std"] == 1855.4460235428546
     assert aggregate_metrics_dict[AMPLITUDE_UUID]["min"] == 100953
-    assert aggregate_metrics_dict[AMPLITUDE_UUID]["max"] == 106274
+    assert aggregate_metrics_dict[AMPLITUDE_UUID]["max"] == 106274.5
 
     # test data_metrics per beat dictionary
-    assert per_twitch_dict[105000][AMPLITUDE_UUID] == 106274
-    assert per_twitch_dict[186000][AMPLITUDE_UUID] == 104624
+    assert per_twitch_dict[105000][AMPLITUDE_UUID] == 106274.5
+    assert per_twitch_dict[186000][AMPLITUDE_UUID] == 104624.5
     assert per_twitch_dict[266000][AMPLITUDE_UUID] == 102671
 
 
@@ -454,23 +442,29 @@ def test_maiden_voyage_data_amplitude(maiden_voyage_data):
 def test_new_A1_twitch_widths_unrounded(new_A1):
     per_twitch_dict, aggregate_metrics_dict = _get_unrounded_data_metrics(new_A1)
 
-    assert per_twitch_dict[105000][WIDTH_UUID][10][WIDTH_VALUE_UUID] == 10768
-    assert per_twitch_dict[186000][WIDTH_UUID][50][WIDTH_VALUE_UUID] == 25340
-    assert per_twitch_dict[266000][WIDTH_UUID][90][WIDTH_VALUE_UUID] == 43566
+    assert (
+        per_twitch_dict[105000][WIDTH_UUID][10][WIDTH_VALUE_UUID] == 10768.450147928874
+    )
+    assert (
+        per_twitch_dict[186000][WIDTH_UUID][50][WIDTH_VALUE_UUID] == 25339.52987215662
+    )
+    assert (
+        per_twitch_dict[266000][WIDTH_UUID][90][WIDTH_VALUE_UUID] == 43565.89536603217
+    )
 
     assert per_twitch_dict[105000][WIDTH_UUID][10][WIDTH_FALLING_COORDS_UUID] == (
-        109494,
-        -211000,
+        109494.26515930113,
+        -211000.4,
     )
     assert per_twitch_dict[186000][WIDTH_UUID][50][WIDTH_RISING_COORDS_UUID] == (
-        171482,
-        -167630,
+        171481.9239034256,
+        -167630.5,
     )
 
-    assert_percent_diff(aggregate_metrics_dict[WIDTH_UUID][20]["mean"], 15758)
-    assert_percent_diff(aggregate_metrics_dict[WIDTH_UUID][50]["std"], 422)
-    assert aggregate_metrics_dict[WIDTH_UUID][80]["min"] == 35534
-    assert aggregate_metrics_dict[WIDTH_UUID][90]["max"] == 46182
+    assert aggregate_metrics_dict[WIDTH_UUID][20]["mean"] == 15757.7783261303
+    assert aggregate_metrics_dict[WIDTH_UUID][50]["std"] == 421.35763657164455
+    assert aggregate_metrics_dict[WIDTH_UUID][80]["min"] == 35533.5074609702
+    assert aggregate_metrics_dict[WIDTH_UUID][90]["max"] == 46182.30189899239
 
 
 def test_new_A1_twitch_widths(new_A1):
@@ -691,6 +685,22 @@ def test_new_A1_auc(new_A1):
     assert_percent_diff(per_twitch_dict[105000][AUC_UUID], 2268446950)
     assert_percent_diff(per_twitch_dict[186000][AUC_UUID], 2203146703)
     assert_percent_diff(per_twitch_dict[266000][AUC_UUID], 2187484903)
+
+
+def test_new_A1_auc_unrounded(new_A1):
+    per_twitch_dict, aggregate_metrics_dict = _get_unrounded_data_metrics(new_A1)
+
+    # test data_metrics aggregate dictionary
+    assert aggregate_metrics_dict[AUC_UUID]["n"] == 11
+    assert aggregate_metrics_dict[AUC_UUID]["mean"] == 2197880868.4578795
+    assert aggregate_metrics_dict[AUC_UUID]["std"] == 40391565.299392566
+    assert aggregate_metrics_dict[AUC_UUID]["min"] == 2145370005.2140386
+    assert aggregate_metrics_dict[AUC_UUID]["max"] == 2268449120.2174563
+
+    # test data_metrics per beat dictionary
+    assert per_twitch_dict[105000][AUC_UUID] == 2268449120.2174563
+    assert per_twitch_dict[186000][AUC_UUID] == 2203146616.572628
+    assert per_twitch_dict[266000][AUC_UUID] == 2187480306.299651
 
 
 def test_new_A2_auc(new_A2):

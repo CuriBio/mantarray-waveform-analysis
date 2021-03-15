@@ -493,7 +493,7 @@ def calculate_amplitudes(
     twitch_indices: Dict[int, Dict[UUID, Optional[int]]],
     filtered_data: NDArray[(2, Any), int],
     round_to_int: bool = True,
-) -> NDArray[int]:
+) -> NDArray[float]:
     """Get the amplitudes for all twitches.
 
     Args:
@@ -517,11 +517,11 @@ def calculate_amplitudes(
             (peak_amplitude - prior_amplitude) + (peak_amplitude - subsequent_amplitude)
         ) / 2
         if round_to_int:
-            amplitude_value = round(amplitude_value, 0)
+            amplitude_value = int(round(amplitude_value, 0))
 
-        amplitudes.append(abs(int(amplitude_value)))
+        amplitudes.append(abs(amplitude_value))
 
-    return np.asarray(amplitudes, dtype=np.int32)
+    return np.asarray(amplitudes, dtype=float)
 
 
 def interpolate_x_for_y_between_two_points(  # pylint:disable=invalid-name # (Eli 9/1/20: I can't think of a shorter name to describe this concept fully)
@@ -678,7 +678,7 @@ def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20)
         ],
     ],
     round_to_int: bool = True,
-) -> NDArray[int]:
+) -> NDArray[float]:
     """Calculate the area under the curve (AUC) for twitches.
 
     Args:
@@ -690,7 +690,7 @@ def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20)
         a 1D array of integers which represent the area under the curve for each twitch
     """
     width_percent = 90  # what percent of repolarization to use as the bottom limit for calculating AUC
-    auc_per_twitch: List[int] = list()
+    auc_per_twitch: List[float] = list()
     value_series = filtered_data[1, :]
     time_series = filtered_data[0, :]
 
@@ -798,10 +798,10 @@ def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20)
             falling_coords,
         )
         if round_to_int:
-            auc_total = round(auc_total, 0)
-        auc_per_twitch.append(int(auc_total))
+            auc_total = int(round(auc_total, 0))
+        auc_per_twitch.append(auc_total)
 
-    return np.asarray(auc_per_twitch, dtype=np.int64)
+    return np.asarray(auc_per_twitch, dtype=float)
 
 
 def _calculate_trapezoid_area(
