@@ -279,7 +279,7 @@ class Pipeline:
         except AttributeError:
             pass
         self._displacement_data_metrics = data_metrics(
-            self.get_peak_detection_results(), self.get_displacement()
+            self.get_peak_detection_results(), self.get_displacement(), rounded=False
         )
         return self._displacement_data_metrics
 
@@ -309,7 +309,7 @@ class Pipeline:
         except AttributeError:
             pass
         self._force_data_metrics = data_metrics(
-            self.get_peak_detection_results(), self.get_force()
+            self.get_peak_detection_results(), self.get_force(), rounded=False
         )
         return self._force_data_metrics
 

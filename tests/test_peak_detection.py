@@ -333,8 +333,8 @@ def test_new_A1_amplitude_unrounded(new_A1):
     # test data_metrics aggregate dictionary
     assert aggregate_metrics_dict[AMPLITUDE_UUID]["n"] == 11
     assert aggregate_metrics_dict[AMPLITUDE_UUID]["mean"] == approx(103286.4090)
-    assert aggregate_metrics_dict[AMPLITUDE_UUID]["std"] == approx(1855.44602)
-    assert aggregate_metrics_dict[AMPLITUDE_UUID]["min"] == approx(10095)
+    assert aggregate_metrics_dict[AMPLITUDE_UUID]["std"] == approx(1855.4460)
+    assert aggregate_metrics_dict[AMPLITUDE_UUID]["min"] == approx(100953)
     assert aggregate_metrics_dict[AMPLITUDE_UUID]["max"] == approx(106274.5)
 
     # test data_metrics per beat dictionary
