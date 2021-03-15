@@ -41,6 +41,7 @@ from .fixtures_peak_detection import fixture_maiden_voyage_data
 from .fixtures_peak_detection import fixture_noisy_data_A1
 from .fixtures_peak_detection import fixture_noisy_data_B1
 from .fixtures_utils import _get_data_metrics
+from .fixtures_utils import _get_unrounded_data_metrics
 from .fixtures_utils import _load_file_tsv
 from .fixtures_utils import _plot_data
 from .fixtures_utils import assert_percent_diff
@@ -147,6 +148,18 @@ def test_new_A1_period(new_A1):
     assert per_twitch_dict[105000][TWITCH_PERIOD_UUID] == 81000
     assert per_twitch_dict[186000][TWITCH_PERIOD_UUID] == 80000
     assert per_twitch_dict[266000][TWITCH_PERIOD_UUID] == 78000
+
+
+def test_new_A1_frequency_not_rounded(new_A1):
+    per_twitch_dict, aggregate_metrics_dict = _get_unrounded_data_metrics(new_A1)
+
+    assert aggregate_metrics_dict[TWITCH_FREQUENCY_UUID]["mean"] == approx(
+        1.2477183310516644
+    )
+    assert aggregate_metrics_dict[TWITCH_FREQUENCY_UUID]["std"] == approx(
+        0.026146910973044845
+    )
+    assert per_twitch_dict[105000][TWITCH_FREQUENCY_UUID] == approx(1.2345679)
 
 
 def test_new_A1_frequency(new_A1):
@@ -326,6 +339,22 @@ def test_new_A1_amplitude(new_A1):
     assert per_twitch_dict[266000][AMPLITUDE_UUID] == 102671
 
 
+def test_new_A1_amplitude_unrounded(new_A1):
+    per_twitch_dict, aggregate_metrics_dict = _get_unrounded_data_metrics(new_A1)
+
+    # test data_metrics aggregate dictionary
+    assert aggregate_metrics_dict[AMPLITUDE_UUID]["n"] == 11
+    assert_percent_diff(aggregate_metrics_dict[AMPLITUDE_UUID]["mean"], 103286)
+    assert_percent_diff(aggregate_metrics_dict[AMPLITUDE_UUID]["std"], 1855)
+    assert aggregate_metrics_dict[AMPLITUDE_UUID]["min"] == 100953
+    assert aggregate_metrics_dict[AMPLITUDE_UUID]["max"] == 106274
+
+    # test data_metrics per beat dictionary
+    assert per_twitch_dict[105000][AMPLITUDE_UUID] == 106274
+    assert per_twitch_dict[186000][AMPLITUDE_UUID] == 104624
+    assert per_twitch_dict[266000][AMPLITUDE_UUID] == 102671
+
+
 def test_new_A2_amplitude(new_A2):
     per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A2)
 
@@ -420,6 +449,28 @@ def test_maiden_voyage_data_amplitude(maiden_voyage_data):
     assert per_twitch_dict[123500][AMPLITUDE_UUID] == 523198
     assert per_twitch_dict[449500][AMPLITUDE_UUID] == 435673
     assert per_twitch_dict[856000][AMPLITUDE_UUID] == 464154
+
+
+def test_new_A1_twitch_widths_unrounded(new_A1):
+    per_twitch_dict, aggregate_metrics_dict = _get_unrounded_data_metrics(new_A1)
+
+    assert per_twitch_dict[105000][WIDTH_UUID][10][WIDTH_VALUE_UUID] == 10768
+    assert per_twitch_dict[186000][WIDTH_UUID][50][WIDTH_VALUE_UUID] == 25340
+    assert per_twitch_dict[266000][WIDTH_UUID][90][WIDTH_VALUE_UUID] == 43566
+
+    assert per_twitch_dict[105000][WIDTH_UUID][10][WIDTH_FALLING_COORDS_UUID] == (
+        109494,
+        -211000,
+    )
+    assert per_twitch_dict[186000][WIDTH_UUID][50][WIDTH_RISING_COORDS_UUID] == (
+        171482,
+        -167630,
+    )
+
+    assert_percent_diff(aggregate_metrics_dict[WIDTH_UUID][20]["mean"], 15758)
+    assert_percent_diff(aggregate_metrics_dict[WIDTH_UUID][50]["std"], 422)
+    assert aggregate_metrics_dict[WIDTH_UUID][80]["min"] == 35534
+    assert aggregate_metrics_dict[WIDTH_UUID][90]["max"] == 46182
 
 
 def test_new_A1_twitch_widths(new_A1):

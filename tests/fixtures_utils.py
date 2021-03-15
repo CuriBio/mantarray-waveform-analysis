@@ -177,6 +177,14 @@ def _get_data_metrics(well_fixture):
     return peak_detection.data_metrics(peak_and_valley_indices, filtered_data)
 
 
+def _get_unrounded_data_metrics(well_fixture):
+    pipeline, peak_and_valley_indices = well_fixture
+    filtered_data = pipeline.get_noise_filtered_gmr()
+    return peak_detection.data_metrics(
+        peak_and_valley_indices, filtered_data, rounded=False
+    )
+
+
 def assert_percent_diff(actual, expected, threshold=0.0006):
     percent_diff = abs(actual - expected) / expected
     assert percent_diff < threshold
