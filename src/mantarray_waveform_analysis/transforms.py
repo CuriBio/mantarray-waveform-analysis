@@ -257,7 +257,6 @@ def calculate_force_from_displacement(
     time = displacement_data[0, :]
 
     # calculate force
-    sample_in_millinewtons = sample_in_millimeters * NEWTONS_PER_MILLIMETER
+    sample_in_newtons = sample_in_millimeters * NEWTONS_PER_MILLIMETER
 
-    sample_in_newtons = sample_in_millinewtons
     return np.vstack((time, sample_in_newtons)).astype(np.float32)
