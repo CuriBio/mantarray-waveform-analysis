@@ -28,6 +28,7 @@ BESSEL_LOWPASS_30_UUID = uuid.UUID("eee66c75-4dc4-4eb4-8d48-6c608bf28d91")
 BUTTERWORTH_LOWPASS_30_UUID = uuid.UUID("de8d8cef-65bf-4119-ada7-bdecbbaa897a")
 
 # GMR conversion factors
+# Conversion values were obtained 03/09/2021 by Kevin Grey
 MIDSCALE_CODE = 0x800000
 RAW_TO_SIGNED_CONVERSION_VALUE = 2 ** 23  # subtract this value from raw hardware data
 MILLIVOLTS_PER_MILLITESLA = 1073.6
