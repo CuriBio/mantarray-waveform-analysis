@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import uuid
 
+from mantarray_waveform_analysis import ADC_GAIN
 from mantarray_waveform_analysis import AMPLITUDE_UUID
 from mantarray_waveform_analysis import AUC_UUID
 from mantarray_waveform_analysis import BESSEL_BANDPASS_UUID
@@ -11,11 +12,16 @@ from mantarray_waveform_analysis import CENTIMILLISECONDS_PER_SECOND
 from mantarray_waveform_analysis import CONTRACTION_VELOCITY_UUID
 from mantarray_waveform_analysis import FILTER_CHARACTERISTICS
 from mantarray_waveform_analysis import MIDSCALE_CODE
+from mantarray_waveform_analysis import MILLI_TO_BASE_CONVERSION
+from mantarray_waveform_analysis import MILLIMETERS_PER_MILLITESLA
+from mantarray_waveform_analysis import MILLIVOLTS_PER_MILLITESLA
 from mantarray_waveform_analysis import MIN_NUMBER_PEAKS
 from mantarray_waveform_analysis import MIN_NUMBER_VALLEYS
+from mantarray_waveform_analysis import NEWTONS_PER_MILLIMETER
 from mantarray_waveform_analysis import PRIOR_PEAK_INDEX_UUID
 from mantarray_waveform_analysis import PRIOR_VALLEY_INDEX_UUID
 from mantarray_waveform_analysis import RAW_TO_SIGNED_CONVERSION_VALUE
+from mantarray_waveform_analysis import REFERENCE_VOLTAGE
 from mantarray_waveform_analysis import RELAXATION_VELOCITY_UUID
 from mantarray_waveform_analysis import SUBSEQUENT_PEAK_INDEX_UUID
 from mantarray_waveform_analysis import SUBSEQUENT_VALLEY_INDEX_UUID
@@ -29,6 +35,7 @@ from mantarray_waveform_analysis import WIDTH_VALUE_UUID
 
 def test_misc_constants():
     assert CENTIMILLISECONDS_PER_SECOND == 100000
+    assert MILLI_TO_BASE_CONVERSION == 1000
 
 
 def test_filter_uuids():
@@ -95,6 +102,11 @@ def test_data_metric_uuids():
 def test_gmr_conversion_factors():
     assert MIDSCALE_CODE == 8388608
     assert RAW_TO_SIGNED_CONVERSION_VALUE == 2 ** 23
+    assert MILLIVOLTS_PER_MILLITESLA == 1073.6
+    assert MILLIMETERS_PER_MILLITESLA == 23.25
+    assert NEWTONS_PER_MILLIMETER == 0.000159
+    assert REFERENCE_VOLTAGE == 2.5
+    assert ADC_GAIN == 2
 
 
 def test_peak_detection_vals():

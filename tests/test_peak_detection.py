@@ -41,6 +41,7 @@ from .fixtures_peak_detection import fixture_maiden_voyage_data
 from .fixtures_peak_detection import fixture_noisy_data_A1
 from .fixtures_peak_detection import fixture_noisy_data_B1
 from .fixtures_utils import _get_data_metrics
+from .fixtures_utils import _get_unrounded_data_metrics
 from .fixtures_utils import _load_file_tsv
 from .fixtures_utils import _plot_data
 from .fixtures_utils import assert_percent_diff
@@ -326,6 +327,22 @@ def test_new_A1_amplitude(new_A1):
     assert per_twitch_dict[266000][AMPLITUDE_UUID] == 102671
 
 
+def test_new_A1_amplitude_unrounded(new_A1):
+    per_twitch_dict, aggregate_metrics_dict = _get_unrounded_data_metrics(new_A1)
+
+    # test data_metrics aggregate dictionary
+    assert aggregate_metrics_dict[AMPLITUDE_UUID]["n"] == 11
+    assert aggregate_metrics_dict[AMPLITUDE_UUID]["mean"] == approx(103286.4090)
+    assert aggregate_metrics_dict[AMPLITUDE_UUID]["std"] == approx(1855.4460)
+    assert aggregate_metrics_dict[AMPLITUDE_UUID]["min"] == approx(100953)
+    assert aggregate_metrics_dict[AMPLITUDE_UUID]["max"] == approx(106274.5)
+
+    # test data_metrics per beat dictionary
+    assert per_twitch_dict[105000][AMPLITUDE_UUID] == approx(106274.5)
+    assert per_twitch_dict[186000][AMPLITUDE_UUID] == approx(104624.5)
+    assert per_twitch_dict[266000][AMPLITUDE_UUID] == approx(102671)
+
+
 def test_new_A2_amplitude(new_A2):
     per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A2)
 
@@ -420,6 +437,40 @@ def test_maiden_voyage_data_amplitude(maiden_voyage_data):
     assert per_twitch_dict[123500][AMPLITUDE_UUID] == 523198
     assert per_twitch_dict[449500][AMPLITUDE_UUID] == 435673
     assert per_twitch_dict[856000][AMPLITUDE_UUID] == 464154
+
+
+def test_new_A1_twitch_widths_unrounded(new_A1):
+    per_twitch_dict, aggregate_metrics_dict = _get_unrounded_data_metrics(new_A1)
+
+    assert per_twitch_dict[105000][WIDTH_UUID][10][WIDTH_VALUE_UUID] == approx(
+        10768.4501
+    )
+
+    assert per_twitch_dict[186000][WIDTH_UUID][50][WIDTH_VALUE_UUID] == approx(
+        25339.5298
+    )
+    assert per_twitch_dict[266000][WIDTH_UUID][90][WIDTH_VALUE_UUID] == approx(
+        43565.8953
+    )
+
+    assert per_twitch_dict[105000][WIDTH_UUID][10][WIDTH_FALLING_COORDS_UUID][
+        0
+    ] == approx(109494.2651)
+    assert per_twitch_dict[105000][WIDTH_UUID][10][WIDTH_FALLING_COORDS_UUID][
+        1
+    ] == approx(-211000.4)
+
+    assert per_twitch_dict[186000][WIDTH_UUID][50][WIDTH_RISING_COORDS_UUID][
+        0
+    ] == approx(171481.9239)
+    assert per_twitch_dict[186000][WIDTH_UUID][50][WIDTH_RISING_COORDS_UUID][
+        1
+    ] == approx(-167630.5)
+
+    assert aggregate_metrics_dict[WIDTH_UUID][20]["mean"] == approx(15757.7783)
+    assert aggregate_metrics_dict[WIDTH_UUID][50]["std"] == approx(421.3576)
+    assert aggregate_metrics_dict[WIDTH_UUID][80]["min"] == approx(35533.5074)
+    assert aggregate_metrics_dict[WIDTH_UUID][90]["max"] == approx(46182.3018)
 
 
 def test_new_A1_twitch_widths(new_A1):
@@ -640,6 +691,22 @@ def test_new_A1_auc(new_A1):
     assert_percent_diff(per_twitch_dict[105000][AUC_UUID], 2268446950)
     assert_percent_diff(per_twitch_dict[186000][AUC_UUID], 2203146703)
     assert_percent_diff(per_twitch_dict[266000][AUC_UUID], 2187484903)
+
+
+def test_new_A1_auc_unrounded(new_A1):
+    per_twitch_dict, aggregate_metrics_dict = _get_unrounded_data_metrics(new_A1)
+
+    # test data_metrics aggregate dictionary
+    assert aggregate_metrics_dict[AUC_UUID]["n"] == 11
+    assert aggregate_metrics_dict[AUC_UUID]["mean"] == approx(2197880868.4578)
+    assert aggregate_metrics_dict[AUC_UUID]["std"] == approx(40391565.2993)
+    assert aggregate_metrics_dict[AUC_UUID]["min"] == approx(2145370005.2140)
+    assert aggregate_metrics_dict[AUC_UUID]["max"] == approx(2268449120.2174)
+
+    # test data_metrics per beat dictionary
+    assert per_twitch_dict[105000][AUC_UUID] == approx(2268449120.2174)
+    assert per_twitch_dict[186000][AUC_UUID] == approx(2203146616.5726)
+    assert per_twitch_dict[266000][AUC_UUID] == approx(2187480306.2996)
 
 
 def test_new_A2_auc(new_A2):

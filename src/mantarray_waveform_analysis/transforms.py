@@ -10,12 +10,18 @@ from nptyping import NDArray
 import numpy as np
 from scipy import signal
 
+from .constants import ADC_GAIN
 from .constants import BESSEL_BANDPASS_UUID
 from .constants import BESSEL_LOWPASS_10_UUID
 from .constants import BESSEL_LOWPASS_30_UUID
 from .constants import BUTTERWORTH_LOWPASS_30_UUID
 from .constants import CENTIMILLISECONDS_PER_SECOND
+from .constants import MILLI_TO_BASE_CONVERSION
+from .constants import MILLIMETERS_PER_MILLITESLA
+from .constants import MILLIVOLTS_PER_MILLITESLA
+from .constants import NEWTONS_PER_MILLIMETER
 from .constants import RAW_TO_SIGNED_CONVERSION_VALUE
+from .constants import REFERENCE_VOLTAGE
 from .exceptions import FilterCreationNotImplementedError
 from .exceptions import UnrecognizedFilterUuidError
 
@@ -185,25 +191,27 @@ def apply_noise_filtering(
 
 def calculate_voltage_from_gmr(
     gmr_data: NDArray[(2, Any), int],
-    reference_voltage: Union[float, int] = 3.3,
-    adc_gain: int = 32,
+    reference_voltage: Union[float, int] = REFERENCE_VOLTAGE,
+    adc_gain: int = ADC_GAIN,
 ) -> NDArray[(2, Any), np.float32]:
     """Convert 'signed' 24-bit values from an ADC to measured voltage.
 
+    Conversion values were obtained 03/09/2021 by Kevin Grey
+
     Args:
         gmr_data: time and GMR numpy array. Typically coming from filtered_gmr_data
-        reference_voltage: Almost always leave as default of 3.3V
-        adc_gain: Current implementation of Mantarray is constant value of 32, but may change in the future. Value can be obtained from HDF5 metadata
+        reference_voltage: Almost always leave as default of 2.5V
+        adc_gain: Current implementation of Mantarray is constant value of 2, but may change in the future
 
     Returns:
         A 2D array of time vs Voltage
     """
-    voltage = (
-        gmr_data[1, :].astype(np.float32)
-        * (1 / RAW_TO_SIGNED_CONVERSION_VALUE)
-        * (reference_voltage / adc_gain)
+    millivolts_per_lsb = 1000 * reference_voltage / RAW_TO_SIGNED_CONVERSION_VALUE
+    sample_in_millivolts = (
+        gmr_data[1, :].astype(np.float32) * millivolts_per_lsb * (1 / adc_gain)
     )
-    return np.vstack((gmr_data[0, :].astype(np.float32), voltage))
+    sample_in_volts = sample_in_millivolts / MILLI_TO_BASE_CONVERSION
+    return np.vstack((gmr_data[0, :].astype(np.float32), sample_in_volts))
 
 
 def calculate_displacement_from_voltage(
@@ -211,13 +219,44 @@ def calculate_displacement_from_voltage(
 ) -> NDArray[(2, Any), np.float32]:
     """Convert voltage to displacement.
 
+    Conversion values were obtained 03/09/2021 by Kevin Grey
+
     Args:
         voltage_data: time and Voltage numpy array. Typically coming from calculate_voltage_from_gmr
 
     Returns:
-        A 2D array of time vs Displacement
+        A 2D array of time vs Displacement (meters)
     """
-    voltage = voltage_data[1, :]
+    sample_in_millivolts = voltage_data[1, :] * MILLI_TO_BASE_CONVERSION
     time = voltage_data[0, :]
-    displacement = voltage * -1 + 0.1  # simplistically just invert the data for now
-    return np.vstack((time, displacement)).astype(np.float32)
+
+    # calculate magnetic flux density
+    sample_in_milliteslas = sample_in_millivolts / MILLIVOLTS_PER_MILLITESLA
+
+    # calculate displacement
+    sample_in_millimeters = sample_in_milliteslas * MILLIMETERS_PER_MILLITESLA
+    sample_in_meters = sample_in_millimeters / MILLI_TO_BASE_CONVERSION
+
+    return np.vstack((time, sample_in_meters)).astype(np.float32)
+
+
+def calculate_force_from_displacement(
+    displacement_data: NDArray[(2, Any), np.float32],
+) -> NDArray[(2, Any), np.float32]:
+    """Convert displacement to force.
+
+    Conversion values were obtained 03/09/2021 by Kevin Grey
+
+    Args:
+        displacement_data: time and Displacement numpy array. Typically coming from calculate_displacement_from_voltage
+
+    Returns:
+        A 2D array of time vs Force (Newtons)
+    """
+    sample_in_millimeters = displacement_data[1, :] * MILLI_TO_BASE_CONVERSION
+    time = displacement_data[0, :]
+
+    # calculate force
+    sample_in_newtons = sample_in_millimeters * NEWTONS_PER_MILLIMETER
+
+    return np.vstack((time, sample_in_newtons)).astype(np.float32)
