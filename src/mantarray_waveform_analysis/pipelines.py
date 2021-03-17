@@ -19,6 +19,7 @@ from .transforms import apply_empty_plate_calibration
 from .transforms import apply_noise_filtering
 from .transforms import apply_sensitivity_calibration
 from .transforms import calculate_displacement_from_voltage
+from .transforms import calculate_force_from_displacement
 from .transforms import calculate_voltage_from_gmr
 from .transforms import create_filter
 from .transforms import noise_cancellation
@@ -52,8 +53,50 @@ class Pipeline:
         self._compressed_magnetic_data: NDArray[(2, Any), int]
         self._compressed_voltage: NDArray[(2, Any), np.float32]
         self._compressed_displacement: NDArray[(2, Any), np.float32]
+        self._compressed_force: NDArray[(2, Any), np.float32]
+        self._voltage: NDArray[(2, Any), np.float32]
+        self._displacement: NDArray[(2, Any), np.float32]
+        self._force: NDArray[(2, Any), np.float32]
         self._peak_detection_results: Tuple[List[int], List[int]]
         self._magnetic_data_metrics: Tuple[  # pylint:disable=duplicate-code # Anna (1/7/21): long type definition causing failture
+            Dict[
+                int,
+                Dict[
+                    UUID,
+                    Union[
+                        Dict[int, Dict[UUID, Union[Tuple[int, int], int]]],
+                        Union[float, int],
+                    ],
+                ],
+            ],
+            Dict[
+                UUID,
+                Union[
+                    Dict[str, Union[float, int]],
+                    Dict[int, Dict[str, Union[float, int]]],
+                ],
+            ],
+        ]
+        self._displacement_data_metrics: Tuple[  # pylint:disable=duplicate-code # Anna (1/7/21): long type definition causing failture
+            Dict[
+                int,
+                Dict[
+                    UUID,
+                    Union[
+                        Dict[int, Dict[UUID, Union[Tuple[int, int], int]]],
+                        Union[float, int],
+                    ],
+                ],
+            ],
+            Dict[
+                UUID,
+                Union[
+                    Dict[str, Union[float, int]],
+                    Dict[int, Dict[str, Union[float, int]]],
+                ],
+            ],
+        ]
+        self._force_data_metrics: Tuple[  # pylint:disable=duplicate-code # Anna (1/7/21): long type definition causing failture
             Dict[
                 int,
                 Dict[
@@ -210,6 +253,66 @@ class Pipeline:
         )
         return self._magnetic_data_metrics
 
+    def get_displacement_data_metrics(
+        self,
+    ) -> Tuple[  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failture
+        Dict[
+            int,
+            Dict[
+                UUID,
+                Union[
+                    Dict[int, Dict[UUID, Union[Tuple[int, int], int]]],
+                    Union[float, int],
+                ],
+            ],
+        ],
+        Dict[
+            UUID,
+            Union[
+                Dict[str, Union[float, int]], Dict[int, Dict[str, Union[float, int]]]
+            ],
+        ],
+    ]:
+        """Calculate data metrics on displacement data."""
+        try:
+            return self._displacement_data_metrics
+        except AttributeError:
+            pass
+        self._displacement_data_metrics = data_metrics(
+            self.get_peak_detection_results(), self.get_displacement(), rounded=False
+        )
+        return self._displacement_data_metrics
+
+    def get_force_data_metrics(
+        self,
+    ) -> Tuple[  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failture
+        Dict[
+            int,
+            Dict[
+                UUID,
+                Union[
+                    Dict[int, Dict[UUID, Union[Tuple[int, int], int]]],
+                    Union[float, int],
+                ],
+            ],
+        ],
+        Dict[
+            UUID,
+            Union[
+                Dict[str, Union[float, int]], Dict[int, Dict[str, Union[float, int]]]
+            ],
+        ],
+    ]:
+        """Calculate data metrics on force data."""
+        try:
+            return self._force_data_metrics
+        except AttributeError:
+            pass
+        self._force_data_metrics = data_metrics(
+            self.get_peak_detection_results(), self.get_force(), rounded=False
+        )
+        return self._force_data_metrics
+
     def get_compressed_gmr(self) -> NDArray[(2, Any), int]:
         return self.get_compressed_magnetic_data()
 
@@ -240,6 +343,40 @@ class Pipeline:
             self.get_compressed_voltage()
         )
         return self._compressed_displacement
+
+    def get_compressed_force(self) -> NDArray[(2, Any), np.float32]:
+        try:
+            return self._compressed_force
+        except AttributeError:
+            pass
+        self._compressed_force = calculate_force_from_displacement(
+            self.get_compressed_displacement()
+        )
+        return self._compressed_force
+
+    def get_voltage(self) -> NDArray[(2, Any), np.float32]:
+        try:
+            return self._voltage
+        except AttributeError:
+            pass
+        self._voltage = calculate_voltage_from_gmr(self.get_noise_filtered_gmr())
+        return self._voltage
+
+    def get_displacement(self) -> NDArray[(2, Any), np.float32]:
+        try:
+            return self._displacement
+        except AttributeError:
+            pass
+        self._displacement = calculate_displacement_from_voltage(self.get_voltage())
+        return self._displacement
+
+    def get_force(self) -> NDArray[(2, Any), np.float32]:
+        try:
+            return self._force
+        except AttributeError:
+            pass
+        self._force = calculate_force_from_displacement(self.get_displacement())
+        return self._force
 
 
 @attr.s
