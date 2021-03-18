@@ -19,7 +19,7 @@ matplotlib==3.3.4
 h5py==3.2.1
 Cython==0.29.22
 mantarray-file-manager==0.4.6
-stdlib-utils==0.4.2
+stdlib-utils==0.4.3
 
 pytest-mock==3.5.1
 pytest-profiling==1.7.0
