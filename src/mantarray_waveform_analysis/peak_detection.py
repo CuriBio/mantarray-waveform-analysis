@@ -110,6 +110,12 @@ def peak_detector(
                 raise NotImplementedError(
                     "The only examples observed so far where two peaks were detected were due to the values/heights of the peaks being identical. In that case the decision was made to always choose the earlier peak. This error is a defensive assertion against the future possibility that there might be a case in the future where the values of the two peaks are unequal---in which case we would need to revisit how we would like to handle that outcome."
                 )
+
+    # print(filtered_magnetic_signal[0][valley_indices[53]])
+    # print(filtered_magnetic_signal[0][valley_indices[54]])
+    # print(magnetic_signal[valley_indices[53]])
+    # print(magnetic_signal[valley_indices[54]])
+
     return peak_indices, valley_indices
 
 

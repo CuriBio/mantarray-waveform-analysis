@@ -37,6 +37,7 @@ from .fixtures_compression import fixture_new_A6
 from .fixtures_peak_detection import fixture_MA20123123__2020_10_13_173812__B6
 from .fixtures_peak_detection import fixture_MA20123123__2020_10_13_234733__A1
 from .fixtures_peak_detection import fixture_MA202000030__2020_12_11_233215__D4
+from .fixtures_peak_detection import fixture_MA202000127__2021_03_26_174059__A3
 from .fixtures_peak_detection import fixture_maiden_voyage_data
 from .fixtures_peak_detection import fixture_noisy_data_A1
 from .fixtures_peak_detection import fixture_noisy_data_B1
@@ -65,6 +66,7 @@ __fixtures__ = [
     fixture_MA20123123__2020_10_13_173812__B6,
     fixture_MA20123123__2020_10_13_234733__A1,
     fixture_MA202000030__2020_12_11_233215__D4,
+    fixture_MA202000127__2021_03_26_174059__A3,
 ]
 
 
@@ -1336,3 +1338,19 @@ def test__D4_data_causing_TwoValleysInARowError(MA202000030__2020_12_11_233215__
 
     assert np.array_equal(peak_indices, expected_peak_indices)
     assert np.array_equal(valley_indices, expected_valley_indices)
+
+
+def test__A3_data_causing_TwoValleysInARowError(MA202000127__2021_03_26_174059__A3):
+    pipeline, peak_and_valley_indices = MA202000127__2021_03_26_174059__A3
+    peak_indices, valley_indices = peak_and_valley_indices
+
+    filtered_data = pipeline.get_noise_filtered_gmr()
+    _plot_data(
+        peak_and_valley_indices,
+        filtered_data,
+        os.path.join(PATH_TO_PNGS, "new_MA202000127__2021_03_26_174059__A3.png"),
+        x_bounds=(60, 70),
+    )
+
+    assert peak_indices is None
+    assert valley_indices is None
