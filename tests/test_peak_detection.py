@@ -1342,7 +1342,7 @@ def test__D4_data_causing_TwoValleysInARowError(MA202000030__2020_12_11_233215__
 
 def test__A3_data_causing_TwoValleysInARowError(MA202000127__2021_03_26_174059__A3):
     pipeline, peak_and_valley_indices = MA202000127__2021_03_26_174059__A3
-    peak_indices, valley_indices = peak_and_valley_indices
+    _, valley_indices = peak_and_valley_indices
 
     filtered_data = pipeline.get_noise_filtered_gmr()
     _plot_data(
@@ -1351,6 +1351,8 @@ def test__A3_data_causing_TwoValleysInARowError(MA202000127__2021_03_26_174059__
         os.path.join(PATH_TO_PNGS, "new_MA202000127__2021_03_26_174059__A3.png"),
         x_bounds=(60, 70),
     )
+    # fmt: off
+    expected_valley_indices = [637, 1361, 2174,2933,3566,4335,5107,5863,6688,7411,7933,8711,9570,10364,11176,11768,12706,13420,14050,14852,15648,16355,17189,17954,18622,19402,20151,20785,21475,22437,23061,23882,24582,25284,26023,26627,27495,28254,29039, 29794,30533,31308,32015,32570,33518,34239,34957,35696,36327,36953,37930,38685,39342,40059,40816,41426,42374,43146,43829,44515,45326,46054,46725,47521,48253,48993,49730,50421,51157,51811,52497,53279,54052,54743,55549,56250,56885,57749,58513,59191,]
+    # fmt: on
 
-    assert peak_indices is None
-    assert valley_indices is None
+    assert np.array_equal(valley_indices, expected_valley_indices)

@@ -2,6 +2,7 @@
 """Detecting peak and valleys of incoming Mantarray data."""
 
 from functools import partial
+import sys
 from typing import Any
 from typing import Dict
 from typing import List
@@ -35,6 +36,8 @@ from .constants import WIDTH_VALUE_UUID
 from .exceptions import TooFewPeaksDetectedError
 from .exceptions import TwoPeaksInARowError
 from .exceptions import TwoValleysInARowError
+
+np.set_printoptions(threshold=sys.maxsize)
 
 
 TWITCH_WIDTH_PERCENTS = range(10, 95, 5)
@@ -106,15 +109,12 @@ def peak_detector(
             if magnetic_signal[valley_idx_last] == magnetic_signal[valley_idx]:
                 valley_indices = np.delete(valley_indices, i)
                 i -= 1
+            elif magnetic_signal[valley_idx] > magnetic_signal[valley_idx_last]:
+                valley_indices = np.delete(valley_indices, i - 1)
             else:
                 raise NotImplementedError(
-                    "The only examples observed so far where two peaks were detected were due to the values/heights of the peaks being identical. In that case the decision was made to always choose the earlier peak. This error is a defensive assertion against the future possibility that there might be a case in the future where the values of the two peaks are unequal---in which case we would need to revisit how we would like to handle that outcome."
+                    "The only examples observed so far where two peaks were detected were due to the values/heights of the peaks being identical or the second peak being taller. In the identical case the decision was made to always choose the earlier peak. In the case where the second peak is taller the first peak is removed and the second peak is kept. This error is a defensive assertion against the future possibility that there might be a case in the future where the values of first of the two peaks is taller---in which case we would need to add a test case to show this option."
                 )
-
-    # print(filtered_magnetic_signal[0][valley_indices[53]])
-    # print(filtered_magnetic_signal[0][valley_indices[54]])
-    # print(magnetic_signal[valley_indices[53]])
-    # print(magnetic_signal[valley_indices[54]])
 
     return peak_indices, valley_indices
 
