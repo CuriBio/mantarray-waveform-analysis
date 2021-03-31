@@ -2,7 +2,6 @@
 """Detecting peak and valleys of incoming Mantarray data."""
 
 from functools import partial
-import sys
 from typing import Any
 from typing import Dict
 from typing import List
@@ -36,8 +35,6 @@ from .constants import WIDTH_VALUE_UUID
 from .exceptions import TooFewPeaksDetectedError
 from .exceptions import TwoPeaksInARowError
 from .exceptions import TwoValleysInARowError
-
-np.set_printoptions(threshold=sys.maxsize)
 
 
 TWITCH_WIDTH_PERCENTS = range(10, 95, 5)
