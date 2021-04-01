@@ -1340,7 +1340,9 @@ def test__D4_data_causing_TwoValleysInARowError(MA202000030__2020_12_11_233215__
     assert np.array_equal(valley_indices, expected_valley_indices)
 
 
-def test__A3_data_causing_TwoValleysInARowError(MA202000127__2021_03_26_174059__A3):
+def test__A3_data_causing_TwoValleysInARowError_second_peak_taller(
+    MA202000127__2021_03_26_174059__A3,
+):
     _, peak_and_valley_indices = MA202000127__2021_03_26_174059__A3
     _, valley_indices = peak_and_valley_indices
 
