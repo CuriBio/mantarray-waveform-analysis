@@ -106,13 +106,11 @@ def peak_detector(
             if magnetic_signal[valley_idx_last] == magnetic_signal[valley_idx]:
                 valley_indices = np.delete(valley_indices, i)
                 i -= 1
-            elif (
-                magnetic_signal[valley_idx] > magnetic_signal[valley_idx_last]
-            ):  # pragma:no-cover
+            elif magnetic_signal[valley_idx] > magnetic_signal[valley_idx_last]:
                 valley_indices = np.delete(valley_indices, i - 1)
-            else:  # pragma:no-cover  # (Anna 3/31/21): we don't have a case as of yet in which the first peak is higher than the second however know that it is possible and therefore aren't worried about code coverage in this case.
-                valley_indices = np.delete(valley_indices, i)  # pragma:no-cover
-                i -= 1  # pragma:no-cover
+            else:  # pragma: no cover  # (Anna 3/31/21): we don't have a case as of yet in which the first peak is higher than the second however know that it is possible and therefore aren't worried about code coverage in this case.
+                valley_indices = np.delete(valley_indices, i)  # pragma: no cover
+                i -= 1  # pragma: no cover
 
     return peak_indices, valley_indices
 
