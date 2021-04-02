@@ -37,6 +37,7 @@ from .fixtures_compression import fixture_new_A6
 from .fixtures_peak_detection import fixture_MA20123123__2020_10_13_173812__B6
 from .fixtures_peak_detection import fixture_MA20123123__2020_10_13_234733__A1
 from .fixtures_peak_detection import fixture_MA202000030__2020_12_11_233215__D4
+from .fixtures_peak_detection import fixture_MA202000127__2021_03_26_174059__A3
 from .fixtures_peak_detection import fixture_maiden_voyage_data
 from .fixtures_peak_detection import fixture_noisy_data_A1
 from .fixtures_peak_detection import fixture_noisy_data_B1
@@ -65,6 +66,7 @@ __fixtures__ = [
     fixture_MA20123123__2020_10_13_173812__B6,
     fixture_MA20123123__2020_10_13_234733__A1,
     fixture_MA202000030__2020_12_11_233215__D4,
+    fixture_MA202000127__2021_03_26_174059__A3,
 ]
 
 
@@ -1335,4 +1337,17 @@ def test__D4_data_causing_TwoValleysInARowError(MA202000030__2020_12_11_233215__
     # fmt: on
 
     assert np.array_equal(peak_indices, expected_peak_indices)
+    assert np.array_equal(valley_indices, expected_valley_indices)
+
+
+def test__A3_data_causing_TwoValleysInARowError_second_peak_taller(
+    MA202000127__2021_03_26_174059__A3,
+):
+    _, peak_and_valley_indices = MA202000127__2021_03_26_174059__A3
+    _, valley_indices = peak_and_valley_indices
+
+    # fmt: off
+    expected_valley_indices = [637, 1361, 2174,2933,3566,4335,5107,5863,6688,7411,7933,8711,9570,10364,11176,11768,12706,13420,14050,14852,15648,16355,17189,17954,18622,19402,20151,20785,21475,22437,23061,23882,24582,25284,26023,26627,27495,28254,29039, 29794,30533,31308,32015,32570,33518,34239,34957,35696,36327,36953,37930,38685,39342,40059,40816,41426,42374,43146,43829,44515,45326,46054,46725,47521,48253,48993,49730,50421,51157,51811,52497,53279,54052,54743,55549,56250,56885,57749,58513,59191,]
+    # fmt: on
+
     assert np.array_equal(valley_indices, expected_valley_indices)

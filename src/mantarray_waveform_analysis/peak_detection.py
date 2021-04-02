@@ -106,10 +106,12 @@ def peak_detector(
             if magnetic_signal[valley_idx_last] == magnetic_signal[valley_idx]:
                 valley_indices = np.delete(valley_indices, i)
                 i -= 1
-            else:
-                raise NotImplementedError(
-                    "The only examples observed so far where two peaks were detected were due to the values/heights of the peaks being identical. In that case the decision was made to always choose the earlier peak. This error is a defensive assertion against the future possibility that there might be a case in the future where the values of the two peaks are unequal---in which case we would need to revisit how we would like to handle that outcome."
-                )
+            elif magnetic_signal[valley_idx] > magnetic_signal[valley_idx_last]:
+                valley_indices = np.delete(valley_indices, i - 1)
+            else:  # pragma: no cover  # (Anna 3/31/21): we don't have a case as of yet in which the first peak is higher than the second however know that it is possible and therefore aren't worried about code coverage in this case.
+                valley_indices = np.delete(valley_indices, i)  # pragma: no cover
+                i -= 1  # pragma: no cover
+
     return peak_indices, valley_indices
 
 
