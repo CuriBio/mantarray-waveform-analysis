@@ -70,3 +70,17 @@ def fixture_MA202000030__2020_12_11_233215__D4():
         time_scaling_factor=CENTIMILLISECONDS_PER_SECOND,
         noise_filter_uuid=BUTTERWORTH_LOWPASS_30_UUID,
     )
+
+
+@pytest.fixture(scope="session", name="MA202000127__2021_03_26_174059__A3")
+def fixture_MA202000127__2021_03_26_174059__A3():
+    return _run_peak_detection(
+        os.path.join(
+            "two_valley_error",
+            "MA202000127__2021_03_26_174059__A3.h5",
+        ),
+        sampling_rate_construct=625,
+        flip_data=True,
+        time_scaling_factor=CENTIMILLISECONDS_PER_SECOND,
+        noise_filter_uuid=BUTTERWORTH_LOWPASS_30_UUID,
+    )
