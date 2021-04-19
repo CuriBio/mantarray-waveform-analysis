@@ -339,7 +339,7 @@ def test_Pipeline__get_peak_detection_info__passes_twitches_point_up_parameter_w
     mocked_peak_detection.assert_called_once_with(ANY, twitches_point_up=True)
 
 
-def test_Pipeline__get_peak_detection_info__passes_twitches_point_up_parameter_when_true(
+def test_Pipeline__get_peak_detection_info__passes_force_data_parameter_when_true(
     mocker, raw_generic_well_a1
 ):
     pt = PipelineTemplate(100, is_force_data=True)
@@ -350,3 +350,16 @@ def test_Pipeline__get_peak_detection_info__passes_twitches_point_up_parameter_w
     )
     pipeline.get_peak_detection_results()
     mocked_peak_detection.assert_called_once_with(ANY, twitches_point_up=True)
+
+
+def test_Pipeline__get_peak_detection_info__passes_force_data_parameter_when_false(
+    mocker, raw_generic_well_a1
+):
+    pt = PipelineTemplate(100, is_force_data=False)
+    pipeline = pt.create_pipeline()
+    pipeline.load_raw_magnetic_data(raw_generic_well_a1, raw_generic_well_a1)
+    mocked_peak_detection = mocker.patch.object(
+        pipelines, "peak_detector", autospec=True
+    )
+    pipeline.get_peak_detection_results()
+    mocked_peak_detection.assert_called_once_with(ANY, twitches_point_up=False)
