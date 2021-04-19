@@ -390,11 +390,24 @@ class PipelineTemplate:  # pylint: disable=too-few-public-methods # This is a si
 
     tissue_sampling_period: int = attr.ib()
     noise_filter_uuid: Optional[UUID] = attr.ib(default=None)
-    magnetic_twitches_point_up: bool = attr.ib(default=False)
+    is_force_data: bool = attr.ib(default=True)
+    magnetic_twitches_point_up: bool
     _filter_coefficients: NDArray[(Any, Any), float]
 
     def create_pipeline(self) -> Pipeline:
+        self.set_twitches_point_up()
         return Pipeline(self)
+
+    def set_twitches_point_up(self) -> None:
+        """Set twitches to point up if force rather than magnetic data.
+
+        If force data is desired the twitches should point up but if
+        magentic data is desired twitches should point down.
+        """
+        if self.is_force_data:
+            self.magnetic_twitches_point_up = True
+        else:
+            self.magnetic_twitches_point_up = False
 
     def get_filter_coefficients(self) -> NDArray[(Any, Any), float]:
         """Get the coefficients for the signal filter.
