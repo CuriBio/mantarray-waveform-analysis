@@ -404,10 +404,7 @@ class PipelineTemplate:  # pylint: disable=too-few-public-methods # This is a si
         If force data is desired the twitches should point up but if
         magentic data is desired twitches should point down.
         """
-        if self.is_force_data:
-            self.magnetic_twitches_point_up = True
-        else:
-            self.magnetic_twitches_point_up = False
+        self.magnetic_twitches_point_up = self.is_force_data
 
     def get_filter_coefficients(self) -> NDArray[(Any, Any), float]:
         """Get the coefficients for the signal filter.
