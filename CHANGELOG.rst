@@ -1,6 +1,12 @@
 Changelog for Mantarray Waveform Analysis
 =========================================
 
+0.8.0 (2021-04-18)
+------------------
+
+- Fixed the direcitonality of the twitch depending on whether the data metrics in the pipeline template are magnetic or force metrics
+
+
 0.7.1 (2021-04-01)
 ------------------
 
