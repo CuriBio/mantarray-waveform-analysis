@@ -38,6 +38,7 @@ from .fixtures_peak_detection import fixture_MA20123123__2020_10_13_173812__B6
 from .fixtures_peak_detection import fixture_MA20123123__2020_10_13_234733__A1
 from .fixtures_peak_detection import fixture_MA202000030__2020_12_11_233215__D4
 from .fixtures_peak_detection import fixture_MA202000127__2021_03_26_174059__A3
+from .fixtures_peak_detection import fixture_MA202000127__2021_04_20_212922__A3
 from .fixtures_peak_detection import fixture_maiden_voyage_data
 from .fixtures_peak_detection import fixture_noisy_data_A1
 from .fixtures_peak_detection import fixture_noisy_data_B1
@@ -67,6 +68,7 @@ __fixtures__ = [
     fixture_MA20123123__2020_10_13_234733__A1,
     fixture_MA202000030__2020_12_11_233215__D4,
     fixture_MA202000127__2021_03_26_174059__A3,
+    fixture_MA202000127__2021_04_20_212922__A3,
 ]
 
 
@@ -1301,6 +1303,7 @@ def test__B6_data_causing_TwoValleysInARowError(MA20123123__2020_10_13_173812__B
     expected_peak_indices = [828, 1593, 2388, 3184, 3980, 4755, 5545, 6258, 7048, 7850, 8636, 9446, 10248, 11017, 11802, 12564, 13370, 14153, 14948, 15718, 16497, 17271, 18050, 18822, 19574, 20335, 21150, 21907, 22714, 23474, 24273, 25041, 25830, 26625, 27408, 28189, 28968, 29800, 30571, 31358, 32137, 32970, 33750, 34516, 35296, 36075, 36857, 37635, 38446, 39182, 39935, 40651, 41366, 42211, 42995, 43757, 44520, 45254, 45998, 46731, 47472, 48232, 48975, 49699, 50479, 51226, 51983, 52707, 53424, 54179, 54844, 55575, 56281, 56982, 57723, 58482, 59253, 60019, 60782, 61528, 62303, 63085, 63851, 64657, 65430, 66214, 66988, 67778, 68573, 69366, 70092, 70809, 71556, 72302, 72997, 73741, 74475, 75211]
     expected_valley_indices = [559, 1338, 2054, 2873, 3752, 4555, 5282, 5994, 6812, 7413, 8182, 8989, 9852, 10642, 11434, 12258, 13055, 13942, 14728, 15498, 16188, 17024, 17669, 18504, 19381, 20119, 20864, 21556, 22510, 23279, 24008, 24859, 25636, 26430, 27222, 27975, 28765, 29567, 30254, 30942, 31910, 32482, 33476, 34099, 34991, 35836, 36576, 37270, 38185, 38830, 39733, 40406, 41179, 41823, 42619, 43533, 44256, 44906, 45785, 46373, 47259, 47852, 48738, 49504, 50292, 51053, 51712, 52500, 53220, 53723, 54485, 55337, 56083, 56649, 57501, 58312, 59058, 59771, 60585, 61183, 62017, 62877, 63646, 64315, 65212, 65912, 66790, 67592, 68370, 69182, 69870, 70570, 71222, 72108, 72793, 73488, 74236, 74983]
     # fmt: on
+
     assert np.array_equal(peak_indices, expected_peak_indices)
     assert np.array_equal(valley_indices, expected_valley_indices)
     assert len(valley_indices) == 98
@@ -1353,25 +1356,23 @@ def test__A3_data_causing_TwoValleysInARowError_second_peak_taller(
     assert np.array_equal(valley_indices, expected_valley_indices)
 
 
-# def test__A3_data_causing_out_of_bounds_error(
+def test__A3_data_causing_out_of_bounds_error(MA202000127__2021_04_20_212922__A3):
+    # peak_detection = _run_peak_detection(
+    #     os.path.join(
+    #         "out_of_bounds_error",
+    #         "MA202000127__2021_04_20_212922__A3.h5",
+    #     ),
+    #     sampling_rate_construct=625,
+    #     flip_data=True,
+    #     time_scaling_factor=CENTIMILLISECONDS_PER_SECOND,
+    #     noise_filter_uuid=BUTTERWORTH_LOWPASS_30_UUID,
+    # )
 
-# ):
-#     peak_detection = _run_peak_detection(
-#         os.path.join(
-#             "out_of_bounds_error",
-#             "MA202000127__2021_04_20_212922__A3.h5",
-#         ),
-#         sampling_rate_construct=625,
-#         flip_data=True,
-#         time_scaling_factor=CENTIMILLISECONDS_PER_SECOND,
-#         noise_filter_uuid=BUTTERWORTH_LOWPASS_30_UUID,
-#     )
+    _, peak_and_valley_indices = MA202000127__2021_04_20_212922__A3
+    _, valley_indices = peak_and_valley_indices
 
-#     _, peak_and_valley_indices = peak_detection
-#     _, valley_indices = peak_and_valley_indices
+    # fmt: off
+    expected_valley_indices = [355, 617, 2493, 3908, 4802, 5368, 5761, 7180, 7627, 8856, 9138, 9534, 10128, 10635, 11110, 11728, 12004, 13011, 13418, 13529, 13908, 14463, 15137, 15618, 15765, 16430, 16867, 17199, 18596, 18810, 19184, 20076, 20307, 20792, 21147, 22183, 22273, 22933, 24386, 25131, 26699, 27265, 27564, 28248, 28453]
+    # fmt: on
 
-#     # fmt: off
-#     expected_valley_indices = [637, 1361, 2174,2933,3566,4335,5107,5863,6688,7411,7933,8711,9570,10364,11176,11768,12706,13420,14050,14852,15648,16355,17189,17954,18622,19402,20151,20785,21475,22437,23061,23882,24582,25284,26023,26627,27495,28254,29039, 29794,30533,31308,32015,32570,33518,34239,34957,35696,36327,36953,37930,38685,39342,40059,40816,41426,42374,43146,43829,44515,45326,46054,46725,47521,48253,48993,49730,50421,51157,51811,52497,53279,54052,54743,55549,56250,56885,57749,58513,59191,]
-#     # fmt: on
-
-#     assert valley_indices is None
+    assert np.array_equal(valley_indices, expected_valley_indices)
