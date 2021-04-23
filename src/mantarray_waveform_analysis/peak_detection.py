@@ -114,9 +114,8 @@ def peak_detector(
                 valley_indices = np.delete(valley_indices, i - 1)  # pragma: no cover
                 left_ips = np.delete(left_ips, i - 1)  # pragma: no cover
                 right_ips = np.delete(right_ips, i - 1)  # pragma: no cover
-
-            i -= 1
-        i += 1
+        else:
+            i += 1
 
     return peak_indices, valley_indices
 
