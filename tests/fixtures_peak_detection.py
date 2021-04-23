@@ -84,3 +84,17 @@ def fixture_MA202000127__2021_03_26_174059__A3():
         time_scaling_factor=CENTIMILLISECONDS_PER_SECOND,
         noise_filter_uuid=BUTTERWORTH_LOWPASS_30_UUID,
     )
+
+
+@pytest.fixture(scope="session", name="MA202000127__2021_04_20_212922__A3")
+def fixture_MA202000127__2021_04_20_212922__A3():
+    return _run_peak_detection(
+        os.path.join(
+            "out_of_bounds_error",
+            "MA202000127__2021_04_20_212922__A3.h5",
+        ),
+        sampling_rate_construct=625,
+        flip_data=True,
+        time_scaling_factor=CENTIMILLISECONDS_PER_SECOND,
+        noise_filter_uuid=BUTTERWORTH_LOWPASS_30_UUID,
+    )
