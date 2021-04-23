@@ -103,7 +103,6 @@ def peak_detector(
     i = 1
     while i < len(valley_indices):
         if left_ips[i] == left_ips[i - 1] and right_ips[i] == right_ips[i - 1]:
-
             valley_idx = valley_indices[i]
             valley_idx_last = valley_indices[i - 1]
 
@@ -112,11 +111,11 @@ def peak_detector(
                 left_ips = np.delete(left_ips, i)
                 right_ips = np.delete(right_ips, i)
                 i -= 1
-            else:  # magnetic_signal[valley_idx] > magnetic_signal[valley_idx_last]:
-                valley_indices = np.delete(valley_indices, i - 1)
-                left_ips = np.delete(left_ips, i - 1)
-                right_ips = np.delete(right_ips, i - 1)
-                i -= 1
+            else:  # pragma: no cover # (Anna 3/31/21): we don't have a case as of yet in which the first peak is higher than the second however know that it is possible and therefore aren't worried about code coverage in this case.
+                valley_indices = np.delete(valley_indices, i - 1)  # pragma: no cover
+                left_ips = np.delete(left_ips, i - 1)  # pragma: no cover
+                right_ips = np.delete(right_ips, i - 1)  # pragma: no cover
+                i -= 1  # pragma: no cover
         i += 1
 
     return peak_indices, valley_indices

@@ -1357,16 +1357,6 @@ def test__A3_data_causing_TwoValleysInARowError_second_peak_taller(
 
 
 def test__A3_data_causing_out_of_bounds_error(MA202000127__2021_04_20_212922__A3):
-    # peak_detection = _run_peak_detection(
-    #     os.path.join(
-    #         "out_of_bounds_error",
-    #         "MA202000127__2021_04_20_212922__A3.h5",
-    #     ),
-    #     sampling_rate_construct=625,
-    #     flip_data=True,
-    #     time_scaling_factor=CENTIMILLISECONDS_PER_SECOND,
-    #     noise_filter_uuid=BUTTERWORTH_LOWPASS_30_UUID,
-    # )
 
     _, peak_and_valley_indices = MA202000127__2021_04_20_212922__A3
     _, valley_indices = peak_and_valley_indices
@@ -1374,5 +1364,4 @@ def test__A3_data_causing_out_of_bounds_error(MA202000127__2021_04_20_212922__A3
     # fmt: off
     expected_valley_indices = [355, 617, 2493, 3908, 4802, 5368, 5761, 7180, 7627, 8856, 9138, 9534, 10128, 10635, 11110, 11728, 12004, 13011, 13418, 13529, 13908, 14463, 15137, 15618, 15765, 16430, 16867, 17199, 18596, 18810, 19184, 20076, 20307, 20792, 21147, 22183, 22273, 22933, 24386, 25131, 26699, 27265, 27564, 28248, 28453]
     # fmt: on
-
     assert np.array_equal(valley_indices, expected_valley_indices)
