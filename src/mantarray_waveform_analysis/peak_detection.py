@@ -134,10 +134,17 @@ def create_avg_dict(
     """
     dictionary: Dict[str, Union[Float64, int]] = dict()
     dictionary["n"] = len(metric)
-    dictionary["mean"] = np.mean(metric)
-    dictionary["std"] = np.std(metric)
-    dictionary["min"] = np.min(metric)
-    dictionary["max"] = np.max(metric)
+    if len(metric) > 0:
+        dictionary["mean"] = np.mean(metric)
+        dictionary["std"] = np.std(metric)
+        dictionary["min"] = np.min(metric)
+        dictionary["max"] = np.max(metric)
+    else:
+        dictionary["mean"] = 0
+        dictionary["std"] = 0
+        dictionary["min"] = 0
+        dictionary["max"] = 0
+
     if round_to_int:
         for iter_key in ("mean", "std", "min", "max"):
             dictionary[iter_key] = int(round(dictionary[iter_key]))
