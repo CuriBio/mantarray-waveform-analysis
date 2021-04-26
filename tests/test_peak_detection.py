@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+import math
 import os
 
 from mantarray_waveform_analysis import AMPLITUDE_UUID
 from mantarray_waveform_analysis import AUC_UUID
 from mantarray_waveform_analysis import CONTRACTION_VELOCITY_UUID
 from mantarray_waveform_analysis import find_twitch_indices
+from mantarray_waveform_analysis import IRREGULARITY_INTERVAL_UUID
 from mantarray_waveform_analysis import MIN_NUMBER_PEAKS
 from mantarray_waveform_analysis import MIN_NUMBER_VALLEYS
 from mantarray_waveform_analysis import peak_detector
@@ -313,6 +315,26 @@ def test_new_A1_relaxation_velocity(new_A1):
     assert_percent_diff(
         aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["max"], 4.495471014492754
     )
+
+
+def test_new_A1_interval_irregularity(new_A1):
+    per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A1)
+
+    # test data_metrics per beat dictionary
+    assert math.isnan(per_twitch_dict[105000][IRREGULARITY_INTERVAL_UUID]) is True
+    assert per_twitch_dict[186000][IRREGULARITY_INTERVAL_UUID] == 1000.0
+    assert math.isnan(per_twitch_dict[906000][IRREGULARITY_INTERVAL_UUID]) is True
+
+    # test data_metrics aggregate dictionary
+    assert aggregate_metrics_dict[IRREGULARITY_INTERVAL_UUID]["n"] == 11
+    assert_percent_diff(
+        aggregate_metrics_dict[IRREGULARITY_INTERVAL_UUID]["mean"], 2444.444
+    )
+    assert_percent_diff(
+        aggregate_metrics_dict[IRREGULARITY_INTERVAL_UUID]["std"], 1422.916
+    )
+    assert aggregate_metrics_dict[IRREGULARITY_INTERVAL_UUID]["min"] == 1000.0
+    assert aggregate_metrics_dict[IRREGULARITY_INTERVAL_UUID]["max"] == 6000.0
 
 
 def test_new_A1_amplitude(new_A1):

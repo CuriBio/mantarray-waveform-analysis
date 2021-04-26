@@ -19,6 +19,7 @@ from .constants import AMPLITUDE_UUID
 from .constants import AUC_UUID
 from .constants import CENTIMILLISECONDS_PER_SECOND
 from .constants import CONTRACTION_VELOCITY_UUID
+from .constants import IRREGULARITY_INTERVAL_UUID
 from .constants import MIN_NUMBER_PEAKS
 from .constants import MIN_NUMBER_VALLEYS
 from .constants import PRIOR_PEAK_INDEX_UUID
@@ -132,7 +133,6 @@ def create_avg_dict(
         a dictionary of the average statistics of that metric in which the metrics are the key and average statistics are the value
     """
     dictionary: Dict[str, Union[Float64, int]] = dict()
-
     dictionary["n"] = len(metric)
     dictionary["mean"] = np.mean(metric)
     dictionary["std"] = np.std(metric)
@@ -268,6 +268,14 @@ def data_metrics(
     )
     aggregate_dict[RELAXATION_VELOCITY_UUID] = relaxation_velocity_averages
 
+    # calculate twitch interval irregularity
+    interval_irregularity = calculate_interval_irregularity(twitch_indices, time_series)
+    interval_irregularity_averages = create_avg_dict(
+        interval_irregularity[1:-1], round_to_int=False
+    )
+    interval_irregularity_averages["n"] = interval_irregularity_averages["n"] + 2
+    aggregate_dict[IRREGULARITY_INTERVAL_UUID] = interval_irregularity_averages
+
     # find aggregate values of area under curve data
     auc_averages_dict = create_avg_dict(auc_per_twitch, round_to_int=rounded)
 
@@ -286,11 +294,50 @@ def data_metrics(
                     TWITCH_FREQUENCY_UUID: twitch_frequencies[i],
                     CONTRACTION_VELOCITY_UUID: contraction_velocity[i],
                     RELAXATION_VELOCITY_UUID: relaxation_velocity[i],
+                    IRREGULARITY_INTERVAL_UUID: interval_irregularity[i],
                 }
             }
         )
 
     return main_twitch_dict, aggregate_dict
+
+
+def calculate_interval_irregularity(
+    twitch_indices: NDArray[int],
+    time_series: NDArray[(1, Any), int],
+) -> NDArray[float]:
+    """Find the interval irregularity for each twitch.
+
+    Args:
+        twitch_indices: a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUID of prior/subsequent peaks and valleys and their index values.
+        filtered_data: a 2D array (time vs value) of the data
+
+    Returns:
+        an array of floats that are the interval irregularities of each twitch
+    """
+    list_of_twitch_indices = list(twitch_indices.keys())
+    num_twitches = len(list_of_twitch_indices)
+
+    iter_list_of_intervals: List[Union[float, int, None]] = []
+    iter_list_of_intervals.append(None)
+
+    for twitch in range(1, num_twitches - 1):
+        last_twitch_index = list_of_twitch_indices[twitch - 1]
+        current_twitch_index = list_of_twitch_indices[twitch]
+        next_twitch_index = list_of_twitch_indices[twitch + 1]
+
+        last_interval = (
+            time_series[current_twitch_index] - time_series[last_twitch_index]
+        )
+        current_interval = (
+            time_series[next_twitch_index] - time_series[current_twitch_index]
+        )
+        interval = abs(current_interval - last_interval)
+
+        iter_list_of_intervals.append(interval)
+
+    iter_list_of_intervals.append(None)
+    return np.asarray(iter_list_of_intervals, dtype=float)
 
 
 def calculate_twitch_velocity(
