@@ -140,10 +140,10 @@ def create_avg_dict(
         dictionary["min"] = np.min(metric)
         dictionary["max"] = np.max(metric)
     else:
-        dictionary["mean"] = 0
-        dictionary["std"] = 0
-        dictionary["min"] = 0
-        dictionary["max"] = 0
+        dictionary["mean"] = None
+        dictionary["std"] = None
+        dictionary["min"] = None
+        dictionary["max"] = None
 
     if round_to_int:
         for iter_key in ("mean", "std", "min", "max"):
