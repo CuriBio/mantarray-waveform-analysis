@@ -1,6 +1,12 @@
 Changelog for Mantarray Waveform Analysis
 =========================================
 
+0.8.1 (2021-04-23)
+------------------
+
+- Fixed the out of bounds error present in h5 file due to the fix in the  ``peak_detector`` which mitigated the TwoValleysInARow error
+
+
 0.8.0 (2021-04-21)
 ------------------
 
