@@ -277,6 +277,7 @@ def data_metrics(
 
     # calculate twitch interval irregularity
     interval_irregularity = calculate_interval_irregularity(twitch_indices, time_series)
+
     interval_irregularity_averages = create_avg_dict(
         interval_irregularity[1:-1], round_to_int=False
     )
