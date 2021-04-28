@@ -1,6 +1,12 @@
 Changelog for Mantarray Waveform Analysis
 =========================================
 
+0.9.0 (2021-04-26)
+------------------
+
+- Added Twitch Interval Irregularity metric to per twitch metrics sheet and aggregate metrics sheet
+
+
 0.8.1 (2021-04-23)
 ------------------
 
