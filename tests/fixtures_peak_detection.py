@@ -98,3 +98,17 @@ def fixture_MA202000127__2021_04_20_212922__A3():
         time_scaling_factor=CENTIMILLISECONDS_PER_SECOND,
         noise_filter_uuid=BUTTERWORTH_LOWPASS_30_UUID,
     )
+
+
+@pytest.fixture(scope="session", name="MA20123456__2020_08_17_145752__A1")
+def fixture_MA20123456__2020_08_17_145752__A1():
+    return _run_peak_detection(
+        os.path.join(
+            "two_twitches",
+            "MA20123456__2020_08_17_145752__A1.h5",
+        ),
+        sampling_rate_construct=625,
+        flip_data=True,
+        time_scaling_factor=CENTIMILLISECONDS_PER_SECOND,
+        noise_filter_uuid=BUTTERWORTH_LOWPASS_30_UUID,
+    )

@@ -11,6 +11,7 @@ from mantarray_waveform_analysis import BUTTERWORTH_LOWPASS_30_UUID
 from mantarray_waveform_analysis import CENTIMILLISECONDS_PER_SECOND
 from mantarray_waveform_analysis import CONTRACTION_VELOCITY_UUID
 from mantarray_waveform_analysis import FILTER_CHARACTERISTICS
+from mantarray_waveform_analysis import IRREGULARITY_INTERVAL_UUID
 from mantarray_waveform_analysis import MIDSCALE_CODE
 from mantarray_waveform_analysis import MILLI_TO_BASE_CONVERSION
 from mantarray_waveform_analysis import MILLIMETERS_PER_MILLITESLA
@@ -96,6 +97,9 @@ def test_data_metric_uuids():
     )
     assert SUBSEQUENT_VALLEY_INDEX_UUID == uuid.UUID(
         "fd47ba6b-ee4d-4674-9a89-56e0db7f3d97"
+    )
+    assert IRREGULARITY_INTERVAL_UUID == uuid.UUID(
+        "61046076-66b9-4b8b-bfec-1e00603743c0"
     )
 
 
