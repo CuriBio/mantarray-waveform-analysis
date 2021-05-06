@@ -440,7 +440,6 @@ def find_twitch_indices(
 
     Args:
         peak_and_valley_indices: a Tuple of 1D array of integers representing the indices of the peaks and valleys
-        filtered_data: a 2D array of the data after being noise filtered
 
     Returns:
         a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUIDs of prior/subsequent peaks and valleys and their index values.
