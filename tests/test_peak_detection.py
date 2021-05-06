@@ -1131,14 +1131,17 @@ def test_find_twitch_indices__excludes_only_last_peak_when_no_outer_peak_at_begi
     "test_data,expected_match,test_description",
     [
         (
+            [24, 69, 105, 186, 266, 344, 424, 502, 586, 667, 745, 825, 906, 987],
             "24 and 69",
             "raises error when two peaks in a row at beginning",
         ),
         (
+            [105, 186, 266, 344, 424, 502, 586, 600, 667, 745, 825, 906, 987],
             "586 and 600",
             "raises error when two peaks in a row in middle",
         ),
         (
+            [105, 186, 266, 344, 424, 502, 586, 667, 745, 825, 906, 987, 1000],
             "987 and 1000",
             "raises error when two peaks in a row at end",
         ),
@@ -1158,14 +1161,17 @@ def test_find_twitch_indices__raises_error_if_two_peaks_in_a_row__and_start_with
     "test_data,expected_match,test_description",
     [
         (
+            [71, 105, 186, 266, 344, 424, 502, 586, 667, 745, 825, 906, 987],
             "71 and 105",
             "raises error when two peaks in a row at beginning",
         ),
         (
+            [105, 186, 266, 344, 424, 502, 586, 600, 667, 745, 825, 906, 987],
             "586 and 600",
             "raises error when two peaks in a row in middle",
         ),
         (
+            [105, 186, 266, 344, 424, 502, 586, 667, 745, 825, 906, 987, 1000],
             "987 and 1000",
             "raises error when two peaks in a row at end",
         ),
@@ -1185,14 +1191,17 @@ def test_find_twitch_indices__raises_error_if_two_peaks_in_a_row__and_does_not_s
     "test_data,expected_match,test_description",
     [
         (
+            [70, 100, 147, 220, 305, 397, 463, 555, 628, 713, 779, 871, 963],
             "70 and 100",
             "raises error when two valleys in a row at beginning",
         ),
         (
+            [70, 147, 220, 305, 397, 400, 463, 555, 628, 713, 779, 871, 963],
             "397 and 400",
             "raises error when two valleys in a row in middle",
         ),
         (
+            [70, 147, 220, 305, 397, 463, 555, 628, 713, 779, 871, 963, 1000, 1001],
             "1000 and 1001",
             "raises error when two valleys in a row at end",
         ),
@@ -1212,14 +1221,17 @@ def test_find_twitch_indices__raises_error_if_two_valleys_in_a_row__and_starts_w
     "test_data,expected_match,test_description",
     [
         (
+            [0, 70, 100, 147, 220, 305, 397, 463, 555, 628, 713, 779, 871, 963],
             "70 and 100",
             "raises error when two valleys in a row at beginning",
         ),
         (
+            [0, 70, 147, 220, 305, 397, 400, 463, 555, 628, 713, 779, 871, 963],
             "397 and 400",
             "raises error when two valleys in a row in middle",
         ),
         (
+            [0, 70, 147, 220, 305, 397, 463, 555, 628, 713, 779, 871, 963, 1000, 1001],
             "1000 and 1001",
             "raises error when two valleys in a row at end",
         ),
