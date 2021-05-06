@@ -205,7 +205,7 @@ def data_metrics(
 
     # find twitch time points
 
-    twitch_indices = find_twitch_indices(peak_and_valley_indices, filtered_data)
+    twitch_indices = find_twitch_indices(peak_and_valley_indices)
     num_twitches = len(twitch_indices)
     time_series = filtered_data[0, :]
 
@@ -432,7 +432,6 @@ def calculate_twitch_period(
 
 def find_twitch_indices(
     peak_and_valley_indices: Tuple[NDArray[int], NDArray[int]],
-    filtered_data: NDArray[(2, Any), int],
 ) -> Dict[int, Dict[UUID, Optional[int]]]:
     """Find twitches that can be analyzed.
 
@@ -441,7 +440,6 @@ def find_twitch_indices(
 
     Args:
         peak_and_valley_indices: a Tuple of 1D array of integers representing the indices of the peaks and valleys
-        filtered_data: a 2D array of the data after being noise filtered
 
     Returns:
         a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUIDs of prior/subsequent peaks and valleys and their index values.
@@ -461,30 +459,22 @@ def find_twitch_indices(
         if prev_feature_is_peak:
             if valley_indices[valley_idx] > peak_indices[peak_idx]:
                 raise TwoPeaksInARowError(
-                    peak_and_valley_indices,
-                    filtered_data,
                     (peak_indices[peak_idx - 1], peak_indices[peak_idx]),
                 )
             valley_idx += 1
         else:
             if valley_indices[valley_idx] < peak_indices[peak_idx]:
                 raise TwoValleysInARowError(
-                    peak_and_valley_indices,
-                    filtered_data,
                     (valley_indices[valley_idx - 1], valley_indices[valley_idx]),
                 )
             peak_idx += 1
         prev_feature_is_peak = not prev_feature_is_peak
     if peak_idx < len(peak_indices) - 1:
         raise TwoPeaksInARowError(
-            peak_and_valley_indices,
-            filtered_data,
             (peak_indices[peak_idx], peak_indices[peak_idx + 1]),
         )
     if valley_idx < len(valley_indices) - 1:
         raise TwoValleysInARowError(
-            peak_and_valley_indices,
-            filtered_data,
             (valley_indices[valley_idx], valley_indices[valley_idx + 1]),
         )
 

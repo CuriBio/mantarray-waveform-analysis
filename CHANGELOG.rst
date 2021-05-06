@@ -1,6 +1,12 @@
 Changelog for Mantarray Waveform Analysis
 =========================================
 
+1.0.0 (2021-05-06)
+------------------
+
+- Removed ``filterd_data`` serialized data from ``PeakDectectionError`` subclassed exceptions and from ``find_twitch_indices`` function arguments for performance reasons
+
+
 0.9.0 (2021-04-26)
 ------------------
 
