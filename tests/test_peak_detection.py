@@ -1020,9 +1020,8 @@ def test_new_A5(new_A5):
 
 def test_new_A6(new_A6):
     pipeline, peak_and_valley_indices = new_A6
-
-    # plot and save results
     filtered_data = pipeline.get_noise_filtered_gmr()
+    # plot and save results
     _plot_data(
         peak_and_valley_indices,
         filtered_data,
@@ -1066,7 +1065,7 @@ def test_find_twitch_indices__raises_error_if_less_than_3_peaks_given():
         TooFewPeaksDetectedError,
         match=rf"A minimum of {MIN_NUMBER_PEAKS} peaks is required to extract twitch metrics, however only 2 peak\(s\) were detected",
     ):
-        find_twitch_indices((np.array([1, 2]), None), None)
+        find_twitch_indices((np.array([1, 2]), None))
 
 
 def test_find_twitch_indices__raises_error_if_less_than_3_valleys_given():
@@ -1074,7 +1073,7 @@ def test_find_twitch_indices__raises_error_if_less_than_3_valleys_given():
         TooFewPeaksDetectedError,
         match=rf"A minimum of {MIN_NUMBER_VALLEYS} valleys is required to extract twitch metrics, however only 2 valley\(s\) were detected",
     ):
-        find_twitch_indices((np.array([1, 3, 5]), np.array([2, 4])), None)
+        find_twitch_indices((np.array([1, 3, 5]), np.array([2, 4])))
 
 
 def test_find_twitch_indices__raises_error_if_no_valleys_given():
@@ -1082,16 +1081,15 @@ def test_find_twitch_indices__raises_error_if_no_valleys_given():
         TooFewPeaksDetectedError,
         match=rf"A minimum of {MIN_NUMBER_VALLEYS} valleys is required to extract twitch metrics, however only 0 valley\(s\) were detected",
     ):
-        find_twitch_indices((np.array([1, 3, 5]), np.array([])), None)
+        find_twitch_indices((np.array([1, 3, 5]), np.array([])))
 
 
 def test_find_twitch_indices__excludes_first_and_last_peak_when_no_outer_valleys(
     new_A1,
 ):
-    pipeline, peak_and_valley_indices = new_A1
-    filtered_data = pipeline.get_noise_filtered_gmr()
+    _, peak_and_valley_indices = new_A1
 
-    actual_twitch_indices = find_twitch_indices(peak_and_valley_indices, filtered_data)
+    actual_twitch_indices = find_twitch_indices(peak_and_valley_indices)
     actual_twitch_peak_indices = list(actual_twitch_indices.keys())
     # fmt: off
     expected_twitch_peak_indices = [105, 186, 266, 344, 424, 502, 586, 667, 745, 825, 906]
@@ -1109,15 +1107,12 @@ def test_find_twitch_indices__excludes_first_and_last_peak_when_no_outer_valleys
 def test_find_twitch_indices__excludes_only_last_peak_when_no_outer_peak_at_beginning_and_no_outer_valley_at_end(
     new_A1,
 ):
-    pipeline, peak_and_valley_indices = new_A1
-    filtered_data = pipeline.get_noise_filtered_gmr()
+    _, peak_and_valley_indices = new_A1
     _, valley_indices = peak_and_valley_indices
     # fmt: off
     peak_indices = np.asarray([105, 186, 266, 344, 424, 502, 586, 667, 745, 825, 906, 987], dtype=np.int32)
     # fmt: on
-    actual_twitch_indices = find_twitch_indices(
-        (peak_indices, valley_indices), filtered_data
-    )
+    actual_twitch_indices = find_twitch_indices((peak_indices, valley_indices))
     actual_twitch_peak_indices = list(actual_twitch_indices.keys())
     # fmt: off
     expected_twitch_peak_indices = [105, 186, 266, 344, 424, 502, 586, 667, 745, 825, 906]
@@ -1141,12 +1136,12 @@ def test_find_twitch_indices__excludes_only_last_peak_when_no_outer_peak_at_begi
             "raises error when two peaks in a row at beginning",
         ),
         (
-            [24, 105, 186, 266, 344, 424, 502, 586, 600, 667, 745, 825, 906, 987],
+            [105, 186, 266, 344, 424, 502, 586, 600, 667, 745, 825, 906, 987],
             "586 and 600",
             "raises error when two peaks in a row in middle",
         ),
         (
-            [24, 105, 186, 266, 344, 424, 502, 586, 667, 745, 825, 906, 987, 1000],
+            [105, 186, 266, 344, 424, 502, 586, 667, 745, 825, 906, 987, 1000],
             "987 and 1000",
             "raises error when two peaks in a row at end",
         ),
@@ -1155,12 +1150,11 @@ def test_find_twitch_indices__excludes_only_last_peak_when_no_outer_peak_at_begi
 def test_find_twitch_indices__raises_error_if_two_peaks_in_a_row__and_start_with_peak(
     new_A1, test_data, expected_match, test_description
 ):
-    pipeline, peak_and_valley_indices = new_A1
-    filtered_data = pipeline.get_noise_filtered_gmr()
+    _, peak_and_valley_indices = new_A1
     _, valley_indices = peak_and_valley_indices
     peak_indices = np.asarray(test_data, dtype=np.int32)
     with pytest.raises(TwoPeaksInARowError, match=expected_match):
-        find_twitch_indices((peak_indices, valley_indices), filtered_data)
+        find_twitch_indices((peak_indices, valley_indices))
 
 
 @pytest.mark.parametrize(
@@ -1186,12 +1180,11 @@ def test_find_twitch_indices__raises_error_if_two_peaks_in_a_row__and_start_with
 def test_find_twitch_indices__raises_error_if_two_peaks_in_a_row__and_does_not_start_with_peak(
     new_A1, test_data, expected_match, test_description
 ):
-    pipeline, peak_and_valley_indices = new_A1
-    filtered_data = pipeline.get_noise_filtered_gmr()
+    _, peak_and_valley_indices = new_A1
     _, valley_indices = peak_and_valley_indices
     peak_indices = np.asarray(test_data, dtype=np.int32)
     with pytest.raises(TwoPeaksInARowError, match=expected_match):
-        find_twitch_indices((peak_indices, valley_indices), filtered_data)
+        find_twitch_indices((peak_indices, valley_indices))
 
 
 @pytest.mark.parametrize(
@@ -1217,12 +1210,11 @@ def test_find_twitch_indices__raises_error_if_two_peaks_in_a_row__and_does_not_s
 def test_find_twitch_indices__raises_error_if_two_valleys_in_a_row__and_starts_with_peak(
     new_A1, test_data, expected_match, test_description
 ):
-    pipeline, peak_and_valley_indices = new_A1
-    filtered_data = pipeline.get_noise_filtered_gmr()
+    _, peak_and_valley_indices = new_A1
     peak_indices, _ = peak_and_valley_indices
     valley_indices = np.asarray(test_data, dtype=np.int32)
     with pytest.raises(TwoValleysInARowError, match=expected_match):
-        find_twitch_indices((peak_indices, valley_indices), filtered_data)
+        find_twitch_indices((peak_indices, valley_indices))
 
 
 @pytest.mark.parametrize(
@@ -1248,18 +1240,17 @@ def test_find_twitch_indices__raises_error_if_two_valleys_in_a_row__and_starts_w
 def test_find_twitch_indices__raises_error_if_two_valleys_in_a_row__and_does_not_start_with_peak(
     new_A1, test_data, expected_match, test_description
 ):
-    pipeline, peak_and_valley_indices = new_A1
-    filtered_data = pipeline.get_noise_filtered_gmr()
+    _, peak_and_valley_indices = new_A1
     peak_indices, _ = peak_and_valley_indices
     valley_indices = np.asarray(test_data, dtype=np.int32)
     with pytest.raises(TwoValleysInARowError, match=expected_match):
-        find_twitch_indices((peak_indices, valley_indices), filtered_data)
+        find_twitch_indices((peak_indices, valley_indices))
 
 
 def test_find_twitch_indices__returns_correct_values_with_data_that_ends_in_peak():
     peak_indices = np.array([1, 3, 5], dtype=np.int32)
     valley_indices = np.array([0, 2, 4], dtype=np.int32)
-    actual = find_twitch_indices((peak_indices, valley_indices), None)
+    actual = find_twitch_indices((peak_indices, valley_indices))
 
     assert actual[1][PRIOR_PEAK_INDEX_UUID] is None
     assert actual[3][PRIOR_PEAK_INDEX_UUID] == 1
@@ -1277,7 +1268,7 @@ def test_find_twitch_indices__returns_correct_values_with_data_that_ends_in_peak
 def test_find_twitch_indices__returns_correct_values_with_data_that_ends_in_valley():
     peak_indices = np.array([1, 3, 5], dtype=np.int32)
     valley_indices = np.array([2, 4, 6], dtype=np.int32)
-    actual = find_twitch_indices((peak_indices, valley_indices), None)
+    actual = find_twitch_indices((peak_indices, valley_indices))
 
     assert actual[3][PRIOR_PEAK_INDEX_UUID] == 1
     assert actual[3][PRIOR_VALLEY_INDEX_UUID] == 2
@@ -1361,7 +1352,7 @@ def test__A1_data_causing_TwoValleysInARowError(MA20123123__2020_10_13_234733__A
     )
 
     peak_indices, valley_indices = peak_and_valley_indices
-    find_twitch_indices(peak_and_valley_indices, filtered_data)
+    find_twitch_indices(peak_and_valley_indices)
 
     # fmt: off
     expected_peak_indices = [625, 1314, 2030, 2718, 3426, 4123, 4840, 5533, 6227, 6934, 7633, 8301, 9009, 9739, 10517, 11275, 12035, 12799, 13577, 14326, 15105, 15872, 16645, 17416, 18175, 18954, 19706, 20478, 21250, 22005, 22792, 23592, 24361, 25169, 25961, 26748, 27528, 28324, 29119, 29921, 30711, 31510, 32330, 33146]
