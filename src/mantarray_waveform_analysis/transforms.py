@@ -55,9 +55,7 @@ def create_filter(
     Returns:
         The scipy 'b' and 'a' vectors to use in scipy.signal.filtfilt
     """
-    sampling_frequency_hz = 1 / (
-        sample_period_centimilliseconds / CENTIMILLISECONDS_PER_SECOND
-    )
+    sampling_frequency_hz = 1 / (sample_period_centimilliseconds / CENTIMILLISECONDS_PER_SECOND)
     nyquist_frequency_limit = sampling_frequency_hz / 2
 
     if filter_uuid not in FILTER_CHARACTERISTICS:
@@ -76,34 +74,22 @@ def create_filter(
     bandpass_type = "lowpass"  # by default
     if "high_pass_hz" in the_filter_characteristics:
         if isinstance(the_filter_characteristics["high_pass_hz"], str):
-            raise NotImplementedError(
-                "The high pass frequency should never be a string."
-            )
-        normalized_high_pass_frequency = (
-            the_filter_characteristics["high_pass_hz"] / nyquist_frequency_limit
-        )
+            raise NotImplementedError("The high pass frequency should never be a string.")
+        normalized_high_pass_frequency = the_filter_characteristics["high_pass_hz"] / nyquist_frequency_limit
         pass_boundaries.append(normalized_high_pass_frequency)
     if "low_pass_hz" in the_filter_characteristics:
         if isinstance(the_filter_characteristics["low_pass_hz"], str):
-            raise NotImplementedError(
-                "The low pass frequency should never be a string."
-            )
-        normalized_low_pass_frequency = (
-            the_filter_characteristics["low_pass_hz"] / nyquist_frequency_limit
-        )
+            raise NotImplementedError("The low pass frequency should never be a string.")
+        normalized_low_pass_frequency = the_filter_characteristics["low_pass_hz"] / nyquist_frequency_limit
         pass_boundaries.append(normalized_low_pass_frequency)
 
     if len(pass_boundaries) == 2:
         bandpass_type = "bandpass"
     filter_type = the_filter_characteristics["filter_type"]
     if filter_type == "bessel":
-        sos_polys = signal.bessel(
-            filter_order, pass_boundaries, btype=bandpass_type, output="sos"
-        )
+        sos_polys = signal.bessel(filter_order, pass_boundaries, btype=bandpass_type, output="sos")
     elif filter_type == "butterworth":
-        sos_polys = signal.butter(
-            filter_order, pass_boundaries, btype=bandpass_type, output="sos"
-        )
+        sos_polys = signal.butter(filter_order, pass_boundaries, btype=bandpass_type, output="sos")
     else:
         raise FilterCreationNotImplementedError(filter_uuid)
 
@@ -112,9 +98,7 @@ def create_filter(
     return sos_polys
 
 
-def apply_sensitivity_calibration(
-    raw_gmr_reading: NDArray[(2, Any), int]
-) -> NDArray[(2, Any), int]:
+def apply_sensitivity_calibration(raw_gmr_reading: NDArray[(2, Any), int]) -> NDArray[(2, Any), int]:
     """Apply the result of a sensor sensitivity calibration.
 
     Actual sensitivity calibration will be performed once information obtained from Jason.
@@ -207,9 +191,7 @@ def calculate_voltage_from_gmr(
         A 2D array of time vs Voltage
     """
     millivolts_per_lsb = 1000 * reference_voltage / RAW_TO_SIGNED_CONVERSION_VALUE
-    sample_in_millivolts = (
-        gmr_data[1, :].astype(np.float32) * millivolts_per_lsb * (1 / adc_gain)
-    )
+    sample_in_millivolts = gmr_data[1, :].astype(np.float32) * millivolts_per_lsb * (1 / adc_gain)
     sample_in_volts = sample_in_millivolts / MILLI_TO_BASE_CONVERSION
     return np.vstack((gmr_data[0, :].astype(np.float32), sample_in_volts))
 

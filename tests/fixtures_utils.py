@@ -91,17 +91,13 @@ def _run_peak_detection(
     # create numpy matrix
     raw_data = create_numpy_array_of_raw_gmr_from_python_arrays(time, v)
     simple_pipeline_template = PipelineTemplate(
-        tissue_sampling_period=1
-        / sampling_rate_construct
-        * CENTIMILLISECONDS_PER_SECOND,
+        tissue_sampling_period=1 / sampling_rate_construct * CENTIMILLISECONDS_PER_SECOND,
         noise_filter_uuid=noise_filter_uuid,
     )
     pipeline = simple_pipeline_template.create_pipeline()
     pipeline.load_raw_gmr_data(raw_data, raw_data)
     filtered_data = pipeline.get_noise_filtered_gmr()
-    peak_and_valley_timepoints = peak_detector(
-        filtered_data, twitches_point_up=not flip_data
-    )
+    peak_and_valley_timepoints = peak_detector(filtered_data, twitches_point_up=not flip_data)
     return pipeline, peak_and_valley_timepoints
 
 
@@ -117,10 +113,7 @@ def _plot_data(
     time_series_in_bounds = [
         t
         for t in time_series
-        if (
-            t / CENTIMILLISECONDS_PER_SECOND > x_bounds[0]
-            and t / CENTIMILLISECONDS_PER_SECOND < x_bounds[1]
-        )
+        if (t / CENTIMILLISECONDS_PER_SECOND > x_bounds[0] and t / CENTIMILLISECONDS_PER_SECOND < x_bounds[1])
     ]
     waveforms_in_bounds = [
         y_val
@@ -180,9 +173,7 @@ def _get_data_metrics(well_fixture):
 def _get_unrounded_data_metrics(well_fixture):
     pipeline, peak_and_valley_indices = well_fixture
     filtered_data = pipeline.get_noise_filtered_gmr()
-    return peak_detection.data_metrics(
-        peak_and_valley_indices, filtered_data, rounded=False
-    )
+    return peak_detection.data_metrics(peak_and_valley_indices, filtered_data, rounded=False)
 
 
 def assert_percent_diff(actual, expected, threshold=0.0006):
