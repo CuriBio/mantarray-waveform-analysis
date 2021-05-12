@@ -59,9 +59,7 @@ def test_apply_empty_plate_calibration(raw_generic_well_a1):
 
 
 def test_create_filter__raises_error_for_unrecognized_uuid():
-    with pytest.raises(
-        UnrecognizedFilterUuidError, match="0ecf0e52-0a29-453f-a6ff-46f5ec3ae782"
-    ):
+    with pytest.raises(UnrecognizedFilterUuidError, match="0ecf0e52-0a29-453f-a6ff-46f5ec3ae782"):
         create_filter(uuid.UUID("0ecf0e52-0a29-453f-a6ff-46f5ec3ae782"), 44)
 
 
@@ -174,15 +172,11 @@ def test_create_filter__bessel_bandpass__returns_correct_coefficients(
     np.testing.assert_array_almost_equal(actual_sos, expected_sos)
 
 
-def test_apply_noise_filtering__bessel_bandpass(
-    raw_generic_well_a1, bessel_lowpass_10_for_100hz
-):
+def test_apply_noise_filtering__bessel_bandpass(raw_generic_well_a1, bessel_lowpass_10_for_100hz):
     # confirm pre-condition
     assert raw_generic_well_a1[1, 5] == -124293
 
-    filtered_gmr = apply_noise_filtering(
-        raw_generic_well_a1, bessel_lowpass_10_for_100hz
-    )
+    filtered_gmr = apply_noise_filtering(raw_generic_well_a1, bessel_lowpass_10_for_100hz)
     assert isinstance(filtered_gmr, NDArray[(2, Any), Int[32]])
 
     # confirm change in GMR after filtering
@@ -193,9 +187,7 @@ def test_apply_noise_filtering__bessel_bandpass(
 
 
 def test_calculate_voltage_from_gmr__returns_correct_values():
-    test_data = np.array(
-        [-0x800000, MIDSCALE_CODE - RAW_TO_SIGNED_CONVERSION_VALUE, 0x7FFFFF]
-    )
+    test_data = np.array([-0x800000, MIDSCALE_CODE - RAW_TO_SIGNED_CONVERSION_VALUE, 0x7FFFFF])
     test_data = np.vstack((np.zeros(3), test_data))
     original_test_data = copy.deepcopy(test_data)
 
@@ -209,32 +201,16 @@ def test_calculate_voltage_from_gmr__returns_correct_values():
     assert isinstance(actual_converted_data, NDArray[(2, Any), np.float32])
 
     expected_first_val = (
-        test_data[1, 0]
-        * 1000
-        * REFERENCE_VOLTAGE
-        / RAW_TO_SIGNED_CONVERSION_VALUE
-        / ADC_GAIN
+        test_data[1, 0] * 1000 * REFERENCE_VOLTAGE / RAW_TO_SIGNED_CONVERSION_VALUE / ADC_GAIN
     )
-    expected_last_val = (
-        test_data[1, 2]
-        * 1000
-        * REFERENCE_VOLTAGE
-        / RAW_TO_SIGNED_CONVERSION_VALUE
-        / ADC_GAIN
-    )
+    expected_last_val = test_data[1, 2] * 1000 * REFERENCE_VOLTAGE / RAW_TO_SIGNED_CONVERSION_VALUE / ADC_GAIN
 
-    expected_first_val = (expected_first_val / MILLI_TO_BASE_CONVERSION).astype(
-        np.float32
-    )
-    expected_last_val = (expected_last_val / MILLI_TO_BASE_CONVERSION).astype(
-        np.float32
-    )
+    expected_first_val = (expected_first_val / MILLI_TO_BASE_CONVERSION).astype(np.float32)
+    expected_last_val = (expected_last_val / MILLI_TO_BASE_CONVERSION).astype(np.float32)
 
     expected_data = [expected_first_val, 0, expected_last_val]
 
-    np.testing.assert_almost_equal(
-        actual_converted_data[1, :], expected_data, decimal=0
-    )
+    np.testing.assert_almost_equal(actual_converted_data[1, :], expected_data, decimal=0)
 
 
 def test_calculate_displacement_from_voltage():
@@ -250,18 +226,16 @@ def test_calculate_displacement_from_voltage():
     assert isinstance(actual_converted_data, NDArray[(2, Any), np.float32])
 
     # converting test voltage to expected displacements
-    expected_first_val = (
-        test_data[1, 0] * MILLIMETERS_PER_MILLITESLA / MILLIVOLTS_PER_MILLITESLA
-    ).astype(np.float32)
-    expected_last_val = (
-        test_data[1, 2] * MILLIMETERS_PER_MILLITESLA / MILLIVOLTS_PER_MILLITESLA
-    ).astype(np.float32)
+    expected_first_val = (test_data[1, 0] * MILLIMETERS_PER_MILLITESLA / MILLIVOLTS_PER_MILLITESLA).astype(
+        np.float32
+    )
+    expected_last_val = (test_data[1, 2] * MILLIMETERS_PER_MILLITESLA / MILLIVOLTS_PER_MILLITESLA).astype(
+        np.float32
+    )
 
     expected_data = [expected_first_val, 0, expected_last_val]
 
-    np.testing.assert_almost_equal(
-        actual_converted_data[1, :], expected_data, decimal=6
-    )
+    np.testing.assert_almost_equal(actual_converted_data[1, :], expected_data, decimal=6)
 
 
 def test_calculate_force_from_displacement():
@@ -277,14 +251,12 @@ def test_calculate_force_from_displacement():
     assert isinstance(actual_converted_data, NDArray[(2, Any), np.float32])
 
     # converting test displacement to expected force
-    expected_first_val = (
-        test_data[1, 0] * NEWTONS_PER_MILLIMETER * MILLI_TO_BASE_CONVERSION
-    ).astype(np.float32)
-    expected_last_val = (
-        test_data[1, 2] * NEWTONS_PER_MILLIMETER * MILLI_TO_BASE_CONVERSION
-    ).astype(np.float32)
+    expected_first_val = (test_data[1, 0] * NEWTONS_PER_MILLIMETER * MILLI_TO_BASE_CONVERSION).astype(
+        np.float32
+    )
+    expected_last_val = (test_data[1, 2] * NEWTONS_PER_MILLIMETER * MILLI_TO_BASE_CONVERSION).astype(
+        np.float32
+    )
 
     expected_data = [expected_first_val, 0, expected_last_val]
-    np.testing.assert_almost_equal(
-        actual_converted_data[1, :], expected_data, decimal=6
-    )
+    np.testing.assert_almost_equal(actual_converted_data[1, :], expected_data, decimal=6)

@@ -64,15 +64,11 @@ def peak_detector(
     if not twitches_point_up:
         peak_invertor_factor *= -1
         valley_invertor_factor *= -1
-    sampling_period_cms = (
-        filtered_magnetic_signal[0, 1] - filtered_magnetic_signal[0, 0]
-    )
+    sampling_period_cms = filtered_magnetic_signal[0, 1] - filtered_magnetic_signal[0, 0]
     maximum_possible_twitch_frequency = 7  # pylint:disable=invalid-name # (Eli 9/1/20): I can't think of a shorter name to describe this concept fully # Hz
     minimum_required_samples_between_twitches = int(  # pylint:disable=invalid-name # (Eli 9/1/20): I can't think of a shorter name to describe this concept fully
         round(
-            (1 / maximum_possible_twitch_frequency)
-            * CENTIMILLISECONDS_PER_SECOND
-            / sampling_period_cms,
+            (1 / maximum_possible_twitch_frequency) * CENTIMILLISECONDS_PER_SECOND / sampling_period_cms,
             0,
         )
     )
@@ -121,9 +117,7 @@ def peak_detector(
     return peak_indices, valley_indices
 
 
-def create_avg_dict(
-    metric: NDArray[int], round_to_int: bool = True
-) -> Dict[str, Union[Float64, int]]:
+def create_avg_dict(metric: NDArray[int], round_to_int: bool = True) -> Dict[str, Union[Float64, int]]:
     """Calculate the average values of a specific metric.
 
     Args:
@@ -186,9 +180,7 @@ def data_metrics(
         int,
         Dict[
             UUID,
-            Union[
-                Dict[int, Dict[UUID, Union[Tuple[int, int], int]]], Union[float, int]
-            ],
+            Union[Dict[int, Dict[UUID, Union[Tuple[int, int], int]]], Union[float, int]],
         ],
     ] = dict()
     aggregate_dict: Dict[
@@ -210,13 +202,9 @@ def data_metrics(
     time_series = filtered_data[0, :]
 
     # find twitch periods
-    combined_twitch_periods = calculate_twitch_period(
-        twitch_indices, peak_indices, filtered_data
-    )
+    combined_twitch_periods = calculate_twitch_period(twitch_indices, peak_indices, filtered_data)
 
-    twitch_frequencies = 1 / (
-        combined_twitch_periods.astype(float) / CENTIMILLISECONDS_PER_SECOND
-    )
+    twitch_frequencies = 1 / (combined_twitch_periods.astype(float) / CENTIMILLISECONDS_PER_SECOND)
     frequency_averages_dict = create_avg_dict(twitch_frequencies, round_to_int=False)
 
     # find aggregate values of period data
@@ -226,9 +214,7 @@ def data_metrics(
     aggregate_dict[TWITCH_FREQUENCY_UUID] = frequency_averages_dict
 
     # find twitch amplitudes
-    amplitudes: NDArray[int] = calculate_amplitudes(
-        twitch_indices, filtered_data, round_to_int=rounded
-    )
+    amplitudes: NDArray[int] = calculate_amplitudes(twitch_indices, filtered_data, round_to_int=rounded)
 
     # find aggregate values of amplitude data
     amplitude_averages_dict = create_avg_dict(amplitudes, round_to_int=rounded)
@@ -236,9 +222,7 @@ def data_metrics(
     aggregate_dict[AMPLITUDE_UUID] = amplitude_averages_dict
 
     # find twitch widths
-    widths = calculate_twitch_widths(
-        twitch_indices, filtered_data, round_to_int=rounded
-    )
+    widths = calculate_twitch_widths(twitch_indices, filtered_data, round_to_int=rounded)
     width_stats_dict: Dict[int, Dict[str, Union[float, int]]] = dict()
 
     for iter_percent in TWITCH_WIDTH_PERCENTS:
@@ -250,9 +234,7 @@ def data_metrics(
                     f"The width value under key {WIDTH_VALUE_UUID} must be a float or an int. It was: {iter_width_value}"
                 )
             iter_list_of_width_values.append(iter_width_value)
-        iter_stats_dict = create_avg_dict(
-            iter_list_of_width_values, round_to_int=rounded
-        )
+        iter_stats_dict = create_avg_dict(iter_list_of_width_values, round_to_int=rounded)
         width_stats_dict[iter_percent] = iter_stats_dict
 
     aggregate_dict[WIDTH_UUID] = width_stats_dict
@@ -264,23 +246,17 @@ def data_metrics(
 
     # calculate twitch contraction/relaxation velocities
     contraction_velocity = calculate_twitch_velocity(twitch_indices, widths, True)
-    contraction_velocity_averages = create_avg_dict(
-        contraction_velocity, round_to_int=False
-    )
+    contraction_velocity_averages = create_avg_dict(contraction_velocity, round_to_int=False)
     aggregate_dict[CONTRACTION_VELOCITY_UUID] = contraction_velocity_averages
 
     relaxation_velocity = calculate_twitch_velocity(twitch_indices, widths, False)
-    relaxation_velocity_averages = create_avg_dict(
-        relaxation_velocity, round_to_int=False
-    )
+    relaxation_velocity_averages = create_avg_dict(relaxation_velocity, round_to_int=False)
     aggregate_dict[RELAXATION_VELOCITY_UUID] = relaxation_velocity_averages
 
     # calculate twitch interval irregularity
     interval_irregularity = calculate_interval_irregularity(twitch_indices, time_series)
 
-    interval_irregularity_averages = create_avg_dict(
-        interval_irregularity[1:-1], round_to_int=False
-    )
+    interval_irregularity_averages = create_avg_dict(interval_irregularity[1:-1], round_to_int=False)
     interval_irregularity_averages["n"] = interval_irregularity_averages["n"] + 2
     aggregate_dict[IRREGULARITY_INTERVAL_UUID] = interval_irregularity_averages
 
@@ -334,12 +310,8 @@ def calculate_interval_irregularity(
         current_twitch_index = list_of_twitch_indices[twitch]
         next_twitch_index = list_of_twitch_indices[twitch + 1]
 
-        last_interval = (
-            time_series[current_twitch_index] - time_series[last_twitch_index]
-        )
-        current_interval = (
-            time_series[next_twitch_index] - time_series[current_twitch_index]
-        )
+        last_interval = time_series[current_twitch_index] - time_series[last_twitch_index]
+        current_interval = time_series[next_twitch_index] - time_series[current_twitch_index]
         interval = abs(current_interval - last_interval)
 
         iter_list_of_intervals.append(interval)
@@ -393,10 +365,7 @@ def calculate_twitch_velocity(
             raise NotImplementedError(
                 f"The width value under twitch {twitch} must be a Tuple. It was: {iter_coord_top}"
             )
-        velocity = abs(
-            (iter_coord_top[1] - iter_coord_base[1])
-            / (iter_coord_top[0] - iter_coord_base[0])
-        )
+        velocity = abs((iter_coord_top[1] - iter_coord_base[1]) / (iter_coord_top[0] - iter_coord_base[0]))
         iter_list_of_velocities.append(velocity)
     return np.asarray(iter_list_of_velocities, dtype=float)
 
@@ -485,16 +454,10 @@ def find_twitch_indices(
                 continue
 
             twitches[itr_peak_index] = {
-                PRIOR_PEAK_INDEX_UUID: None
-                if itr_idx == 0
-                else peak_indices[itr_idx - 1],
-                PRIOR_VALLEY_INDEX_UUID: valley_indices[
-                    itr_idx - 1 if starts_with_peak else itr_idx
-                ],
+                PRIOR_PEAK_INDEX_UUID: None if itr_idx == 0 else peak_indices[itr_idx - 1],
+                PRIOR_VALLEY_INDEX_UUID: valley_indices[itr_idx - 1 if starts_with_peak else itr_idx],
                 SUBSEQUENT_PEAK_INDEX_UUID: peak_indices[itr_idx + 1],
-                SUBSEQUENT_VALLEY_INDEX_UUID: valley_indices[
-                    itr_idx if starts_with_peak else itr_idx + 1
-                ],
+                SUBSEQUENT_VALLEY_INDEX_UUID: valley_indices[itr_idx if starts_with_peak else itr_idx + 1],
             }
 
     # print(list(twitches.keys())[0])
@@ -502,9 +465,7 @@ def find_twitch_indices(
     return twitches
 
 
-def _too_few_peaks_or_valleys(
-    peak_indices: NDArray[int], valley_indices: NDArray[int]
-) -> None:
+def _too_few_peaks_or_valleys(peak_indices: NDArray[int], valley_indices: NDArray[int]) -> None:
     """Raise an error if there are too few peaks or valleys detected.
 
     Args:
@@ -559,15 +520,9 @@ def calculate_amplitudes(
     amplitude_series = filtered_data[1, :]
     for iter_twitch_peak_idx, iter_twitch_indices_info in twitch_indices.items():
         peak_amplitude = amplitude_series[iter_twitch_peak_idx]
-        prior_amplitude = amplitude_series[
-            iter_twitch_indices_info[PRIOR_VALLEY_INDEX_UUID]
-        ]
-        subsequent_amplitude = amplitude_series[
-            iter_twitch_indices_info[SUBSEQUENT_VALLEY_INDEX_UUID]
-        ]
-        amplitude_value = (
-            (peak_amplitude - prior_amplitude) + (peak_amplitude - subsequent_amplitude)
-        ) / 2
+        prior_amplitude = amplitude_series[iter_twitch_indices_info[PRIOR_VALLEY_INDEX_UUID]]
+        subsequent_amplitude = amplitude_series[iter_twitch_indices_info[SUBSEQUENT_VALLEY_INDEX_UUID]]
+        amplitude_value = ((peak_amplitude - prior_amplitude) + (peak_amplitude - subsequent_amplitude)) / 2
         if round_to_int:
             amplitude_value = int(round(amplitude_value, 0))
 
@@ -610,15 +565,7 @@ def calculate_twitch_widths(
     twitch_indices: Dict[int, Dict[UUID, Optional[int]]],
     filtered_data: NDArray[(2, Any), int],
     round_to_int: bool = True,
-) -> List[
-    Dict[
-        int,
-        Dict[
-            UUID,
-            Union[Tuple[Union[float, int], Union[float, int]], Union[float, int]],
-        ],
-    ]
-]:
+) -> List[Dict[int, Dict[UUID, Union[Tuple[Union[float, int], Union[float, int]], Union[float, int]],],]]:
     """Determine twitch width between 10-90% down to the nearby valleys.
 
     Args:
@@ -648,12 +595,8 @@ def calculate_twitch_widths(
             ],
         ] = dict()
         peak_value = value_series[iter_twitch_peak_idx]
-        prior_valley_value = value_series[
-            iter_twitch_indices_info[PRIOR_VALLEY_INDEX_UUID]
-        ]
-        subsequent_valley_value = value_series[
-            iter_twitch_indices_info[SUBSEQUENT_VALLEY_INDEX_UUID]
-        ]
+        prior_valley_value = value_series[iter_twitch_indices_info[PRIOR_VALLEY_INDEX_UUID]]
+        subsequent_valley_value = value_series[iter_twitch_indices_info[SUBSEQUENT_VALLEY_INDEX_UUID]]
 
         rising_amplitude = peak_value - prior_valley_value
         falling_amplitude = peak_value - subsequent_valley_value
@@ -694,12 +637,8 @@ def calculate_twitch_widths(
             width_val = interpolated_falling_timepoint - interpolated_rising_timepoint
             if round_to_int:
                 width_val = int(round(width_val, 0))
-                interpolated_falling_timepoint = int(
-                    round(interpolated_falling_timepoint, 0)
-                )
-                interpolated_rising_timepoint = int(
-                    round(interpolated_rising_timepoint, 0)
-                )
+                interpolated_falling_timepoint = int(round(interpolated_falling_timepoint, 0))
+                interpolated_rising_timepoint = int(round(interpolated_rising_timepoint, 0))
                 rising_threshold = int(round(rising_threshold, 0))
                 falling_threshold = int(round(falling_threshold, 0))
 
@@ -751,25 +690,17 @@ def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20)
     ):
         # iter_twitch_peak_timepoint = time_series[iter_twitch_peak_idx]
         width_info = per_twitch_widths[iter_twitch_idx]
-        prior_valley_value = value_series[
-            iter_twitch_indices_info[PRIOR_VALLEY_INDEX_UUID]
-        ]
-        subsequent_valley_value = value_series[
-            iter_twitch_indices_info[SUBSEQUENT_VALLEY_INDEX_UUID]
-        ]
+        prior_valley_value = value_series[iter_twitch_indices_info[PRIOR_VALLEY_INDEX_UUID]]
+        subsequent_valley_value = value_series[iter_twitch_indices_info[SUBSEQUENT_VALLEY_INDEX_UUID]]
         rising_coords = width_info[width_percent][WIDTH_RISING_COORDS_UUID]
         falling_coords = width_info[width_percent][WIDTH_FALLING_COORDS_UUID]
 
-        if not isinstance(
-            rising_coords, tuple
-        ):  # Eli (9/1/20): this appears needed to make mypy happy
+        if not isinstance(rising_coords, tuple):  # Eli (9/1/20): this appears needed to make mypy happy
             raise NotImplementedError(
                 f"Rising coordinates under the key {WIDTH_RISING_COORDS_UUID} must be a tuple."
             )
 
-        if not isinstance(
-            falling_coords, tuple
-        ):  # Eli (9/1/20): this appears needed to make mypy happy
+        if not isinstance(falling_coords, tuple):  # Eli (9/1/20): this appears needed to make mypy happy
             raise NotImplementedError(
                 f"Falling coordinates under the key {WIDTH_FALLING_COORDS_UUID} must be a tuple."
             )
@@ -782,9 +713,7 @@ def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20)
         # calculate area of rising side
         rising_idx = iter_twitch_peak_idx
         # move to the left from the twitch peak until the threshold is reached
-        while abs(value_series[rising_idx - 1] - prior_valley_value) > abs(
-            rising_y - prior_valley_value
-        ):
+        while abs(value_series[rising_idx - 1] - prior_valley_value) > abs(rising_y - prior_valley_value):
             left_x = time_series[rising_idx - 1]
             right_x = time_series[rising_idx]
             left_y = value_series[rising_idx - 1]

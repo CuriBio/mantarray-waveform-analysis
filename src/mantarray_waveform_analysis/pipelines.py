@@ -25,9 +25,7 @@ from .transforms import create_filter
 from .transforms import noise_cancellation
 
 
-if (
-    6 < 9
-):  # pragma: no cover # protect this from zimports deleting the pylint disable statement
+if 6 < 9:  # pragma: no cover # protect this from zimports deleting the pylint disable statement
     from .compression_cy import (  # pylint: disable=import-error # Eli (8/18/20) unsure why pylint is unable to recognize cython import...
         compress_filtered_gmr,
     )
@@ -188,9 +186,7 @@ class Pipeline:
             return self._fully_calibrated_magnetic_data
         except AttributeError:
             pass
-        self._fully_calibrated_magnetic_data = apply_empty_plate_calibration(
-            self.get_noise_cancelled_gmr()
-        )
+        self._fully_calibrated_magnetic_data = apply_empty_plate_calibration(self.get_noise_cancelled_gmr())
         return self._fully_calibrated_magnetic_data
 
     def get_noise_filtered_gmr(self) -> NDArray[(2, Any), int]:
@@ -238,9 +234,7 @@ class Pipeline:
         ],
         Dict[
             UUID,
-            Union[
-                Dict[str, Union[float, int]], Dict[int, Dict[str, Union[float, int]]]
-            ],
+            Union[Dict[str, Union[float, int]], Dict[int, Dict[str, Union[float, int]]]],
         ],
     ]:
         """Calculate data metrics on noise filtered magnetic data."""
@@ -268,9 +262,7 @@ class Pipeline:
         ],
         Dict[
             UUID,
-            Union[
-                Dict[str, Union[float, int]], Dict[int, Dict[str, Union[float, int]]]
-            ],
+            Union[Dict[str, Union[float, int]], Dict[int, Dict[str, Union[float, int]]]],
         ],
     ]:
         """Calculate data metrics on displacement data."""
@@ -298,9 +290,7 @@ class Pipeline:
         ],
         Dict[
             UUID,
-            Union[
-                Dict[str, Union[float, int]], Dict[int, Dict[str, Union[float, int]]]
-            ],
+            Union[Dict[str, Union[float, int]], Dict[int, Dict[str, Union[float, int]]]],
         ],
     ]:
         """Calculate data metrics on force data."""
@@ -321,9 +311,7 @@ class Pipeline:
             return self._compressed_magnetic_data
         except AttributeError:
             pass
-        self._compressed_magnetic_data = compress_filtered_gmr(
-            self.get_noise_filtered_magnetic_data()
-        )
+        self._compressed_magnetic_data = compress_filtered_gmr(self.get_noise_filtered_magnetic_data())
         return self._compressed_magnetic_data
 
     def get_compressed_voltage(self) -> NDArray[(2, Any), np.float32]:
@@ -339,9 +327,7 @@ class Pipeline:
             return self._compressed_displacement
         except AttributeError:
             pass
-        self._compressed_displacement = calculate_displacement_from_voltage(
-            self.get_compressed_voltage()
-        )
+        self._compressed_displacement = calculate_displacement_from_voltage(self.get_compressed_voltage())
         return self._compressed_displacement
 
     def get_compressed_force(self) -> NDArray[(2, Any), np.float32]:
@@ -349,9 +335,7 @@ class Pipeline:
             return self._compressed_force
         except AttributeError:
             pass
-        self._compressed_force = calculate_force_from_displacement(
-            self.get_compressed_displacement()
-        )
+        self._compressed_force = calculate_force_from_displacement(self.get_compressed_displacement())
         return self._compressed_force
 
     def get_voltage(self) -> NDArray[(2, Any), np.float32]:
@@ -419,7 +403,5 @@ class PipelineTemplate:  # pylint: disable=too-few-public-methods # This is a si
             return self._filter_coefficients
         except AttributeError:
             pass
-        self._filter_coefficients = create_filter(
-            self.noise_filter_uuid, self.tissue_sampling_period
-        )
+        self._filter_coefficients = create_filter(self.noise_filter_uuid, self.tissue_sampling_period)
         return self._filter_coefficients
