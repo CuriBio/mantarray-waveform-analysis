@@ -56,7 +56,7 @@ class Pipeline:
         self._displacement: NDArray[(2, Any), np.float32]
         self._force: NDArray[(2, Any), np.float32]
         self._peak_detection_results: Tuple[List[int], List[int]]
-        self._magnetic_data_metrics: Tuple[  # pylint:disable=duplicate-code # Anna (1/7/21): long type definition causing failture
+        self._magnetic_data_metrics: Tuple[  # pylint:disable=duplicate-code # Anna (1/7/21): long type definition causing failure
             Dict[
                 int,
                 Dict[
@@ -75,7 +75,7 @@ class Pipeline:
                 ],
             ],
         ]
-        self._displacement_data_metrics: Tuple[  # pylint:disable=duplicate-code # Anna (1/7/21): long type definition causing failture
+        self._displacement_data_metrics: Tuple[  # pylint:disable=duplicate-code # Anna (1/7/21): long type definition causing failure
             Dict[
                 int,
                 Dict[
@@ -94,7 +94,7 @@ class Pipeline:
                 ],
             ],
         ]
-        self._force_data_metrics: Tuple[  # pylint:disable=duplicate-code # Anna (1/7/21): long type definition causing failture
+        self._force_data_metrics: Tuple[  # pylint:disable=duplicate-code # Anna (1/7/21): long type definition causing failure
             Dict[
                 int,
                 Dict[
@@ -221,7 +221,7 @@ class Pipeline:
 
     def get_magnetic_data_metrics(
         self,
-    ) -> Tuple[  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failture
+    ) -> Tuple[  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failure
         Dict[
             int,
             Dict[
@@ -249,7 +249,7 @@ class Pipeline:
 
     def get_displacement_data_metrics(
         self,
-    ) -> Tuple[  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failture
+    ) -> Tuple[  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failure
         Dict[
             int,
             Dict[
@@ -277,7 +277,7 @@ class Pipeline:
 
     def get_force_data_metrics(
         self,
-    ) -> Tuple[  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failture
+    ) -> Tuple[  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failure
         Dict[
             int,
             Dict[

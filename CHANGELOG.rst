@@ -1,28 +1,35 @@
 Changelog for Mantarray Waveform Analysis
 =========================================
 
+
+1.1.0 (2021-07-13)
+------------------
+
+- TODO
+
+
 1.0.0 (2021-05-06)
 ------------------
 
-- Removed ``filterd_data`` serialized data from ``PeakDectectionError`` subclassed exceptions and from ``find_twitch_indices`` function arguments for performance reasons
+- Removed ``filtered_data`` serialized data from ``PeakDectectionError`` subclassed exceptions and from ``find_twitch_indices`` function arguments for performance reasons.
 
 
 0.9.0 (2021-04-26)
 ------------------
 
-- Added Twitch Interval Irregularity metric to per twitch metrics sheet and aggregate metrics sheet
+- Added Twitch Interval Irregularity metric to per twitch metrics sheet and aggregate metrics sheet.
 
 
 0.8.1 (2021-04-23)
 ------------------
 
-- Fixed the out of bounds error present in h5 file due to the fix in the  ``peak_detector`` which mitigated the TwoValleysInARow error
+- Fixed the out of bounds error present in h5 file due to the fix in the  ``peak_detector`` which mitigated the TwoValleysInARow error.
 
 
 0.8.0 (2021-04-21)
 ------------------
 
-- Fixed the directionality of the twitch depending on whether the data metrics in the pipeline template are magnetic or force metrics
+- Fixed the directionality of the twitch depending on whether the data metrics in the pipeline template are magnetic or force metrics.
 
 
 0.7.1 (2021-04-01)
