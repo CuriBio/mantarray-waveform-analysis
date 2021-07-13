@@ -2,6 +2,7 @@
 """Transforming arrays of Mantarray data throughout the analysis pipeline."""
 from typing import Any
 from typing import Dict
+from typing import Iterable
 from typing import List
 from typing import Optional
 from typing import Tuple
@@ -12,6 +13,7 @@ import attr
 from nptyping import NDArray
 import numpy as np
 
+from .constants import ALL_METRICS
 from .exceptions import DataAlreadyLoadedInPipelineError
 from .peak_detection import data_metrics
 from .peak_detection import peak_detector
@@ -221,6 +223,7 @@ class Pipeline:
 
     def get_magnetic_data_metrics(
         self,
+        metrics_to_create: Iterable[UUID] = ALL_METRICS,
     ) -> Tuple[  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failure
         Dict[
             int,
@@ -243,12 +246,15 @@ class Pipeline:
         except AttributeError:
             pass
         self._magnetic_data_metrics = data_metrics(
-            self.get_peak_detection_results(), self.get_noise_filtered_magnetic_data()
+            self.get_peak_detection_results(),
+            self.get_noise_filtered_magnetic_data(),
+            metrics_to_create=metrics_to_create,
         )
         return self._magnetic_data_metrics
 
     def get_displacement_data_metrics(
         self,
+        metrics_to_create: Iterable[UUID] = ALL_METRICS,
     ) -> Tuple[  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failure
         Dict[
             int,
@@ -271,12 +277,16 @@ class Pipeline:
         except AttributeError:
             pass
         self._displacement_data_metrics = data_metrics(
-            self.get_peak_detection_results(), self.get_displacement(), rounded=False
+            self.get_peak_detection_results(),
+            self.get_displacement(),
+            rounded=False,
+            metrics_to_create=metrics_to_create,
         )
         return self._displacement_data_metrics
 
     def get_force_data_metrics(
         self,
+        metrics_to_create: Iterable[UUID] = ALL_METRICS,
     ) -> Tuple[  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failure
         Dict[
             int,
@@ -299,7 +309,10 @@ class Pipeline:
         except AttributeError:
             pass
         self._force_data_metrics = data_metrics(
-            self.get_peak_detection_results(), self.get_force(), rounded=False
+            self.get_peak_detection_results(),
+            self.get_force(),
+            rounded=False,
+            metrics_to_create=metrics_to_create,
         )
         return self._force_data_metrics
 
