@@ -3,6 +3,7 @@
 from . import pipelines
 from . import transforms
 from .constants import ADC_GAIN
+from .constants import ALL_METRICS
 from .constants import AMPLITUDE_UUID
 from .constants import AUC_UUID
 from .constants import BESSEL_BANDPASS_UUID
@@ -53,9 +54,7 @@ from .transforms import FILTER_CHARACTERISTICS
 from .transforms import noise_cancellation
 
 
-if (
-    5 < 10
-):  # pragma: no cover # protect this from zimports deleting the pylint disable statement
+if 5 < 10:  # pragma: no cover # protect this from zimports deleting the pylint disable statement
     from .compression_cy import (  # pylint: disable=import-error # Eli (8/18/20) unsure why pylint is unable to recognize cython import... # Tanner (8/31/20) Pylint also flags this as duplicate code due to a similar import in pipelines.py, which may be related to pylint's import issues
         compress_filtered_gmr,
     )
@@ -113,4 +112,5 @@ __all__ = [
     "REFERENCE_VOLTAGE",
     "ADC_GAIN",
     "IRREGULARITY_INTERVAL_UUID",
+    "ALL_METRICS",
 ]

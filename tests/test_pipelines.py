@@ -26,9 +26,7 @@ __fixtures__ = [
 
 
 def test_PipelineTemeplate__create_pipeline__creates_pipeline_linked_to_template():
-    template = PipelineTemplate(
-        noise_filter_uuid=BESSEL_LOWPASS_10_UUID, tissue_sampling_period=960
-    )
+    template = PipelineTemplate(noise_filter_uuid=BESSEL_LOWPASS_10_UUID, tissue_sampling_period=960)
     pipeline = template.create_pipeline()
     assert isinstance(pipeline, Pipeline)
 
@@ -53,9 +51,7 @@ def test_PipelineTemplate__get_filter_coefficients__calls_create_filter_with_exp
 def test_Pipeline__load_raw_gmr_data__sets_data(
     loaded_generic_pipeline, raw_generic_well_a1, raw_generic_well_a2
 ):
-    np.testing.assert_array_equal(
-        loaded_generic_pipeline.get_raw_tissue_magnetic_data(), raw_generic_well_a1
-    )
+    np.testing.assert_array_equal(loaded_generic_pipeline.get_raw_tissue_magnetic_data(), raw_generic_well_a1)
     np.testing.assert_array_equal(
         loaded_generic_pipeline.get_raw_reference_magnetic_data(), raw_generic_well_a2
     )
@@ -65,9 +61,7 @@ def test_Pipeline__load_raw_gmr_data__raises_error_if_data_already_loaded(
     loaded_generic_pipeline, raw_generic_well_a1, raw_generic_well_a2
 ):
     with pytest.raises(DataAlreadyLoadedInPipelineError):
-        loaded_generic_pipeline.load_raw_magnetic_data(
-            raw_generic_well_a1, raw_generic_well_a2
-        )
+        loaded_generic_pipeline.load_raw_magnetic_data(raw_generic_well_a1, raw_generic_well_a2)
 
 
 def test_Pipeline__get_sensitivity_calibrated_tissue_gmr__calls_correct_methods_to_calibrate__but_does_not_call_again_repeatedly(
@@ -102,9 +96,7 @@ def test_Pipeline__get_sensitivity_calibrated_reference_gmr__calls_correct_metho
         autospec=True,
         return_value=expected_return,
     )
-    calibrated_reference = (
-        loaded_generic_pipeline.get_sensitivity_calibrated_reference_gmr()
-    )
+    calibrated_reference = loaded_generic_pipeline.get_sensitivity_calibrated_reference_gmr()
     # Eli (7/6/20): NumPy arrays don't play well with assert_called_once_with, so asserting things separately
     assert mocked_apply_sensitivity_calibration.call_count == 1
     actual_array_arg = mocked_apply_sensitivity_calibration.call_args_list[0][0][0]
@@ -269,9 +261,7 @@ def test_Pipeline__get_data_type__calls_correct_methods_to_perform_action__but_d
         assert actual_array_arg == expected_array_arg
     if len(list_of_lambdas_to_get_call_args) == 2:
         actual_array_arg = mocked_function_under_test.call_args_list[0][0][1]
-        expected_array_arg = list_of_lambdas_to_get_call_args[1](
-            loaded_generic_pipeline
-        )
+        expected_array_arg = list_of_lambdas_to_get_call_args[1](loaded_generic_pipeline)
         if isinstance(expected_array_arg, np.ndarray):
             np.testing.assert_array_equal(
                 actual_array_arg,
@@ -332,9 +322,7 @@ def test_Pipeline__get_peak_detection_info__passes_twitches_point_up_parameter_w
     pt = PipelineTemplate(100)
     pipeline = pt.create_pipeline()
     pipeline.load_raw_magnetic_data(raw_generic_well_a1, raw_generic_well_a1)
-    mocked_peak_detection = mocker.patch.object(
-        pipelines, "peak_detector", autospec=True
-    )
+    mocked_peak_detection = mocker.patch.object(pipelines, "peak_detector", autospec=True)
     pipeline.get_peak_detection_results()
     mocked_peak_detection.assert_called_once_with(ANY, twitches_point_up=True)
 
@@ -345,9 +333,7 @@ def test_Pipeline__get_peak_detection_info__passes_force_data_parameter_when_tru
     pt = PipelineTemplate(100, is_force_data=True)
     pipeline = pt.create_pipeline()
     pipeline.load_raw_magnetic_data(raw_generic_well_a1, raw_generic_well_a1)
-    mocked_peak_detection = mocker.patch.object(
-        pipelines, "peak_detector", autospec=True
-    )
+    mocked_peak_detection = mocker.patch.object(pipelines, "peak_detector", autospec=True)
     pipeline.get_peak_detection_results()
     mocked_peak_detection.assert_called_once_with(ANY, twitches_point_up=True)
 
@@ -358,8 +344,6 @@ def test_Pipeline__get_peak_detection_info__passes_force_data_parameter_when_fal
     pt = PipelineTemplate(100, is_force_data=False)
     pipeline = pt.create_pipeline()
     pipeline.load_raw_magnetic_data(raw_generic_well_a1, raw_generic_well_a1)
-    mocked_peak_detection = mocker.patch.object(
-        pipelines, "peak_detector", autospec=True
-    )
+    mocked_peak_detection = mocker.patch.object(pipelines, "peak_detector", autospec=True)
     pipeline.get_peak_detection_results()
     mocked_peak_detection.assert_called_once_with(ANY, twitches_point_up=False)

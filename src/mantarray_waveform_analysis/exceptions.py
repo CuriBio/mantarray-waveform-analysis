@@ -19,10 +19,6 @@ class PeakDetectionError(Exception):
     pass
 
 
-class InsufficientPeaksDetectedError(PeakDetectionError):
-    pass
-
-
 class TwoFeaturesInARowError(PeakDetectionError):
     """There must always be a peak in between valleys and vice-versa."""
 

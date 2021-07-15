@@ -16,9 +16,7 @@ __fixtures__ = [
 
 @pytest.fixture(scope="function", name="generic_pipeline_template")
 def fixture_generic_pipeline_template():
-    template = PipelineTemplate(
-        noise_filter_uuid=BESSEL_LOWPASS_10_UUID, tissue_sampling_period=1000
-    )
+    template = PipelineTemplate(noise_filter_uuid=BESSEL_LOWPASS_10_UUID, tissue_sampling_period=1000)
     yield template
 
 
@@ -29,8 +27,6 @@ def fixture_generic_pipeline(generic_pipeline_template):
 
 
 @pytest.fixture(scope="function", name="loaded_generic_pipeline")
-def fixture_loaded_generic_pipeline(
-    generic_pipeline, raw_generic_well_a1, raw_generic_well_a2
-):
+def fixture_loaded_generic_pipeline(generic_pipeline, raw_generic_well_a1, raw_generic_well_a2):
     generic_pipeline.load_raw_magnetic_data(raw_generic_well_a1, raw_generic_well_a2)
     yield generic_pipeline

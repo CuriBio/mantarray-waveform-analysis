@@ -30,9 +30,7 @@ matplotlib.use("Agg")
 PATH_OF_CURRENT_FILE = get_current_file_abs_directory()
 
 COMPRESSION_ACCURACY = 0.10
-COMPRESSION_ACCURACY_AMPLITUDE = (
-    0.01  # amplitude is the key metric, so it must remain more accurate
-)
+COMPRESSION_ACCURACY_AMPLITUDE = 0.01  # amplitude is the key metric, so it must remain more accurate
 
 COMPRESSION_FACTOR = 0.30
 __fixtures__ = (
@@ -77,9 +75,7 @@ def test_compression_performance(new_A1):
     ending_time = time.perf_counter_ns()
     ns_per_iter = (ending_time - starting_time) / num_iters
     centimilliseconds_per_second = 100000
-    seconds_of_data = (
-        filtered_data[0, -1] - filtered_data[0, 0]
-    ) / centimilliseconds_per_second
+    seconds_of_data = (filtered_data[0, -1] - filtered_data[0, 0]) / centimilliseconds_per_second
 
     expected_time_per_compression = seconds_of_data / 24 / 4 / 10 * 10 ** 9
     # print(ns_per_iter)
@@ -93,21 +89,15 @@ def _get_info_for_compression(well_fixture, file_prefix, pipeline_template_with_
     pipeline_with_filter.load_raw_gmr_data(unfiltered_data, unfiltered_data)
 
     filtered_data = pipeline_with_filter.get_noise_filtered_gmr()
-    original_per_twitch_dict, original_aggregate_metrics_dict = _get_data_metrics(
-        well_fixture
-    )
+    original_per_twitch_dict, original_aggregate_metrics_dict = _get_data_metrics(well_fixture)
 
     original_num_samples = filtered_data.shape[1]
 
     # compress the data
     compressed_data = compress_filtered_gmr(filtered_data)
     new_num_samples = compressed_data.shape[1]
-    compressed_peak_and_valley_indices = peak_detector(
-        compressed_data, twitches_point_up=False
-    )
-    original_peak_and_valley_indices = peak_detector(
-        filtered_data, twitches_point_up=False
-    )
+    compressed_peak_and_valley_indices = peak_detector(compressed_data, twitches_point_up=False)
+    original_peak_and_valley_indices = peak_detector(filtered_data, twitches_point_up=False)
     _plot_data(
         compressed_peak_and_valley_indices,
         compressed_data,
@@ -174,12 +164,8 @@ def test_new_A1_compression(new_A1, generic_pipeline_template):
         threshold=COMPRESSION_ACCURACY,
     )
     assert_percent_diff(
-        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][
-            WIDTH_VALUE_UUID
-        ],
-        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][
-            WIDTH_VALUE_UUID
-        ],
+        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
         threshold=COMPRESSION_ACCURACY,
     )
 
@@ -222,9 +208,7 @@ def test_new_A2_compression(new_A2, generic_pipeline_template):
     )
     assert_percent_diff(
         compressed_per_twitch_dict[104000][WIDTH_UUID][90][WIDTH_VALUE_UUID],
-        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][
-            WIDTH_VALUE_UUID
-        ],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
         threshold=COMPRESSION_ACCURACY,
     )
 
@@ -266,12 +250,8 @@ def test_new_A3_compression(new_A3, generic_pipeline_template):
         threshold=COMPRESSION_ACCURACY,
     )
     assert_percent_diff(
-        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][
-            WIDTH_VALUE_UUID
-        ],
-        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][
-            WIDTH_VALUE_UUID
-        ],
+        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
         threshold=COMPRESSION_ACCURACY,
     )
 
@@ -312,12 +292,8 @@ def test_new_A4_compression(new_A4, generic_pipeline_template):
         threshold=COMPRESSION_ACCURACY,
     )
     assert_percent_diff(
-        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][
-            WIDTH_VALUE_UUID
-        ],
-        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][
-            WIDTH_VALUE_UUID
-        ],
+        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
         threshold=COMPRESSION_ACCURACY,
     )
 
@@ -358,12 +334,8 @@ def test_new_A5_compression(new_A5, generic_pipeline_template):
         threshold=COMPRESSION_ACCURACY,
     )
     assert_percent_diff(
-        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][
-            WIDTH_VALUE_UUID
-        ],
-        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][
-            WIDTH_VALUE_UUID
-        ],
+        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
         threshold=COMPRESSION_ACCURACY,
     )
 
@@ -381,9 +353,7 @@ def test_new_A6_compression(new_A6, generic_pipeline_template):
     # make sure sampling rate has been reduced by appropriate amount
     assert new_num_samples <= (original_num_samples * COMPRESSION_FACTOR)
     # make sure data metrics have not been altered heavily
-    assert len(compressed_per_twitch_dict.keys()) == len(
-        original_per_twitch_dict.keys()
-    )
+    assert len(compressed_per_twitch_dict.keys()) == len(original_per_twitch_dict.keys())
     assert_percent_diff(
         compressed_aggregate_metrics_dict[AUC_UUID]["mean"],
         original_aggregate_metrics_dict[AUC_UUID]["mean"],
@@ -407,11 +377,7 @@ def test_new_A6_compression(new_A6, generic_pipeline_template):
         threshold=COMPRESSION_ACCURACY,
     )
     assert_percent_diff(
-        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][
-            WIDTH_VALUE_UUID
-        ],
-        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][
-            WIDTH_VALUE_UUID
-        ],
+        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
         threshold=COMPRESSION_ACCURACY,
     )

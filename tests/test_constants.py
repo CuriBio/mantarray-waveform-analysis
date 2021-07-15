@@ -2,6 +2,7 @@
 import uuid
 
 from mantarray_waveform_analysis import ADC_GAIN
+from mantarray_waveform_analysis import ALL_METRICS
 from mantarray_waveform_analysis import AMPLITUDE_UUID
 from mantarray_waveform_analysis import AUC_UUID
 from mantarray_waveform_analysis import BESSEL_BANDPASS_UUID
@@ -43,9 +44,7 @@ def test_filter_uuids():
     assert BESSEL_BANDPASS_UUID == uuid.UUID("0ecf0e52-0a29-453f-a6ff-46f5ec3ae783")
     assert BESSEL_LOWPASS_10_UUID == uuid.UUID("7d64cac3-b841-4912-b734-c0cf20a81e7a")
     assert BESSEL_LOWPASS_30_UUID == uuid.UUID("eee66c75-4dc4-4eb4-8d48-6c608bf28d91")
-    assert BUTTERWORTH_LOWPASS_30_UUID == uuid.UUID(
-        "de8d8cef-65bf-4119-ada7-bdecbbaa897a"
-    )
+    assert BUTTERWORTH_LOWPASS_30_UUID == uuid.UUID("de8d8cef-65bf-4119-ada7-bdecbbaa897a")
 
 
 def test_filter_characteristics():
@@ -82,24 +81,27 @@ def test_data_metric_uuids():
     assert WIDTH_UUID == uuid.UUID("c4c60d55-017a-4783-9600-f19606de26f3")
     assert WIDTH_VALUE_UUID == uuid.UUID("05041f4e-c77d-42d9-a2ae-8902f912e9ac")
     assert WIDTH_RISING_COORDS_UUID == uuid.UUID("2a16acb6-4df7-4064-9d47-5d27ea7a98ad")
-    assert WIDTH_FALLING_COORDS_UUID == uuid.UUID(
-        "26e5637d-42c9-4060-aa5d-52209b349c84"
-    )
+    assert WIDTH_FALLING_COORDS_UUID == uuid.UUID("26e5637d-42c9-4060-aa5d-52209b349c84")
     assert RELAXATION_VELOCITY_UUID == uuid.UUID("0fcc0dc3-f9aa-4f1b-91b3-e5b5924279a9")
-    assert CONTRACTION_VELOCITY_UUID == uuid.UUID(
-        "73961e7c-17ec-42b0-b503-a23195ec249c"
-    )
+    assert CONTRACTION_VELOCITY_UUID == uuid.UUID("73961e7c-17ec-42b0-b503-a23195ec249c")
 
     assert PRIOR_PEAK_INDEX_UUID == uuid.UUID("80df90dc-21f8-4cad-a164-89436909b30a")
     assert PRIOR_VALLEY_INDEX_UUID == uuid.UUID("72ba9466-c203-41b6-ac30-337b4a17a124")
-    assert SUBSEQUENT_PEAK_INDEX_UUID == uuid.UUID(
-        "7e37325b-6681-4623-b192-39f154350f36"
-    )
-    assert SUBSEQUENT_VALLEY_INDEX_UUID == uuid.UUID(
-        "fd47ba6b-ee4d-4674-9a89-56e0db7f3d97"
-    )
-    assert IRREGULARITY_INTERVAL_UUID == uuid.UUID(
-        "61046076-66b9-4b8b-bfec-1e00603743c0"
+    assert SUBSEQUENT_PEAK_INDEX_UUID == uuid.UUID("7e37325b-6681-4623-b192-39f154350f36")
+    assert SUBSEQUENT_VALLEY_INDEX_UUID == uuid.UUID("fd47ba6b-ee4d-4674-9a89-56e0db7f3d97")
+    assert IRREGULARITY_INTERVAL_UUID == uuid.UUID("61046076-66b9-4b8b-bfec-1e00603743c0")
+
+    assert ALL_METRICS == frozenset(
+        [
+            TWITCH_PERIOD_UUID,
+            AMPLITUDE_UUID,
+            WIDTH_UUID,
+            AUC_UUID,
+            TWITCH_FREQUENCY_UUID,
+            CONTRACTION_VELOCITY_UUID,
+            RELAXATION_VELOCITY_UUID,
+            IRREGULARITY_INTERVAL_UUID,
+        ]
     )
 
 

@@ -2,6 +2,7 @@
 import math
 import os
 
+from mantarray_waveform_analysis import ALL_METRICS
 from mantarray_waveform_analysis import AMPLITUDE_UUID
 from mantarray_waveform_analysis import AUC_UUID
 from mantarray_waveform_analysis import CONTRACTION_VELOCITY_UUID
@@ -143,6 +144,37 @@ def _plot_twitch_widths(filtered_data, per_twitch_dict, my_local_path_graphs):
     plt.savefig(my_local_path_graphs)
 
 
+@pytest.mark.parametrize(
+    "expected_metrics,test_description",
+    [
+        (
+            [TWITCH_FREQUENCY_UUID, AMPLITUDE_UUID],
+            "only creates freq and amp metrics",
+        ),
+        (
+            [TWITCH_PERIOD_UUID, CONTRACTION_VELOCITY_UUID],
+            "only creates period and contraction velocity",
+        ),
+        (
+            [RELAXATION_VELOCITY_UUID],
+            "only creates relaxation velocity",
+        ),
+    ],
+)
+def test_data_metrics__accepts_kwarg_dict_of_which_metrics_to_create(
+    expected_metrics, test_description, new_A1
+):
+    per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A1, metrics_to_create=expected_metrics)
+    for metric_id in ALL_METRICS:
+        # make sure metric handled correctly in aggregate dict
+        assert (metric_id in aggregate_metrics_dict) is (metric_id in expected_metrics), metric_id
+        # make sure metric handled correctly in per twitch dict
+        for twitch_timepoint, twitch_dict in per_twitch_dict.items():
+            assert (metric_id in twitch_dict) is (
+                metric_id in expected_metrics
+            ), f"{twitch_timepoint}, {metric_id}"
+
+
 def test_new_A1_period(new_A1):
     per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A1)
 
@@ -161,12 +193,8 @@ def test_new_A1_period(new_A1):
 def test_new_A1_frequency(new_A1):
     per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A1)
 
-    assert aggregate_metrics_dict[TWITCH_FREQUENCY_UUID]["mean"] == approx(
-        1.2477183310516644
-    )
-    assert aggregate_metrics_dict[TWITCH_FREQUENCY_UUID]["std"] == approx(
-        0.026146910973044845
-    )
+    assert aggregate_metrics_dict[TWITCH_FREQUENCY_UUID]["mean"] == approx(1.2477183310516644)
+    assert aggregate_metrics_dict[TWITCH_FREQUENCY_UUID]["std"] == approx(0.026146910973044845)
     assert per_twitch_dict[105000][TWITCH_FREQUENCY_UUID] == approx(1.2345679)
 
 
@@ -265,58 +293,32 @@ def test_new_A1_contraction_velocity(new_A1):
     per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A1)
 
     # test data_metrics per beat dictionary
-    assert_percent_diff(
-        per_twitch_dict[105000][CONTRACTION_VELOCITY_UUID], 6.474188398084087
-    )
+    assert_percent_diff(per_twitch_dict[105000][CONTRACTION_VELOCITY_UUID], 6.474188398084087)
     assert_percent_diff(per_twitch_dict[186000][CONTRACTION_VELOCITY_UUID], 5.99059)
-    assert_percent_diff(
-        per_twitch_dict[266000][CONTRACTION_VELOCITY_UUID], 6.800115874855156
-    )
+    assert_percent_diff(per_twitch_dict[266000][CONTRACTION_VELOCITY_UUID], 6.800115874855156)
 
     # test data_metrics aggregate dictionary
     assert aggregate_metrics_dict[CONTRACTION_VELOCITY_UUID]["n"] == 11
-    assert_percent_diff(
-        aggregate_metrics_dict[CONTRACTION_VELOCITY_UUID]["mean"], 6.440001805351568
-    )
-    assert_percent_diff(
-        aggregate_metrics_dict[CONTRACTION_VELOCITY_UUID]["std"], 0.2531719477692566
-    )
-    assert_percent_diff(
-        aggregate_metrics_dict[CONTRACTION_VELOCITY_UUID]["min"], 5.990590432409137
-    )
-    assert_percent_diff(
-        aggregate_metrics_dict[CONTRACTION_VELOCITY_UUID]["max"], 6.905701940184699
-    )
+    assert_percent_diff(aggregate_metrics_dict[CONTRACTION_VELOCITY_UUID]["mean"], 6.440001805351568)
+    assert_percent_diff(aggregate_metrics_dict[CONTRACTION_VELOCITY_UUID]["std"], 0.2531719477692566)
+    assert_percent_diff(aggregate_metrics_dict[CONTRACTION_VELOCITY_UUID]["min"], 5.990590432409137)
+    assert_percent_diff(aggregate_metrics_dict[CONTRACTION_VELOCITY_UUID]["max"], 6.905701940184699)
 
 
 def test_new_A1_relaxation_velocity(new_A1):
     per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A1)
 
     # test data_metrics per beat dictionary
-    assert_percent_diff(
-        per_twitch_dict[105000][RELAXATION_VELOCITY_UUID], 3.8382997965182004
-    )
-    assert_percent_diff(
-        per_twitch_dict[186000][RELAXATION_VELOCITY_UUID], 3.7836936936936936
-    )
-    assert_percent_diff(
-        per_twitch_dict[266000][RELAXATION_VELOCITY_UUID], 4.144501085146116
-    )
+    assert_percent_diff(per_twitch_dict[105000][RELAXATION_VELOCITY_UUID], 3.8382997965182004)
+    assert_percent_diff(per_twitch_dict[186000][RELAXATION_VELOCITY_UUID], 3.7836936936936936)
+    assert_percent_diff(per_twitch_dict[266000][RELAXATION_VELOCITY_UUID], 4.144501085146116)
 
     # test data_metrics aggregate dictionary
     assert aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["n"] == 11
-    assert_percent_diff(
-        aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["mean"], 4.053570198234518
-    )
-    assert_percent_diff(
-        aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["std"], 0.23419699561645954
-    )
-    assert_percent_diff(
-        aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["min"], 3.7407880918679512
-    )
-    assert_percent_diff(
-        aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["max"], 4.495471014492754
-    )
+    assert_percent_diff(aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["mean"], 4.053570198234518)
+    assert_percent_diff(aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["std"], 0.23419699561645954)
+    assert_percent_diff(aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["min"], 3.7407880918679512)
+    assert_percent_diff(aggregate_metrics_dict[RELAXATION_VELOCITY_UUID]["max"], 4.495471014492754)
 
 
 def test_new_A1_interval_irregularity(new_A1):
@@ -329,20 +331,14 @@ def test_new_A1_interval_irregularity(new_A1):
 
     # test data_metrics aggregate dictionary
     assert aggregate_metrics_dict[IRREGULARITY_INTERVAL_UUID]["n"] == 11
-    assert_percent_diff(
-        aggregate_metrics_dict[IRREGULARITY_INTERVAL_UUID]["mean"], 2444.444
-    )
-    assert_percent_diff(
-        aggregate_metrics_dict[IRREGULARITY_INTERVAL_UUID]["std"], 1422.916
-    )
+    assert_percent_diff(aggregate_metrics_dict[IRREGULARITY_INTERVAL_UUID]["mean"], 2444.444)
+    assert_percent_diff(aggregate_metrics_dict[IRREGULARITY_INTERVAL_UUID]["std"], 1422.916)
     assert aggregate_metrics_dict[IRREGULARITY_INTERVAL_UUID]["min"] == 1000.0
     assert aggregate_metrics_dict[IRREGULARITY_INTERVAL_UUID]["max"] == 6000.0
 
 
 def test_new_two_twitches_interval_irregularity(MA20123456__2020_08_17_145752__A1):
-    per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(
-        MA20123456__2020_08_17_145752__A1
-    )
+    per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(MA20123456__2020_08_17_145752__A1)
 
     # test data_metrics per beat dictionary
     assert math.isnan(per_twitch_dict[108160][IRREGULARITY_INTERVAL_UUID]) is True
@@ -487,30 +483,16 @@ def test_maiden_voyage_data_amplitude(maiden_voyage_data):
 def test_new_A1_twitch_widths_unrounded(new_A1):
     per_twitch_dict, aggregate_metrics_dict = _get_unrounded_data_metrics(new_A1)
 
-    assert per_twitch_dict[105000][WIDTH_UUID][10][WIDTH_VALUE_UUID] == approx(
-        10768.4501
-    )
+    assert per_twitch_dict[105000][WIDTH_UUID][10][WIDTH_VALUE_UUID] == approx(10768.4501)
 
-    assert per_twitch_dict[186000][WIDTH_UUID][50][WIDTH_VALUE_UUID] == approx(
-        25339.5298
-    )
-    assert per_twitch_dict[266000][WIDTH_UUID][90][WIDTH_VALUE_UUID] == approx(
-        43565.8953
-    )
+    assert per_twitch_dict[186000][WIDTH_UUID][50][WIDTH_VALUE_UUID] == approx(25339.5298)
+    assert per_twitch_dict[266000][WIDTH_UUID][90][WIDTH_VALUE_UUID] == approx(43565.8953)
 
-    assert per_twitch_dict[105000][WIDTH_UUID][10][WIDTH_FALLING_COORDS_UUID][
-        0
-    ] == approx(109494.2651)
-    assert per_twitch_dict[105000][WIDTH_UUID][10][WIDTH_FALLING_COORDS_UUID][
-        1
-    ] == approx(-211000.4)
+    assert per_twitch_dict[105000][WIDTH_UUID][10][WIDTH_FALLING_COORDS_UUID][0] == approx(109494.2651)
+    assert per_twitch_dict[105000][WIDTH_UUID][10][WIDTH_FALLING_COORDS_UUID][1] == approx(-211000.4)
 
-    assert per_twitch_dict[186000][WIDTH_UUID][50][WIDTH_RISING_COORDS_UUID][
-        0
-    ] == approx(171481.9239)
-    assert per_twitch_dict[186000][WIDTH_UUID][50][WIDTH_RISING_COORDS_UUID][
-        1
-    ] == approx(-167630.5)
+    assert per_twitch_dict[186000][WIDTH_UUID][50][WIDTH_RISING_COORDS_UUID][0] == approx(171481.9239)
+    assert per_twitch_dict[186000][WIDTH_UUID][50][WIDTH_RISING_COORDS_UUID][1] == approx(-167630.5)
 
     assert aggregate_metrics_dict[WIDTH_UUID][20]["mean"] == approx(15757.7783)
     assert aggregate_metrics_dict[WIDTH_UUID][50]["std"] == approx(421.3576)
@@ -524,9 +506,7 @@ def test_new_A1_twitch_widths(new_A1):
     per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A1)
 
     # plot and save results
-    _plot_twitch_widths(
-        filtered_data, per_twitch_dict, os.path.join(PATH_TO_PNGS, "new_A1_widths.png")
-    )
+    _plot_twitch_widths(filtered_data, per_twitch_dict, os.path.join(PATH_TO_PNGS, "new_A1_widths.png"))
 
     assert per_twitch_dict[105000][WIDTH_UUID][10][WIDTH_VALUE_UUID] == 10768
     assert per_twitch_dict[186000][WIDTH_UUID][50][WIDTH_VALUE_UUID] == 25340
@@ -553,9 +533,7 @@ def test_new_A2_twitch_widths(new_A2):
     per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A2)
 
     # plot and save results
-    _plot_twitch_widths(
-        filtered_data, per_twitch_dict, os.path.join(PATH_TO_PNGS, "new_A2_widths.png")
-    )
+    _plot_twitch_widths(filtered_data, per_twitch_dict, os.path.join(PATH_TO_PNGS, "new_A2_widths.png"))
 
     assert per_twitch_dict[104000][WIDTH_UUID][10][WIDTH_VALUE_UUID] == 9937
     assert per_twitch_dict[185000][WIDTH_UUID][50][WIDTH_VALUE_UUID] == 24890
@@ -582,9 +560,7 @@ def test_new_A3_twitch_widths(new_A3):
     per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A3)
 
     # plot and save results
-    _plot_twitch_widths(
-        filtered_data, per_twitch_dict, os.path.join(PATH_TO_PNGS, "new_A3_widths.png")
-    )
+    _plot_twitch_widths(filtered_data, per_twitch_dict, os.path.join(PATH_TO_PNGS, "new_A3_widths.png"))
 
     assert per_twitch_dict[108000][WIDTH_UUID][10][WIDTH_VALUE_UUID] == 10789
     assert per_twitch_dict[193000][WIDTH_UUID][50][WIDTH_VALUE_UUID] == 29398
@@ -611,9 +587,7 @@ def test_new_A4_twitch_widths(new_A4):
     per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A4)
 
     # plot and save results
-    _plot_twitch_widths(
-        filtered_data, per_twitch_dict, os.path.join(PATH_TO_PNGS, "new_A4_widths.png")
-    )
+    _plot_twitch_widths(filtered_data, per_twitch_dict, os.path.join(PATH_TO_PNGS, "new_A4_widths.png"))
 
     assert per_twitch_dict[81000][WIDTH_UUID][10][WIDTH_VALUE_UUID] == 8941
     assert per_twitch_dict[137000][WIDTH_UUID][50][WIDTH_VALUE_UUID] == 21595
@@ -640,9 +614,7 @@ def test_new_A5_twitch_widths(new_A5):
     per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A5)
 
     # plot and save results
-    _plot_twitch_widths(
-        filtered_data, per_twitch_dict, os.path.join(PATH_TO_PNGS, "new_A5_widths.png")
-    )
+    _plot_twitch_widths(filtered_data, per_twitch_dict, os.path.join(PATH_TO_PNGS, "new_A5_widths.png"))
 
     assert per_twitch_dict[80000][WIDTH_UUID][10][WIDTH_VALUE_UUID] == 8051
     assert per_twitch_dict[138000][WIDTH_UUID][50][WIDTH_VALUE_UUID] == 20612
@@ -669,9 +641,7 @@ def test_new_A6_twitch_widths(new_A6):
     per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A6)
 
     # plot and save results
-    _plot_twitch_widths(
-        filtered_data, per_twitch_dict, os.path.join(PATH_TO_PNGS, "new_A6_widths.png")
-    )
+    _plot_twitch_widths(filtered_data, per_twitch_dict, os.path.join(PATH_TO_PNGS, "new_A6_widths.png"))
 
     assert per_twitch_dict[88000][WIDTH_UUID][10][WIDTH_VALUE_UUID] == 4815
     assert per_twitch_dict[148000][WIDTH_UUID][50][WIDTH_VALUE_UUID] == 28278
