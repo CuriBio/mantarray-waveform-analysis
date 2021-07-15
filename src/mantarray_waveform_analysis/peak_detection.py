@@ -454,8 +454,6 @@ def find_twitch_indices(
                 SUBSEQUENT_VALLEY_INDEX_UUID: valley_indices[itr_idx if starts_with_peak else itr_idx + 1],
             }
 
-    # print(list(twitches.keys())[0])
-    # print(twitches[list(twitches.keys())[0]])
     return twitches
 
 

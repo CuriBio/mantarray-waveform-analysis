@@ -2,10 +2,11 @@ Changelog for Mantarray Waveform Analysis
 =========================================
 
 
-1.1.0 (2021-07-13)
+1.0.1 (2021-07-15)
 ------------------
 
-- TODO
+- Added ``metrics_to_create`` kwarg to ``data_metrics`` to specify which metrics to create. This kwarg can
+  also be passed to Pipeline methods that get data metrics.
 
 
 1.0.0 (2021-05-06)
