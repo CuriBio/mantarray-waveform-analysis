@@ -164,10 +164,10 @@ def _plot_data(
     plt.close()
 
 
-def _get_data_metrics(well_fixture):
+def _get_data_metrics(well_fixture, **kwargs):
     pipeline, peak_and_valley_indices = well_fixture
     filtered_data = pipeline.get_noise_filtered_gmr()
-    return peak_detection.data_metrics(peak_and_valley_indices, filtered_data)
+    return peak_detection.data_metrics(peak_and_valley_indices, filtered_data, **kwargs)
 
 
 def _get_unrounded_data_metrics(well_fixture):

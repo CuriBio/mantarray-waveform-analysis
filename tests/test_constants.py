@@ -2,6 +2,7 @@
 import uuid
 
 from mantarray_waveform_analysis import ADC_GAIN
+from mantarray_waveform_analysis import ALL_METRICS
 from mantarray_waveform_analysis import AMPLITUDE_UUID
 from mantarray_waveform_analysis import AUC_UUID
 from mantarray_waveform_analysis import BESSEL_BANDPASS_UUID
@@ -89,6 +90,19 @@ def test_data_metric_uuids():
     assert SUBSEQUENT_PEAK_INDEX_UUID == uuid.UUID("7e37325b-6681-4623-b192-39f154350f36")
     assert SUBSEQUENT_VALLEY_INDEX_UUID == uuid.UUID("fd47ba6b-ee4d-4674-9a89-56e0db7f3d97")
     assert IRREGULARITY_INTERVAL_UUID == uuid.UUID("61046076-66b9-4b8b-bfec-1e00603743c0")
+
+    assert ALL_METRICS == frozenset(
+        [
+            TWITCH_PERIOD_UUID,
+            AMPLITUDE_UUID,
+            WIDTH_UUID,
+            AUC_UUID,
+            TWITCH_FREQUENCY_UUID,
+            CONTRACTION_VELOCITY_UUID,
+            RELAXATION_VELOCITY_UUID,
+            IRREGULARITY_INTERVAL_UUID,
+        ]
+    )
 
 
 def test_gmr_conversion_factors():

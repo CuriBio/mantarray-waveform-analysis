@@ -2,6 +2,7 @@
 import math
 import os
 
+from mantarray_waveform_analysis import ALL_METRICS
 from mantarray_waveform_analysis import AMPLITUDE_UUID
 from mantarray_waveform_analysis import AUC_UUID
 from mantarray_waveform_analysis import CONTRACTION_VELOCITY_UUID
@@ -141,6 +142,37 @@ def _plot_twitch_widths(filtered_data, per_twitch_dict, my_local_path_graphs):
     plt.xlabel("Time (centimilliseconds)")
     plt.ylabel("Voltage (V)")
     plt.savefig(my_local_path_graphs)
+
+
+@pytest.mark.parametrize(
+    "expected_metrics,test_description",
+    [
+        (
+            [TWITCH_FREQUENCY_UUID, AMPLITUDE_UUID],
+            "only creates freq and amp metrics",
+        ),
+        (
+            [TWITCH_PERIOD_UUID, CONTRACTION_VELOCITY_UUID],
+            "only creates period and contraction velocity",
+        ),
+        (
+            [RELAXATION_VELOCITY_UUID],
+            "only creates relaxation velocity",
+        ),
+    ],
+)
+def test_data_metrics__accepts_kwarg_dict_of_which_metrics_to_create(
+    expected_metrics, test_description, new_A1
+):
+    per_twitch_dict, aggregate_metrics_dict = _get_data_metrics(new_A1, metrics_to_create=expected_metrics)
+    for metric_id in ALL_METRICS:
+        # make sure metric handled correctly in aggregate dict
+        assert (metric_id in aggregate_metrics_dict) is (metric_id in expected_metrics), metric_id
+        # make sure metric handled correctly in per twitch dict
+        for twitch_timepoint, twitch_dict in per_twitch_dict.items():
+            assert (metric_id in twitch_dict) is (
+                metric_id in expected_metrics
+            ), f"{twitch_timepoint}, {metric_id}"
 
 
 def test_new_A1_period(new_A1):
