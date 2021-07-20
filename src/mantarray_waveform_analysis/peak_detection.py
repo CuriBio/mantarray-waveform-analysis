@@ -61,6 +61,8 @@ def peak_detector(
         A tuple of the indices of the peaks and valleys
     """
     magnetic_signal: NDArray[int] = filtered_magnetic_signal[1, :]
+    magnetic_signal *= -1
+
     peak_invertor_factor = 1
     valley_invertor_factor = -1
     if not twitches_point_up:
