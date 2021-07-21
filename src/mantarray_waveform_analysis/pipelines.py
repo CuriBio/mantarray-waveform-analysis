@@ -218,6 +218,7 @@ class Pipeline:
         self._peak_detection_results = peak_detector(
             self.get_noise_filtered_magnetic_data(),
             twitches_point_up=self._pipeline_template.magnetic_twitches_point_up,
+            is_magnetic_data=self._pipeline_template.is_magnetic_data,
         )
         return self._peak_detection_results
 
@@ -388,6 +389,7 @@ class PipelineTemplate:  # pylint: disable=too-few-public-methods # This is a si
     tissue_sampling_period: int = attr.ib()
     noise_filter_uuid: Optional[UUID] = attr.ib(default=None)
     is_force_data: bool = attr.ib(default=True)
+    is_magnetic_data: bool = attr.ib(default=True)
     magnetic_twitches_point_up: bool
     _filter_coefficients: NDArray[(Any, Any), float]
 
