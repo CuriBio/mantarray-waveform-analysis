@@ -48,6 +48,7 @@ TWITCH_WIDTH_INDEX_OF_CONTRACTION_VELOCITY_END = TWITCH_WIDTH_PERCENTS.index(90)
 def peak_detector(
     filtered_magnetic_signal: NDArray[(2, Any), int],
     twitches_point_up: bool = True,
+    is_magnetic_data: bool = True,
 ) -> Tuple[List[int], List[int]]:
     """Locates peaks and valleys and returns the indices.
 
@@ -61,7 +62,8 @@ def peak_detector(
         A tuple of the indices of the peaks and valleys
     """
     magnetic_signal: NDArray[int] = filtered_magnetic_signal[1, :]
-    magnetic_signal *= -1
+    if is_magnetic_data:
+        magnetic_signal *= -1
 
     peak_invertor_factor = 1
     valley_invertor_factor = -1
