@@ -324,7 +324,7 @@ def test_Pipeline__get_peak_detection_info__passes_twitches_point_up_parameter_w
     pipeline.load_raw_magnetic_data(raw_generic_well_a1, raw_generic_well_a1)
     mocked_peak_detection = mocker.patch.object(pipelines, "peak_detector", autospec=True)
     pipeline.get_peak_detection_results()
-    mocked_peak_detection.assert_called_once_with(ANY, twitches_point_up=True)
+    mocked_peak_detection.assert_called_once_with(ANY, twitches_point_up=True, is_magnetic_data=True)
 
 
 def test_Pipeline__get_peak_detection_info__passes_force_data_parameter_when_true(
@@ -335,15 +335,15 @@ def test_Pipeline__get_peak_detection_info__passes_force_data_parameter_when_tru
     pipeline.load_raw_magnetic_data(raw_generic_well_a1, raw_generic_well_a1)
     mocked_peak_detection = mocker.patch.object(pipelines, "peak_detector", autospec=True)
     pipeline.get_peak_detection_results()
-    mocked_peak_detection.assert_called_once_with(ANY, twitches_point_up=True)
+    mocked_peak_detection.assert_called_once_with(ANY, twitches_point_up=True, is_magnetic_data=True)
 
 
 def test_Pipeline__get_peak_detection_info__passes_force_data_parameter_when_false(
     mocker, raw_generic_well_a1
 ):
-    pt = PipelineTemplate(100, is_force_data=False)
+    pt = PipelineTemplate(100, is_force_data=False, is_magnetic_data=False)
     pipeline = pt.create_pipeline()
     pipeline.load_raw_magnetic_data(raw_generic_well_a1, raw_generic_well_a1)
     mocked_peak_detection = mocker.patch.object(pipelines, "peak_detector", autospec=True)
     pipeline.get_peak_detection_results()
-    mocked_peak_detection.assert_called_once_with(ANY, twitches_point_up=False)
+    mocked_peak_detection.assert_called_once_with(ANY, twitches_point_up=False, is_magnetic_data=False)
