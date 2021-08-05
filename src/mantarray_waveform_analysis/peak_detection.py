@@ -19,6 +19,7 @@ from .constants import AMPLITUDE_UUID
 from .constants import AUC_UUID
 from .constants import CENTIMILLISECONDS_PER_SECOND
 from .constants import CONTRACTION_VELOCITY_UUID
+from .constants import FRACTION_MAX_UUID
 from .constants import IRREGULARITY_INTERVAL_UUID
 from .constants import MIN_NUMBER_PEAKS
 from .constants import MIN_NUMBER_VALLEYS
@@ -51,9 +52,7 @@ def peak_detector(
 
     Args:
         noise_free_data: a 2D array of the time and voltage data after it has gone through noise cancellation
-        sampling_rate: an integer value of the sampling rate of the data in Hz
         twitches_point_up: whether in the incoming data stream the biological twitches are pointing up (in the positive direction) or down
-        data: a 2D array of the original time and voltage before noise cancellation
 
     Returns:
         A tuple of the indices of the peaks and valleys
@@ -117,14 +116,14 @@ def peak_detector(
     return peak_indices, valley_indices
 
 
-def create_avg_dict(metric: NDArray[int], round_to_int: bool = True) -> Dict[str, Union[Float64, int]]:
-    """Calculate the average values of a specific metric.
+def create_statistics_dict(metric: NDArray[int], round_to_int: bool = True) -> Dict[str, Union[Float64, int]]:
+    """Calculate various statistics for a specific metric.
 
     Args:
         metric: a 1D array of integer values of a specific metric results
 
     Returns:
-        a dictionary of the average statistics of that metric in which the metrics are the key and average statistics are the value
+        a dictionary of statistics of that metric in which the metrics are the key and the estimates are the value
     """
     dictionary: Dict[str, Union[Float64, int]] = dict()
     dictionary["n"] = len(metric)
@@ -189,9 +188,9 @@ def data_metrics(
     ] = dict()
 
     # create dependent dicitonaries
-    period_averages_dict: Dict[str, Union[float, int]] = {}
-    amplitude_averages_dict: Dict[str, Union[float, int]] = {}
-    auc_averages_dict: Dict[str, Union[float, int]] = {}
+    period_statistics_dict: Dict[str, Union[float, int]] = {}
+    amplitude_statistics_dict: Dict[str, Union[float, int]] = {}
+    auc_statistics_dict: Dict[str, Union[float, int]] = {}
 
     peak_indices, _ = peak_and_valley_indices
 
@@ -205,21 +204,27 @@ def data_metrics(
     combined_twitch_periods = calculate_twitch_period(twitch_indices, peak_indices, filtered_data)
 
     twitch_frequencies = 1 / (combined_twitch_periods.astype(float) / CENTIMILLISECONDS_PER_SECOND)
-    frequency_averages_dict = create_avg_dict(twitch_frequencies, round_to_int=False)
+    frequency_statistics_dict = create_statistics_dict(twitch_frequencies, round_to_int=False)
 
     # find aggregate values of period data
-    period_averages_dict = create_avg_dict(combined_twitch_periods)
+    period_statistics_dict = create_statistics_dict(combined_twitch_periods)
 
-    aggregate_dict[TWITCH_PERIOD_UUID] = period_averages_dict
-    aggregate_dict[TWITCH_FREQUENCY_UUID] = frequency_averages_dict
+    aggregate_dict[TWITCH_PERIOD_UUID] = period_statistics_dict
+    aggregate_dict[TWITCH_FREQUENCY_UUID] = frequency_statistics_dict
 
     # find twitch amplitudes
     amplitudes: NDArray[int] = calculate_amplitudes(twitch_indices, filtered_data, round_to_int=rounded)
 
     # find aggregate values of amplitude data
-    amplitude_averages_dict = create_avg_dict(amplitudes, round_to_int=rounded)
+    amplitude_statistics_dict = create_statistics_dict(amplitudes, round_to_int=rounded)
+    aggregate_dict[AMPLITUDE_UUID] = amplitude_statistics_dict
 
-    aggregate_dict[AMPLITUDE_UUID] = amplitude_averages_dict
+    # compute the twitch amplitude fraction of max twitch amplitude
+    amplitude_fraction_of_max: NDArray[float] = amplitudes / amplitude_statistics_dict['max']
+
+    # compute aggregate values of fraction of max
+    aggregate_dict[FRACTION_MAX_UUID] = create_statistics_dict(amplitude_fraction_of_max, round_to_int=rounded)
+
 
     # find twitch widths
     widths = calculate_twitch_widths(twitch_indices, filtered_data, round_to_int=rounded)
@@ -234,7 +239,7 @@ def data_metrics(
                     f"The width value under key {WIDTH_VALUE_UUID} must be a float or an int. It was: {iter_width_value}"
                 )
             iter_list_of_width_values.append(iter_width_value)
-        iter_stats_dict = create_avg_dict(iter_list_of_width_values, round_to_int=rounded)
+        iter_stats_dict = create_statistics_dict(iter_list_of_width_values, round_to_int=rounded)
         width_stats_dict[iter_percent] = iter_stats_dict
 
     aggregate_dict[WIDTH_UUID] = width_stats_dict
@@ -246,24 +251,24 @@ def data_metrics(
 
     # calculate twitch contraction/relaxation velocities
     contraction_velocity = calculate_twitch_velocity(twitch_indices, widths, True)
-    contraction_velocity_averages = create_avg_dict(contraction_velocity, round_to_int=False)
+    contraction_velocity_averages = create_statistics_dict(contraction_velocity, round_to_int=False)
     aggregate_dict[CONTRACTION_VELOCITY_UUID] = contraction_velocity_averages
 
     relaxation_velocity = calculate_twitch_velocity(twitch_indices, widths, False)
-    relaxation_velocity_averages = create_avg_dict(relaxation_velocity, round_to_int=False)
+    relaxation_velocity_averages = create_statistics_dict(relaxation_velocity, round_to_int=False)
     aggregate_dict[RELAXATION_VELOCITY_UUID] = relaxation_velocity_averages
 
     # calculate twitch interval irregularity
     interval_irregularity = calculate_interval_irregularity(twitch_indices, time_series)
 
-    interval_irregularity_averages = create_avg_dict(interval_irregularity[1:-1], round_to_int=False)
+    interval_irregularity_averages = create_statistics_dict(interval_irregularity[1:-1], round_to_int=False)
     interval_irregularity_averages["n"] = interval_irregularity_averages["n"] + 2
     aggregate_dict[IRREGULARITY_INTERVAL_UUID] = interval_irregularity_averages
 
     # find aggregate values of area under curve data
-    auc_averages_dict = create_avg_dict(auc_per_twitch, round_to_int=rounded)
+    auc_statistics_dict = create_statistics_dict(auc_per_twitch, round_to_int=rounded)
 
-    aggregate_dict[AUC_UUID] = auc_averages_dict
+    aggregate_dict[AUC_UUID] = auc_statistics_dict
 
     # add metrics to per peak dictionary
     twitch_peak_indices = tuple(twitch_indices.keys())
@@ -273,12 +278,13 @@ def data_metrics(
                 time_series[twitch_peak_indices[i]]: {
                     TWITCH_PERIOD_UUID: combined_twitch_periods[i],
                     AMPLITUDE_UUID: amplitudes[i],
+                    FRACTION_MAX_UUID: amplitude_fraction_of_max[i],
                     WIDTH_UUID: widths[i],
                     AUC_UUID: auc_per_twitch[i],
                     TWITCH_FREQUENCY_UUID: twitch_frequencies[i],
                     CONTRACTION_VELOCITY_UUID: contraction_velocity[i],
                     RELAXATION_VELOCITY_UUID: relaxation_velocity[i],
-                    IRREGULARITY_INTERVAL_UUID: interval_irregularity[i],
+                    IRREGULARITY_INTERVAL_UUID: interval_irregularity[i]
                 }
             }
         )
@@ -378,7 +384,7 @@ def calculate_twitch_period(
     """Find the distance between each twitch at its peak.
 
     Args:
-        twitch_indices:a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUID of prior/subsequent peaks and valleys and their index values.
+        twitch_indices: a 1D array in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUID of prior/subsequent peaks and valleys and their index values.
         all_peak_indices: a 1D array of the indices in teh data array that all peaks are at
         filtered_data: a 2D array (time vs value) of the data
 

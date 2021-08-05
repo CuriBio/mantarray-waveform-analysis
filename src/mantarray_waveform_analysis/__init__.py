@@ -11,6 +11,7 @@ from .constants import BESSEL_LOWPASS_30_UUID
 from .constants import BUTTERWORTH_LOWPASS_30_UUID
 from .constants import CENTIMILLISECONDS_PER_SECOND
 from .constants import CONTRACTION_VELOCITY_UUID
+from .constants import FRACTION_MAX_UUID
 from .constants import IRREGULARITY_INTERVAL_UUID
 from .constants import MIDSCALE_CODE
 from .constants import MILLI_TO_BASE_CONVERSION

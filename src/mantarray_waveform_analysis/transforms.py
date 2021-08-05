@@ -25,6 +25,7 @@ from .constants import REFERENCE_VOLTAGE
 from .exceptions import FilterCreationNotImplementedError
 from .exceptions import UnrecognizedFilterUuidError
 
+
 FILTER_CHARACTERISTICS: Dict[uuid.UUID, Dict[str, Union[str, float, int]]] = {
     BESSEL_BANDPASS_UUID: {
         "filter_type": "bessel",
@@ -40,6 +41,14 @@ FILTER_CHARACTERISTICS: Dict[uuid.UUID, Dict[str, Union[str, float, int]]] = {
         "low_pass_hz": 30,
     },
 }
+
+# create the noise filtering polynomial coefficients
+# currently, the optional filters are hard-coded (see above)
+# we allow a single band-pass filter (Bessel: order 4, 0.1 < w < 10)
+# we allow three low-pass filters:
+# Bessel: order 4, w < 10
+# Bessel: order 4, w<30
+# Butterworth: order 4, w<30)
 
 
 def create_filter(

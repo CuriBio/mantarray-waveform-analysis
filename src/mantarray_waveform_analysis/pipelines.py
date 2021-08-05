@@ -151,6 +151,11 @@ class Pipeline:
         return self._raw_reference_magnetic_data
 
     def get_sensitivity_calibrated_tissue_gmr(self) -> NDArray[(2, Any), int]:
+        """Return sensitivity calibration results on raw data.
+        
+        08/4/21 Kristian: apply_sensitivity_calibration currently does nothing.
+        """
+
         try:
             return self._sensitivity_calibrated_tissue_gmr
         except AttributeError:
@@ -161,6 +166,11 @@ class Pipeline:
         return self._sensitivity_calibrated_tissue_gmr
 
     def get_sensitivity_calibrated_reference_gmr(self) -> NDArray[(2, Any), int]:
+        """Return sensitivity calibration results on reference data.
+        
+        08/4/21 Kristian: apply_sensitivity_calibration currently does nothing.
+        """
+
         try:
             return self._sensitivity_calibrated_reference_gmr
         except AttributeError:
