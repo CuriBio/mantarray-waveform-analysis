@@ -2,7 +2,6 @@
 """Transforming arrays of Mantarray data throughout the analysis pipeline."""
 from typing import Any
 from typing import Dict
-from typing import Iterable
 from typing import List
 from typing import Optional
 from typing import Tuple
@@ -13,7 +12,6 @@ import attr
 from nptyping import NDArray
 import numpy as np
 
-from .constants import ALL_METRICS
 from .exceptions import DataAlreadyLoadedInPipelineError
 from .peak_detection import data_metrics
 from .peak_detection import peak_detector
@@ -58,7 +56,7 @@ class Pipeline:
         self._displacement: NDArray[(2, Any), np.float32]
         self._force: NDArray[(2, Any), np.float32]
         self._peak_detection_results: Tuple[List[int], List[int]]
-        self._magnetic_data_metrics: Tuple[  # pylint:disable=duplicate-code # Anna (1/7/21): long type definition causing failure
+        self._magnetic_data_metrics: Tuple[  # pylint:disable=duplicate-code # Anna (1/7/21): long type definition causing failture
             Dict[
                 int,
                 Dict[
@@ -77,7 +75,7 @@ class Pipeline:
                 ],
             ],
         ]
-        self._displacement_data_metrics: Tuple[  # pylint:disable=duplicate-code # Anna (1/7/21): long type definition causing failure
+        self._displacement_data_metrics: Tuple[  # pylint:disable=duplicate-code # Anna (1/7/21): long type definition causing failture
             Dict[
                 int,
                 Dict[
@@ -96,7 +94,7 @@ class Pipeline:
                 ],
             ],
         ]
-        self._force_data_metrics: Tuple[  # pylint:disable=duplicate-code # Anna (1/7/21): long type definition causing failure
+        self._force_data_metrics: Tuple[  # pylint:disable=duplicate-code # Anna (1/7/21): long type definition causing failture
             Dict[
                 int,
                 Dict[
@@ -153,6 +151,11 @@ class Pipeline:
         return self._raw_reference_magnetic_data
 
     def get_sensitivity_calibrated_tissue_gmr(self) -> NDArray[(2, Any), int]:
+        """Return sensitivity calibration results on raw data.
+        
+        08/4/21 Kristian: apply_sensitivity_calibration currently does nothing.
+        """
+
         try:
             return self._sensitivity_calibrated_tissue_gmr
         except AttributeError:
@@ -163,6 +166,11 @@ class Pipeline:
         return self._sensitivity_calibrated_tissue_gmr
 
     def get_sensitivity_calibrated_reference_gmr(self) -> NDArray[(2, Any), int]:
+        """Return sensitivity calibration results on reference data.
+        
+        08/4/21 Kristian: apply_sensitivity_calibration currently does nothing.
+        """
+
         try:
             return self._sensitivity_calibrated_reference_gmr
         except AttributeError:
@@ -218,14 +226,12 @@ class Pipeline:
         self._peak_detection_results = peak_detector(
             self.get_noise_filtered_magnetic_data(),
             twitches_point_up=self._pipeline_template.magnetic_twitches_point_up,
-            is_magnetic_data=self._pipeline_template.is_magnetic_data,
         )
         return self._peak_detection_results
 
     def get_magnetic_data_metrics(
         self,
-        metrics_to_create: Iterable[UUID] = ALL_METRICS,
-    ) -> Tuple[  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failure
+    ) -> Tuple[  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failture
         Dict[
             int,
             Dict[
@@ -247,16 +253,13 @@ class Pipeline:
         except AttributeError:
             pass
         self._magnetic_data_metrics = data_metrics(
-            self.get_peak_detection_results(),
-            self.get_noise_filtered_magnetic_data(),
-            metrics_to_create=metrics_to_create,
+            self.get_peak_detection_results(), self.get_noise_filtered_magnetic_data()
         )
         return self._magnetic_data_metrics
 
     def get_displacement_data_metrics(
         self,
-        metrics_to_create: Iterable[UUID] = ALL_METRICS,
-    ) -> Tuple[  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failure
+    ) -> Tuple[  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failture
         Dict[
             int,
             Dict[
@@ -278,17 +281,13 @@ class Pipeline:
         except AttributeError:
             pass
         self._displacement_data_metrics = data_metrics(
-            self.get_peak_detection_results(),
-            self.get_displacement(),
-            rounded=False,
-            metrics_to_create=metrics_to_create,
+            self.get_peak_detection_results(), self.get_displacement(), rounded=False
         )
         return self._displacement_data_metrics
 
     def get_force_data_metrics(
         self,
-        metrics_to_create: Iterable[UUID] = ALL_METRICS,
-    ) -> Tuple[  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failure
+    ) -> Tuple[  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failture
         Dict[
             int,
             Dict[
@@ -310,10 +309,7 @@ class Pipeline:
         except AttributeError:
             pass
         self._force_data_metrics = data_metrics(
-            self.get_peak_detection_results(),
-            self.get_force(),
-            rounded=False,
-            metrics_to_create=metrics_to_create,
+            self.get_peak_detection_results(), self.get_force(), rounded=False
         )
         return self._force_data_metrics
 
@@ -389,7 +385,6 @@ class PipelineTemplate:  # pylint: disable=too-few-public-methods # This is a si
     tissue_sampling_period: int = attr.ib()
     noise_filter_uuid: Optional[UUID] = attr.ib(default=None)
     is_force_data: bool = attr.ib(default=True)
-    is_magnetic_data: bool = attr.ib(default=True)
     magnetic_twitches_point_up: bool
     _filter_coefficients: NDArray[(Any, Any), float]
 

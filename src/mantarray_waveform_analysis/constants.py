@@ -10,6 +10,7 @@ TWITCH_FREQUENCY_UUID = uuid.UUID(
 )  # This is just the reciprocal of twitch period, but is pre-computed to make downstream pipelines simpler. Frequency is reported in Hz
 AMPLITUDE_UUID = uuid.UUID("89cf1105-a015-434f-b527-4169b9400e26")
 AUC_UUID = uuid.UUID("e7b9a6e4-c43d-4e8b-af7e-51742e252030")
+FRACTION_MAX_UUID = uuid.UUID("d9758590-9f0d-418d-8913-db3bec2be65f")
 WIDTH_UUID = uuid.UUID("c4c60d55-017a-4783-9600-f19606de26f3")
 WIDTH_VALUE_UUID = uuid.UUID("05041f4e-c77d-42d9-a2ae-8902f912e9ac")
 WIDTH_RISING_COORDS_UUID = uuid.UUID("2a16acb6-4df7-4064-9d47-5d27ea7a98ad")
@@ -22,6 +23,7 @@ ALL_METRICS = frozenset(
     [
         TWITCH_PERIOD_UUID,
         AMPLITUDE_UUID,
+        FRACTION_MAX_UUID,
         WIDTH_UUID,
         AUC_UUID,
         TWITCH_FREQUENCY_UUID,
@@ -52,7 +54,6 @@ NEWTONS_PER_MILLIMETER = 0.000159
 REFERENCE_VOLTAGE = 2.5
 ADC_GAIN = 2
 MILLI_TO_BASE_CONVERSION = 1000
-
 
 MIN_NUMBER_PEAKS = 3
 MIN_NUMBER_VALLEYS = 3
