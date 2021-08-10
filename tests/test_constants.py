@@ -97,6 +97,7 @@ def test_data_metric_uuids():
         [
             TWITCH_PERIOD_UUID,
             AMPLITUDE_UUID,
+            FRACTION_MAX_UUID,
             WIDTH_UUID,
             AUC_UUID,
             TWITCH_FREQUENCY_UUID,
