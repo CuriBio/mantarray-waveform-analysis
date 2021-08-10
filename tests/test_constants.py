@@ -12,6 +12,7 @@ from mantarray_waveform_analysis import BUTTERWORTH_LOWPASS_30_UUID
 from mantarray_waveform_analysis import CENTIMILLISECONDS_PER_SECOND
 from mantarray_waveform_analysis import CONTRACTION_VELOCITY_UUID
 from mantarray_waveform_analysis import FILTER_CHARACTERISTICS
+from mantarray_waveform_analysis import FRACTION_MAX_UUID
 from mantarray_waveform_analysis import IRREGULARITY_INTERVAL_UUID
 from mantarray_waveform_analysis import MIDSCALE_CODE
 from mantarray_waveform_analysis import MILLI_TO_BASE_CONVERSION
@@ -78,6 +79,7 @@ def test_data_metric_uuids():
     assert TWITCH_FREQUENCY_UUID == uuid.UUID("472d0707-ff87-4198-9374-c28900bb216c")
     assert AMPLITUDE_UUID == uuid.UUID("89cf1105-a015-434f-b527-4169b9400e26")
     assert AUC_UUID == uuid.UUID("e7b9a6e4-c43d-4e8b-af7e-51742e252030")
+    assert FRACTION_MAX_UUID = uuid.UUID("d9758590-9f0d-418d-8913-db3bec2be65f")
     assert WIDTH_UUID == uuid.UUID("c4c60d55-017a-4783-9600-f19606de26f3")
     assert WIDTH_VALUE_UUID == uuid.UUID("05041f4e-c77d-42d9-a2ae-8902f912e9ac")
     assert WIDTH_RISING_COORDS_UUID == uuid.UUID("2a16acb6-4df7-4064-9d47-5d27ea7a98ad")
