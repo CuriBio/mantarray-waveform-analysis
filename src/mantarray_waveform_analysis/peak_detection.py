@@ -21,6 +21,7 @@ from .constants import AMPLITUDE_UUID
 from .constants import AUC_UUID
 from .constants import CENTIMILLISECONDS_PER_SECOND
 from .constants import CONTRACTION_VELOCITY_UUID
+from .constants import FRACTION_MAX_UUID
 from .constants import IRREGULARITY_INTERVAL_UUID
 from .constants import MIN_NUMBER_PEAKS
 from .constants import MIN_NUMBER_VALLEYS
@@ -123,14 +124,14 @@ def peak_detector(
     return peak_indices, valley_indices
 
 
-def create_avg_dict(metric: NDArray[int], round_to_int: bool = True) -> Dict[str, Union[Float64, int]]:
-    """Calculate the average values of a specific metric.
+def create_statistics_dict(metric: NDArray[int], round_to_int: bool = True) -> Dict[str, Union[Float64, int]]:
+    """Calculate various statistics for a specific metric.
 
     Args:
         metric: a 1D array of integer values of a specific metric results
-
+        
     Returns:
-        a dictionary of the average statistics of that metric in which the metrics are the key and average statistics are the value
+        a dictionary of statistics of that metric in which the metrics are the key and the estimates are the value
     """
     dictionary: Dict[str, Union[Float64, int]] = dict()
     dictionary["n"] = len(metric)
@@ -210,19 +211,25 @@ def data_metrics(
         combined_twitch_periods = calculate_twitch_period(twitch_indices, peak_indices, filtered_data)
     if TWITCH_PERIOD_UUID in metrics_to_create:
         _add_per_twitch_metrics(main_twitch_dict, TWITCH_PERIOD_UUID, combined_twitch_periods)
-        aggregate_dict[TWITCH_PERIOD_UUID] = create_avg_dict(combined_twitch_periods)
+        aggregate_dict[TWITCH_PERIOD_UUID] = create_statistics_dict(combined_twitch_periods)
 
     # find twitch frequencies
     if TWITCH_FREQUENCY_UUID in metrics_to_create:
         twitch_frequencies = 1 / (combined_twitch_periods.astype(float) / CENTIMILLISECONDS_PER_SECOND)
         _add_per_twitch_metrics(main_twitch_dict, TWITCH_FREQUENCY_UUID, twitch_frequencies)
-        aggregate_dict[TWITCH_FREQUENCY_UUID] = create_avg_dict(twitch_frequencies, round_to_int=False)
+        aggregate_dict[TWITCH_FREQUENCY_UUID] = create_statistics_dict(twitch_frequencies, round_to_int=False)
 
     # find twitch amplitudes
     if AMPLITUDE_UUID in metrics_to_create:
         amplitudes: NDArray[int] = calculate_amplitudes(twitch_indices, filtered_data, round_to_int=rounded)
         _add_per_twitch_metrics(main_twitch_dict, AMPLITUDE_UUID, amplitudes)
-        aggregate_dict[AMPLITUDE_UUID] = create_avg_dict(amplitudes, round_to_int=rounded)
+        aggregate_dict[AMPLITUDE_UUID] = create_statistics_dict(amplitudes, round_to_int=rounded)
+
+    # find fraction of max amplitude
+    if AMPLITUDE_UUID in metrics_to_create and FRACTION_MAX_UUID in metrics_to_create:
+        amplitude_fraction_of_max: NDArray[float] = amplitudes / aggregate_dict[AMPLITUDE_UUID]['max']
+        _add_per_twitch_metrics(main_twitch_dict, FRACTION_MAX_UUID, amplitude_fraction_of_max)
+        aggregate_dict[FRACTION_MAX_UUID] = create_statistics_dict(amplitude_fraction_of_max, round_to_int=rounded)
 
     # find twitch widths
     if (
@@ -244,7 +251,7 @@ def data_metrics(
                         f"The width value under key {WIDTH_VALUE_UUID} must be a float or an int. It was: {iter_width_value}"
                     )
                 iter_list_of_width_values.append(iter_width_value)
-            iter_stats_dict = create_avg_dict(iter_list_of_width_values, round_to_int=rounded)
+            iter_stats_dict = create_statistics_dict(iter_list_of_width_values, round_to_int=rounded)
             width_stats_dict[iter_percent] = iter_stats_dict
         aggregate_dict[WIDTH_UUID] = width_stats_dict
 
@@ -252,17 +259,17 @@ def data_metrics(
     if CONTRACTION_VELOCITY_UUID in metrics_to_create:
         contraction_velocity = calculate_twitch_velocity(twitch_indices, widths, True)
         _add_per_twitch_metrics(main_twitch_dict, CONTRACTION_VELOCITY_UUID, contraction_velocity)
-        aggregate_dict[CONTRACTION_VELOCITY_UUID] = create_avg_dict(contraction_velocity, round_to_int=False)
+        aggregate_dict[CONTRACTION_VELOCITY_UUID] = create_statistics_dict(contraction_velocity, round_to_int=False)
     if RELAXATION_VELOCITY_UUID in metrics_to_create:
         relaxation_velocity = calculate_twitch_velocity(twitch_indices, widths, False)
         _add_per_twitch_metrics(main_twitch_dict, RELAXATION_VELOCITY_UUID, relaxation_velocity)
-        aggregate_dict[RELAXATION_VELOCITY_UUID] = create_avg_dict(relaxation_velocity, round_to_int=False)
+        aggregate_dict[RELAXATION_VELOCITY_UUID] = create_statistics_dict(relaxation_velocity, round_to_int=False)
 
     # calculate twitch interval irregularity
     if IRREGULARITY_INTERVAL_UUID in metrics_to_create:
         interval_irregularity = calculate_interval_irregularity(twitch_indices, time_series)
         _add_per_twitch_metrics(main_twitch_dict, IRREGULARITY_INTERVAL_UUID, interval_irregularity)
-        interval_irregularity_averages = create_avg_dict(interval_irregularity[1:-1], round_to_int=False)
+        interval_irregularity_averages = create_statistics_dict(interval_irregularity[1:-1], round_to_int=False)
         interval_irregularity_averages["n"] += 2
         aggregate_dict[IRREGULARITY_INTERVAL_UUID] = interval_irregularity_averages
 
@@ -272,7 +279,7 @@ def data_metrics(
             twitch_indices, filtered_data, widths, round_to_int=rounded
         )
         _add_per_twitch_metrics(main_twitch_dict, AUC_UUID, auc_per_twitch)
-        aggregate_dict[AUC_UUID] = create_avg_dict(auc_per_twitch, round_to_int=rounded)
+        aggregate_dict[AUC_UUID] = create_statistics_dict(auc_per_twitch, round_to_int=rounded)
 
     return main_twitch_dict, aggregate_dict
 
