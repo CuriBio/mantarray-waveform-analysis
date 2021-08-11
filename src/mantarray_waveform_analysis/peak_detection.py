@@ -129,7 +129,7 @@ def create_statistics_dict(metric: NDArray[int], round_to_int: bool = True) -> D
 
     Args:
         metric: a 1D array of integer values of a specific metric results
-        
+
     Returns:
         a dictionary of statistics of that metric in which the metrics are the key and the estimates are the value
     """
@@ -227,9 +227,11 @@ def data_metrics(
 
     # find fraction of max amplitude
     if AMPLITUDE_UUID in metrics_to_create and FRACTION_MAX_UUID in metrics_to_create:
-        amplitude_fraction_of_max: NDArray[float] = amplitudes / aggregate_dict[AMPLITUDE_UUID]['max']
+        amplitude_fraction_of_max: NDArray[float] = amplitudes / aggregate_dict[AMPLITUDE_UUID]["max"]
         _add_per_twitch_metrics(main_twitch_dict, FRACTION_MAX_UUID, amplitude_fraction_of_max)
-        aggregate_dict[FRACTION_MAX_UUID] = create_statistics_dict(amplitude_fraction_of_max, round_to_int=rounded)
+        aggregate_dict[FRACTION_MAX_UUID] = create_statistics_dict(
+            amplitude_fraction_of_max, round_to_int=rounded
+        )
 
     # find twitch widths
     if (
@@ -259,17 +261,23 @@ def data_metrics(
     if CONTRACTION_VELOCITY_UUID in metrics_to_create:
         contraction_velocity = calculate_twitch_velocity(twitch_indices, widths, True)
         _add_per_twitch_metrics(main_twitch_dict, CONTRACTION_VELOCITY_UUID, contraction_velocity)
-        aggregate_dict[CONTRACTION_VELOCITY_UUID] = create_statistics_dict(contraction_velocity, round_to_int=False)
+        aggregate_dict[CONTRACTION_VELOCITY_UUID] = create_statistics_dict(
+            contraction_velocity, round_to_int=False
+        )
     if RELAXATION_VELOCITY_UUID in metrics_to_create:
         relaxation_velocity = calculate_twitch_velocity(twitch_indices, widths, False)
         _add_per_twitch_metrics(main_twitch_dict, RELAXATION_VELOCITY_UUID, relaxation_velocity)
-        aggregate_dict[RELAXATION_VELOCITY_UUID] = create_statistics_dict(relaxation_velocity, round_to_int=False)
+        aggregate_dict[RELAXATION_VELOCITY_UUID] = create_statistics_dict(
+            relaxation_velocity, round_to_int=False
+        )
 
     # calculate twitch interval irregularity
     if IRREGULARITY_INTERVAL_UUID in metrics_to_create:
         interval_irregularity = calculate_interval_irregularity(twitch_indices, time_series)
         _add_per_twitch_metrics(main_twitch_dict, IRREGULARITY_INTERVAL_UUID, interval_irregularity)
-        interval_irregularity_averages = create_statistics_dict(interval_irregularity[1:-1], round_to_int=False)
+        interval_irregularity_averages = create_statistics_dict(
+            interval_irregularity[1:-1], round_to_int=False
+        )
         interval_irregularity_averages["n"] += 2
         aggregate_dict[IRREGULARITY_INTERVAL_UUID] = interval_irregularity_averages
 
