@@ -47,17 +47,21 @@ TWITCH_WIDTH_INDEX_OF_CONTRACTION_VELOCITY_END = TWITCH_WIDTH_PERCENTS.index(90)
 def peak_detector(
     filtered_magnetic_signal: NDArray[(2, Any), int],
     twitches_point_up: bool = True,
+    is_magnetic_data: bool = True,
 ) -> Tuple[List[int], List[int]]:
     """Locates peaks and valleys and returns the indices.
-
     Args:
         noise_free_data: a 2D array of the time and voltage data after it has gone through noise cancellation
+        sampling_rate: an integer value of the sampling rate of the data in Hz
         twitches_point_up: whether in the incoming data stream the biological twitches are pointing up (in the positive direction) or down
-
+        data: a 2D array of the original time and voltage before noise cancellation
     Returns:
         A tuple of the indices of the peaks and valleys
     """
     magnetic_signal: NDArray[int] = filtered_magnetic_signal[1, :]
+    if is_magnetic_data:
+        magnetic_signal *= -1
+
     peak_invertor_factor = 1
     valley_invertor_factor = -1
     if not twitches_point_up:
