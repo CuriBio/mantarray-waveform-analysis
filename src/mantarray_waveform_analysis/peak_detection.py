@@ -187,8 +187,6 @@ def data_metrics(
     # create top level dict
     twitch_peak_indices = tuple(twitch_indices.keys())
 
-    # create main dictionaries
-    main_twitch_dict_uni: Dict[int, Dict[UUID, Union[float, int]]] = dict()
     # each twitch has its own dictionary of metrics
     main_twitch_dict = {time_series[twitch_peak_indices[i]]: dict() for i in range(num_twitches)}
     
@@ -738,20 +736,14 @@ def calculate_twitch_time_diff(
                                 NDArray[float]]]] = list()
 
     list_of_twitch_indices = list(twitch_indices.keys())
-    num_twitches = len(list_of_twitch_indices)
-
-    time_diff: Dict[int, NDArray[float]] = dict()
 
     value_series = filtered_data[1, :]
     time_series = filtered_data[0, :]
 
-    for iter_twitch_idx, (iter_twitch_peak_idx, iter_twitch_indices_info) in enumerate(
-            twitch_indices.items()
-        ):
+    for iter_twitch_idx, iter_twitch_peak_idx in enumerate(twitch_indices.keys()):
 
         # get twitch value and time
         time_value = time_series[iter_twitch_peak_idx]
-        peak_value = value_series[iter_twitch_peak_idx]
 
         # compile time differences for each peak
         iter_twich_difference_dict: Dict[int, 
