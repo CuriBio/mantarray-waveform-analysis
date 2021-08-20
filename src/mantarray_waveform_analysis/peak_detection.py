@@ -263,10 +263,6 @@ def data_metrics(
                 iter_list_difference_times: List[Union[float, int]] = []
                 for iter_difference in difference_times:
                     iter_difference_value = iter_difference[iter_percent][time_to_peak_uuid]
-                    if not isinstance(iter_difference_value, (float, int)):  # making mypy happy
-                        raise NotImplementedError(
-                            f"The time-to-peak value under key {time_to_peak_uuid} must be a float or an int. It was: {iter_difference_value}"
-                        )
                     iter_list_difference_times.append(iter_difference_value)
                     iter_relaxation_stats_dict = create_statistics_dict(iter_list_difference_times)
                 difference_stats_dict[iter_percent] = iter_relaxation_stats_dict
