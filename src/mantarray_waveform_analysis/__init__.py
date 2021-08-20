@@ -11,6 +11,7 @@ from .constants import BESSEL_LOWPASS_10_UUID
 from .constants import BESSEL_LOWPASS_30_UUID
 from .constants import BUTTERWORTH_LOWPASS_30_UUID
 from .constants import CENTIMILLISECONDS_PER_SECOND
+from .constants import CONTRACTION_TIME_UUID
 from .constants import CONTRACTION_VELOCITY_UUID
 from .constants import FRACTION_MAX_UUID
 from .constants import IRREGULARITY_INTERVAL_UUID
@@ -25,9 +26,11 @@ from .constants import PRIOR_PEAK_INDEX_UUID
 from .constants import PRIOR_VALLEY_INDEX_UUID
 from .constants import RAW_TO_SIGNED_CONVERSION_VALUE
 from .constants import REFERENCE_VOLTAGE
+from .constants import RELAXATION_TIME_UUID
 from .constants import RELAXATION_VELOCITY_UUID
 from .constants import SUBSEQUENT_PEAK_INDEX_UUID
 from .constants import SUBSEQUENT_VALLEY_INDEX_UUID
+from .constants import TIME_DIFFERENCE_UUID
 from .constants import TWITCH_FREQUENCY_UUID
 from .constants import TWITCH_PERIOD_UUID
 from .constants import WIDTH_FALLING_COORDS_UUID
@@ -69,6 +72,9 @@ __all__ = [
     "PRIOR_VALLEY_INDEX_UUID",
     "SUBSEQUENT_PEAK_INDEX_UUID",
     "SUBSEQUENT_VALLEY_INDEX_UUID",
+    "TIME_DIFFERENCE_UUID",
+    "RELAXATION_TIME_UUID",
+    "CONTRACTION_TIME_UUID",
     "AMPLITUDE_UUID",
     "AUC_UUID",
     "FRACTION_MAX_UUID",

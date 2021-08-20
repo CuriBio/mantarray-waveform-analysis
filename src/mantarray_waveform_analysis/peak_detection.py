@@ -227,8 +227,7 @@ def data_metrics(
         WIDTH_UUID in metrics_to_create
         or CONTRACTION_VELOCITY_UUID in metrics_to_create
         or RELAXATION_VELOCITY_UUID in metrics_to_create
-        or RELAXATION_TIME_UUID in metrics_to_create
-        or CONTRACTION_TIME_UUID in metrics_to_create
+        or TIME_DIFFERENCE_UUID in metrics_to_create
     ):
         widths = calculate_twitch_widths(twitch_indices, filtered_data, round_to_int=rounded)   
      
