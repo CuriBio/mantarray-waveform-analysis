@@ -188,9 +188,8 @@ def data_metrics(
 
     # each twitch has its own dictionary of metrics
     main_twitch_dict: Dict[int, Dict[UUID, Union[float, int]]] = dict()
-    for i in range(num_twitches):
-        main_twitch_dict[time_series[twitch_peak_indices[i]]]: dict()
-
+    main_twitch_dict = {time_series[twitch_peak_indices[i]]: dict() for i in range(num_twitches)}
+    
     aggregate_dict: Dict[UUID, Dict[str, Union[float, int]]] = dict()
     aggregate_dict_by_width: Dict[UUID, Dict[int, Dict[str, Union[float, int]]]] = dict()
 
