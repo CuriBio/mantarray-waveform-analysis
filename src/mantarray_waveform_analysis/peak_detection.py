@@ -177,7 +177,6 @@ def data_metrics(
         aggregate_dict: a dictionary of metric group-level statistics
         aggregate_dict_by_width: a dictionary of nested dictionaries (Twitch Width, Time Difference)
     """
-
     # get values needed for metrics creation
     peak_indices, _ = peak_and_valley_indices
     twitch_indices = find_twitch_indices(peak_and_valley_indices)
@@ -307,7 +306,6 @@ def _add_per_twitch_metrics(
     metric_id: UUID, 
     metrics: Union[NDArray[int], NDArray[float]]
 ) -> None:
-
     """Add twitch-specific metrics to main dictionary
 
     Args:
@@ -317,7 +315,6 @@ def _add_per_twitch_metrics(
     Returns:
         None
     """
-    
     for i, twitch_dict in enumerate(main_twitch_dict.values()):
         twitch_dict[metric_id] = metrics[i]
 
@@ -711,8 +708,8 @@ def calculate_twitch_time_diff(
         ],
     ]
     ) -> List[Dict[int, Dict[UUID, NDArray[float]]]]:
-    """
-    Calculate the time-difference of percent contraction and percent relaxation to peak.
+    """Calculate the time-difference of percent contraction and percent relaxation to peak.
+    
     Args:
         twitch_indices: Dict
             a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUIDs of prior/subsequent peaks and valleys and their index values.
@@ -722,13 +719,10 @@ def calculate_twitch_time_diff(
             list of dictionaries where the first key is the percentage of the way down to the nearby valleys, the second key is a UUID representing either the value of the width, or the rising or falling coordinates. The final value is either an int representing the width value or a tuple of ints for the x/y coordinates
         percentage: Union[int, float]
             the percentage to compute time difference for
-        is_contraction: bool
-            return the time to contraction (True) or time to relaxation (False)
 
     Returns:
         a list of dictionaries where the first key is the percentage of the way down to the nearby valleys, the second key is a UUID representing either the relaxation or contraction time.  The final value is float indicating time from relaxation/contraction to peak
     """
-
     # dictionary of time differences for each peak
     time_differences: List[
                         Dict[int,
