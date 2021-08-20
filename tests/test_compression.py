@@ -8,6 +8,8 @@ from mantarray_waveform_analysis import compress_filtered_gmr
 from mantarray_waveform_analysis import peak_detection
 from mantarray_waveform_analysis import peak_detector
 from mantarray_waveform_analysis import TWITCH_PERIOD_UUID
+from mantarray_waveform_analysis import RELAXATION_TIME_UUID
+from mantarray_waveform_analysis import CONTRACTION_TIME_UUID
 from mantarray_waveform_analysis import WIDTH_UUID
 from mantarray_waveform_analysis import WIDTH_VALUE_UUID
 import matplotlib
@@ -174,6 +176,16 @@ def test_new_A1_compression(new_A1, generic_pipeline_template):
         original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
         threshold=COMPRESSION_ACCURACY,
     )
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict_by_width[RELAXATION_TIME_UUID][90]['mean'],
+        original_aggregate_metrics_dict_by_width[RELAXATION_TIME_UUID][90]['mean'],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict_by_width[CONTRACTION_TIME_UUID][90]['mean'],
+        original_aggregate_metrics_dict_by_width[CONTRACTION_TIME_UUID][90]['mean'],
+        threshold=COMPRESSION_ACCURACY,
+    )
 
 
 def test_new_A2_compression(new_A2, generic_pipeline_template):
@@ -217,6 +229,16 @@ def test_new_A2_compression(new_A2, generic_pipeline_template):
     assert_percent_diff(
         compressed_per_twitch_dict[104000][WIDTH_UUID][90][WIDTH_VALUE_UUID],
         original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict_by_width[RELAXATION_TIME_UUID][90]['mean'],
+        original_aggregate_metrics_dict_by_width[RELAXATION_TIME_UUID][90]['mean'],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict_by_width[CONTRACTION_TIME_UUID][90]['mean'],
+        original_aggregate_metrics_dict_by_width[CONTRACTION_TIME_UUID][90]['mean'],
         threshold=COMPRESSION_ACCURACY,
     )
 
@@ -264,6 +286,16 @@ def test_new_A3_compression(new_A3, generic_pipeline_template):
         original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
         threshold=COMPRESSION_ACCURACY,
     )
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict_by_width[RELAXATION_TIME_UUID][90]['mean'],
+        original_aggregate_metrics_dict_by_width[RELAXATION_TIME_UUID][90]['mean'],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict_by_width[CONTRACTION_TIME_UUID][90]['mean'],
+        original_aggregate_metrics_dict_by_width[CONTRACTION_TIME_UUID][90]['mean'],
+        threshold=COMPRESSION_ACCURACY,
+    )
 
 
 def test_new_A4_compression(new_A4, generic_pipeline_template):
@@ -306,6 +338,16 @@ def test_new_A4_compression(new_A4, generic_pipeline_template):
     assert_percent_diff(
         compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
         original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict_by_width[RELAXATION_TIME_UUID][90]['mean'],
+        original_aggregate_metrics_dict_by_width[RELAXATION_TIME_UUID][90]['mean'],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict_by_width[CONTRACTION_TIME_UUID][90]['mean'],
+        original_aggregate_metrics_dict_by_width[CONTRACTION_TIME_UUID][90]['mean'],
         threshold=COMPRESSION_ACCURACY,
     )
 
@@ -352,6 +394,16 @@ def test_new_A5_compression(new_A5, generic_pipeline_template):
         original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
         threshold=COMPRESSION_ACCURACY,
     )
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict_by_width[RELAXATION_TIME_UUID][90]['mean'],
+        original_aggregate_metrics_dict_by_width[RELAXATION_TIME_UUID][90]['mean'],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict_by_width[CONTRACTION_TIME_UUID][90]['mean'],
+        original_aggregate_metrics_dict_by_width[CONTRACTION_TIME_UUID][90]['mean'],
+        threshold=COMPRESSION_ACCURACY,
+    )
 
 
 def test_new_A6_compression(new_A6, generic_pipeline_template):
@@ -395,5 +447,15 @@ def test_new_A6_compression(new_A6, generic_pipeline_template):
     assert_percent_diff(
         compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
         original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict_by_width[RELAXATION_TIME_UUID][90]['mean'],
+        original_aggregate_metrics_dict_by_width[RELAXATION_TIME_UUID][90]['mean'],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_aggregate_metrics_dict_by_width[CONTRACTION_TIME_UUID][90]['mean'],
+        original_aggregate_metrics_dict_by_width[CONTRACTION_TIME_UUID][90]['mean'],
         threshold=COMPRESSION_ACCURACY,
     )
