@@ -89,7 +89,7 @@ def _get_info_for_compression(well_fixture, file_prefix, pipeline_template_with_
     pipeline_with_filter.load_raw_gmr_data(unfiltered_data, unfiltered_data)
 
     filtered_data = pipeline_with_filter.get_noise_filtered_gmr()
-    original_per_twitch_dict, original_aggregate_metrics_dict = _get_data_metrics(well_fixture)
+    original_per_twitch_dict, original_aggregate_metrics_dict, original_aggregate_metrics_dict_by_width = _get_data_metrics(well_fixture)
 
     original_num_samples = filtered_data.shape[1]
 
@@ -111,10 +111,12 @@ def _get_info_for_compression(well_fixture, file_prefix, pipeline_template_with_
     (
         compressed_per_twitch_dict,
         compressed_aggregate_metrics_dict,
+        compressed_aggregate_metrics_dict_by_width,
     ) = peak_detection.data_metrics(compressed_peak_and_valley_indices, compressed_data)
     (
         original_per_twitch_dict,
         original_aggregate_metrics_dict,
+        original_aggregate_metrics_dict_by_width
     ) = peak_detection.data_metrics(original_peak_and_valley_indices, filtered_data)
 
     return (
@@ -122,8 +124,10 @@ def _get_info_for_compression(well_fixture, file_prefix, pipeline_template_with_
         original_num_samples,
         compressed_per_twitch_dict,
         compressed_aggregate_metrics_dict,
+        compressed_aggregate_metrics_dict_by_width,
         original_per_twitch_dict,
         original_aggregate_metrics_dict,
+        original_aggregate_metrics_dict_by_width
     )
 
 
@@ -133,8 +137,10 @@ def test_new_A1_compression(new_A1, generic_pipeline_template):
         original_num_samples,
         compressed_per_twitch_dict,
         compressed_aggregate_metrics_dict,
+        compressed_aggregate_metrics_dict_by_width,
         original_per_twitch_dict,
         original_aggregate_metrics_dict,
+        original_aggregate_metrics_dict_by_width,
     ) = _get_info_for_compression(new_A1, "new_A1", generic_pipeline_template)
 
     # make sure sampling rate has been reduced by appropriate amount
@@ -176,8 +182,10 @@ def test_new_A2_compression(new_A2, generic_pipeline_template):
         original_num_samples,
         compressed_per_twitch_dict,
         compressed_aggregate_metrics_dict,
+        compressed_aggregate_metrics_dict_by_width,
         original_per_twitch_dict,
         original_aggregate_metrics_dict,
+        original_aggregate_metrics_dict_by_width,
     ) = _get_info_for_compression(new_A2, "new_A2", generic_pipeline_template)
 
     # make sure sampling rate has been reduced by appropriate amount
@@ -219,8 +227,10 @@ def test_new_A3_compression(new_A3, generic_pipeline_template):
         original_num_samples,
         compressed_per_twitch_dict,
         compressed_aggregate_metrics_dict,
+        compressed_aggregate_metrics_dict_by_width,
         original_per_twitch_dict,
         original_aggregate_metrics_dict,
+        original_aggregate_metrics_dict_by_width,
     ) = _get_info_for_compression(new_A3, "new_A3", generic_pipeline_template)
 
     # make sure sampling rate has been reduced by appropriate amount
@@ -262,8 +272,10 @@ def test_new_A4_compression(new_A4, generic_pipeline_template):
         original_num_samples,
         compressed_per_twitch_dict,
         compressed_aggregate_metrics_dict,
+        compressed_aggregate_metrics_dict_by_width,
         original_per_twitch_dict,
         original_aggregate_metrics_dict,
+        original_aggregate_metrics_dict_by_width,
     ) = _get_info_for_compression(new_A4, "new_A4", generic_pipeline_template)
 
     # make sure sampling rate has been reduced by appropriate amount
@@ -304,8 +316,10 @@ def test_new_A5_compression(new_A5, generic_pipeline_template):
         original_num_samples,
         compressed_per_twitch_dict,
         compressed_aggregate_metrics_dict,
+        compressed_aggregate_metrics_dict_by_width,
         original_per_twitch_dict,
         original_aggregate_metrics_dict,
+        original_aggregate_metrics_dict_by_width,
     ) = _get_info_for_compression(new_A5, "new_A5", generic_pipeline_template)
 
     # make sure sampling rate has been reduced by appropriate amount
@@ -346,8 +360,10 @@ def test_new_A6_compression(new_A6, generic_pipeline_template):
         original_num_samples,
         compressed_per_twitch_dict,
         compressed_aggregate_metrics_dict,
+        compressed_aggregate_metrics_dict_by_width,
         original_per_twitch_dict,
         original_aggregate_metrics_dict,
+        original_aggregate_metrics_dict_by_width,
     ) = _get_info_for_compression(new_A6, "new_A6", generic_pipeline_template)
 
     # make sure sampling rate has been reduced by appropriate amount
