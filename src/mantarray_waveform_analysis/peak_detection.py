@@ -187,8 +187,10 @@ def data_metrics(
     twitch_peak_indices = tuple(twitch_indices.keys())
 
     # each twitch has its own dictionary of metrics
-    main_twitch_dict = {time_series[twitch_peak_indices[i]]: dict() for i in range(num_twitches)}
-    
+    main_twitch_dict: Dict[int, Dict[UUID, Union[float, int]]] = dict()
+    for i in range(num_twitches):
+        main_twitch_dict[time_series[twitch_peak_indices[i]]]: dict()
+
     aggregate_dict: Dict[UUID, Dict[str, Union[float, int]]] = dict()
     aggregate_dict_by_width: Dict[UUID, Dict[int, Dict[str, Union[float, int]]]] = dict()
 
@@ -709,7 +711,7 @@ def calculate_twitch_time_diff(
     ]
     ) -> List[Dict[int, Dict[UUID, NDArray[float]]]]:
     """Calculate the time-difference of percent contraction and percent relaxation to peak.
-    
+
     Args:
         twitch_indices: Dict
             a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUIDs of prior/subsequent peaks and valleys and their index values.
@@ -729,9 +731,6 @@ def calculate_twitch_time_diff(
                             Dict[UUID,
                                 NDArray[float]]]] = list()
 
-    list_of_twitch_indices = list(twitch_indices.keys())
-
-    value_series = filtered_data[1, :]
     time_series = filtered_data[0, :]
 
     for iter_twitch_idx, iter_twitch_peak_idx in enumerate(twitch_indices.keys()):
