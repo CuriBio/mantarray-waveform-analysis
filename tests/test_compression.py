@@ -9,6 +9,8 @@ from mantarray_waveform_analysis import peak_detection
 from mantarray_waveform_analysis import peak_detector
 from mantarray_waveform_analysis import TWITCH_PERIOD_UUID
 from mantarray_waveform_analysis import WIDTH_UUID
+from mantarray_waveform_analysis import CONTRACTION_TIME_UUID
+from mantarray_waveform_analysis import RELAXATION_TIME_UUID
 from mantarray_waveform_analysis import WIDTH_VALUE_UUID
 import matplotlib
 import numpy as np
@@ -125,6 +127,16 @@ def _get_info_for_compression(well_fixture, file_prefix, pipeline_template_with_
         original_per_twitch_dict,
         original_aggregate_metrics_dict,
     )
+    assert_percent_diff(
+        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][RELAXATION_TIME_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][RELAXATION_TIME_UUID],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][CONTRACTION_TIME_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][CONTRACTION_TIME_UUID],
+        threshold=COMPRESSION_ACCURACY,
+    )
 
 
 def test_new_A1_compression(new_A1, generic_pipeline_template):
@@ -166,6 +178,16 @@ def test_new_A1_compression(new_A1, generic_pipeline_template):
     assert_percent_diff(
         compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
         original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][RELAXATION_TIME_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][RELAXATION_TIME_UUID],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][CONTRACTION_TIME_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][CONTRACTION_TIME_UUID],
         threshold=COMPRESSION_ACCURACY,
     )
 
@@ -211,6 +233,16 @@ def test_new_A2_compression(new_A2, generic_pipeline_template):
         original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
         threshold=COMPRESSION_ACCURACY,
     )
+    assert_percent_diff(
+        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][RELAXATION_TIME_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][RELAXATION_TIME_UUID],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][CONTRACTION_TIME_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][CONTRACTION_TIME_UUID],
+        threshold=COMPRESSION_ACCURACY,
+    )
 
 
 def test_new_A3_compression(new_A3, generic_pipeline_template):
@@ -252,6 +284,16 @@ def test_new_A3_compression(new_A3, generic_pipeline_template):
     assert_percent_diff(
         compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
         original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][RELAXATION_TIME_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][RELAXATION_TIME_UUID],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][CONTRACTION_TIME_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][CONTRACTION_TIME_UUID],
         threshold=COMPRESSION_ACCURACY,
     )
 
@@ -296,6 +338,16 @@ def test_new_A4_compression(new_A4, generic_pipeline_template):
         original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
         threshold=COMPRESSION_ACCURACY,
     )
+    assert_percent_diff(
+        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][RELAXATION_TIME_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][RELAXATION_TIME_UUID],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][CONTRACTION_TIME_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][CONTRACTION_TIME_UUID],
+        threshold=COMPRESSION_ACCURACY,
+    )
 
 
 def test_new_A5_compression(new_A5, generic_pipeline_template):
@@ -336,6 +388,16 @@ def test_new_A5_compression(new_A5, generic_pipeline_template):
     assert_percent_diff(
         compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
         original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][RELAXATION_TIME_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][RELAXATION_TIME_UUID],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][CONTRACTION_TIME_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][CONTRACTION_TIME_UUID],
         threshold=COMPRESSION_ACCURACY,
     )
 
@@ -379,5 +441,15 @@ def test_new_A6_compression(new_A6, generic_pipeline_template):
     assert_percent_diff(
         compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
         original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][WIDTH_VALUE_UUID],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][RELAXATION_TIME_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][RELAXATION_TIME_UUID],
+        threshold=COMPRESSION_ACCURACY,
+    )
+    assert_percent_diff(
+        compressed_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][CONTRACTION_TIME_UUID],
+        original_per_twitch_dict[iter_twitch_timepoint][WIDTH_UUID][90][CONTRACTION_TIME_UUID],
         threshold=COMPRESSION_ACCURACY,
     )
