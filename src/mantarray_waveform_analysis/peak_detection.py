@@ -132,6 +132,7 @@ def create_statistics_dict(metric: NDArray[int], round_to_int: bool = True) -> D
 
     Args:
         metric: a 1D array of integer values of a specific metric results
+        round_to_int: round metics to nearest integer
 
     Returns:
         a dictionary of statistics of that metric in which the metrics are the key and the estimates are the value
@@ -307,7 +308,7 @@ def _add_per_twitch_metrics(
     metric_id: UUID, 
     metrics: Union[NDArray[int], NDArray[float]]
 ) -> None:
-    """Add twitch-specific metrics to main dictionary
+    """Add twitch-specific metrics to main dictionary.
 
     Args:
         main_twitch_dict: dictionaries of individual peak metrics
@@ -328,7 +329,7 @@ def calculate_interval_irregularity(
 
     Args:
         twitch_indices: a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUID of prior/subsequent peaks and valleys and their index values.
-        filtered_data: a 2D array (time vs value) of the data
+        filtered_data: a 2D array (time vs value) of the data.
 
     Returns:
         an array of floats that are the interval irregularities of each twitch
@@ -368,12 +369,9 @@ def calculate_twitch_velocity(
     """Find the velocity for each twitch.
 
     Args:
-        twitch_indices: dict
-            key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUID of prior/subsequent peaks and valleys and their index values.
-        per_twitch_width_coordinates:  list[Dict]
-            list where each element is a dictionary.  Keys are twidth width percentages and values are rising/falling coordinates (time, amplitude)
-        is_contraction: bool
-            indicating if twitch velocities to be calculating are for the twitch contraction or relaxation
+        twitch_indices: key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUID of prior/subsequent peaks and valleys and their index values.
+        per_twitch_width_coordinates:  list where each element is a dictionary.  Keys are twidth width percentages and values are rising/falling coordinates (time, amplitude).
+        is_contraction: indicating if twitch velocities to be calculating are for the twitch contraction or relaxation.
 
     Returns:
         an array of floats that are the velocities of each twitch
@@ -544,6 +542,8 @@ def calculate_amplitudes(
     Args:
         twitch_indices: a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUID of prior/subsequent peaks and valleys and their index values.
         filtered_data: a 2D array of the time and value (magnetic, voltage, displacement, force...) data after it has gone through noise filtering
+        round_to_int: bool
+            round metics to nearest integer
 
     Returns:
         a 1D array of integers representing the amplitude of each twitch
@@ -606,6 +606,8 @@ def calculate_twitch_widths(
     Args:
         twitch_indices: a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUIDs of prior/subsequent peaks and valleys and their index values.
         filtered_data: a 2D array of the time and value (magnetic, voltage, displacement, force...) data after it has gone through noise filtering
+        round_to_int: bool
+            round metics to nearest integer
 
     # Kristian (08/20/21): mypy complains about bad indexing when returning one nested dictionary, so we return two
     Returns:
@@ -711,16 +713,12 @@ def calculate_twitch_time_diff(
     """Calculate the time-difference of percent contraction and percent relaxation to peak.
 
     Args:
-        twitch_indices: Dict
-            a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUIDs of prior/subsequent peaks and valleys and their index values.
-        filtered_data: NDarray
-            a 2D array of the time and value (magnetic, voltage, displacement, force...) data after it has gone through noise filtering
-        per_twitch_width_coordinates:  list[Dict]
-            list where each element is a dictionary.  Keys are twidth width percentages and values are rising/falling coordinates (time, amplitude)
-
+        twitch_indices: a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUIDs of prior/subsequent peaks and valleys and their index values.
+        filtered_data: a 2D array of the time and value (magnetic, voltage, displacement, force...) data after it has gone through noise filtering
+        per_twitch_width_coordinates: list where each element is a dictionary.  Keys are twidth width percentages and values are rising/falling coordinates (time, amplitude)
+        
     Returns:
-        time_differences: list[Dict]
-            a list of dictionaries where the first key is the percentage of the way down to the nearby valleys, the second key is a UUID representing either the relaxation or contraction time.  The final value is float indicating time from relaxation/contraction to peak
+        time_differences: a list of dictionaries where the first key is the percentage of the way down to the nearby valleys, the second key is a UUID representing either the relaxation or contraction time.  The final value is float indicating time from relaxation/contraction to peak
     """
     # dictionary of time differences for each peak
     time_differences: List[
@@ -780,12 +778,10 @@ def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20)
     """Calculate the area under the curve (AUC) for twitches.
 
     Args:
-        twitch_indices: Dict
-            key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUIDs of prior/subsequent peaks and valleys and their index values.
-        filtered_data: NDarray[2D]
-            a 2D array of the time and value (magnetic, voltage, displacement, force...) data after it has gone through noise filtering
-        per_twitch_width_coordinates:  list[Dict]
-            list where each element is a dictionary.  Keys are twidth width percentages and values are rising/falling coordinates (time, amplitude)
+        twitch_indices: key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUIDs of prior/subsequent peaks and valleys and their index values.
+        filtered_data: a 2D array of the time and value (magnetic, voltage, displacement, force...) data after it has gone through noise filtering
+        per_twitch_width_coordinates: list where each element is a dictionary.  Keys are twidth width percentages and values are rising/falling coordinates (time, amplitude)
+        round_to_int: round metics to nearest integer
 
     Returns:
         a 1D array of integers which represent the area under the curve for each twitch
