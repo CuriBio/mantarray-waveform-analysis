@@ -709,14 +709,14 @@ def calculate_twitch_time_diff(
                 ]
             ]
         ]
-    ) -> List[Dict[int, Dict[UUID, NDArray[float]]]]:
-    """Calculate the time-difference of percent contraction and percent relaxation to peak.
+) -> List[Dict[int, Dict[UUID, NDArray[float]]]]:
+    """Calculate time from percent contraction / relaxation to twitch peak.
 
     Args:
         twitch_indices: a dictionary in which the key is an integer representing the time points of all the peaks of interest and the value is an inner dictionary with various UUIDs of prior/subsequent peaks and valleys and their index values.
         filtered_data: a 2D array of the time and value (magnetic, voltage, displacement, force...) data after it has gone through noise filtering
         per_twitch_width_coordinates: list where each element is a dictionary.  Keys are twidth width percentages and values are rising/falling coordinates (time, amplitude)
-        
+
     Returns:
         time_differences: a list of dictionaries where the first key is the percentage of the way down to the nearby valleys, the second key is a UUID representing either the relaxation or contraction time.  The final value is float indicating time from relaxation/contraction to peak
     """
