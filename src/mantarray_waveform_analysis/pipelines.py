@@ -61,17 +61,17 @@ class Pipeline:
         self._magnetic_data_metrics: Tuple[
             Dict[int, Dict[UUID, Union[float, int]]],
             Dict[UUID, Dict[str, Union[float, int]]],
-            Dict[UUID, Dict[int, Dict[str, Union[float, int]]]]
+            Dict[UUID, Dict[int, Dict[str, Union[float, int]]]],
         ]
         self._displacement_data_metrics: Tuple[
             Dict[int, Dict[UUID, Union[float, int]]],
             Dict[UUID, Dict[str, Union[float, int]]],
-            Dict[UUID, Dict[int, Dict[str, Union[float, int]]]]
+            Dict[UUID, Dict[int, Dict[str, Union[float, int]]]],
         ]
         self._force_data_metrics: Tuple[
             Dict[int, Dict[UUID, Union[float, int]]],
             Dict[UUID, Dict[str, Union[float, int]]],
-            Dict[UUID, Dict[int, Dict[str, Union[float, int]]]]
+            Dict[UUID, Dict[int, Dict[str, Union[float, int]]]],
         ]
 
     def get_template(self) -> "PipelineTemplate":
@@ -186,7 +186,7 @@ class Pipeline:
     ) -> Tuple[
         Dict[int, Dict[UUID, Union[float, int]]],
         Dict[UUID, Dict[str, Union[float, int]]],
-        Dict[UUID, Dict[int, Dict[str, Union[float, int]]]]
+        Dict[UUID, Dict[int, Dict[str, Union[float, int]]]],
     ]:
         """Calculate data metrics on noise filtered magnetic data."""
         try:
@@ -206,7 +206,7 @@ class Pipeline:
     ) -> Tuple[
         Dict[int, Dict[UUID, Union[float, int]]],
         Dict[UUID, Dict[str, Union[float, int]]],
-        Dict[UUID, Dict[int, Dict[str, Union[float, int]]]]
+        Dict[UUID, Dict[int, Dict[str, Union[float, int]]]],
     ]:
         """Calculate data metrics on displacement data."""
         try:
@@ -227,7 +227,7 @@ class Pipeline:
     ) -> Tuple[
         Dict[int, Dict[UUID, Union[float, int]]],
         Dict[UUID, Dict[str, Union[float, int]]],
-        Dict[UUID, Dict[int, Dict[str, Union[float, int]]]]
+        Dict[UUID, Dict[int, Dict[str, Union[float, int]]]],
     ]:
         """Calculate data metrics on force data."""
         try:

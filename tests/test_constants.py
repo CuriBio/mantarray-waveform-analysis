@@ -89,9 +89,9 @@ def test_data_metric_uuids():
     assert WIDTH_FALLING_COORDS_UUID == uuid.UUID("26e5637d-42c9-4060-aa5d-52209b349c84")
     assert RELAXATION_VELOCITY_UUID == uuid.UUID("0fcc0dc3-f9aa-4f1b-91b3-e5b5924279a9")
     assert CONTRACTION_VELOCITY_UUID == uuid.UUID("73961e7c-17ec-42b0-b503-a23195ec249c")
-    assert TIME_DIFFERENCE_UUID == uuid.UUID('58ae3d02-df1b-419c-925a-7a772053bddf')
-    assert RELAXATION_TIME_UUID == uuid.UUID('f263e0d0-c55e-49b2-b5a6-93e9a7836be5')
-    assert CONTRACTION_TIME_UUID == uuid.UUID('5a92d051-703b-412b-b4e9-968e48331e8b')
+    assert TIME_DIFFERENCE_UUID == uuid.UUID("58ae3d02-df1b-419c-925a-7a772053bddf")
+    assert RELAXATION_TIME_UUID == uuid.UUID("f263e0d0-c55e-49b2-b5a6-93e9a7836be5")
+    assert CONTRACTION_TIME_UUID == uuid.UUID("5a92d051-703b-412b-b4e9-968e48331e8b")
 
     assert PRIOR_PEAK_INDEX_UUID == uuid.UUID("80df90dc-21f8-4cad-a164-89436909b30a")
     assert PRIOR_VALLEY_INDEX_UUID == uuid.UUID("72ba9466-c203-41b6-ac30-337b4a17a124")
@@ -110,7 +110,7 @@ def test_data_metric_uuids():
             CONTRACTION_VELOCITY_UUID,
             RELAXATION_VELOCITY_UUID,
             IRREGULARITY_INTERVAL_UUID,
-            TIME_DIFFERENCE_UUID
+            TIME_DIFFERENCE_UUID,
         ]
     )
 

@@ -20,16 +20,16 @@ from .constants import ALL_METRICS
 from .constants import AMPLITUDE_UUID
 from .constants import AUC_UUID
 from .constants import CENTIMILLISECONDS_PER_SECOND
-from .constants import CONTRACTION_VELOCITY_UUID
 from .constants import CONTRACTION_TIME_UUID
+from .constants import CONTRACTION_VELOCITY_UUID
 from .constants import FRACTION_MAX_UUID
 from .constants import IRREGULARITY_INTERVAL_UUID
 from .constants import MIN_NUMBER_PEAKS
 from .constants import MIN_NUMBER_VALLEYS
 from .constants import PRIOR_PEAK_INDEX_UUID
 from .constants import PRIOR_VALLEY_INDEX_UUID
-from .constants import RELAXATION_VELOCITY_UUID
 from .constants import RELAXATION_TIME_UUID
+from .constants import RELAXATION_VELOCITY_UUID
 from .constants import SUBSEQUENT_PEAK_INDEX_UUID
 from .constants import SUBSEQUENT_VALLEY_INDEX_UUID
 from .constants import TIME_DIFFERENCE_UUID
@@ -74,6 +74,7 @@ def peak_detector(
     if not twitches_point_up:
         peak_invertor_factor *= -1
         valley_invertor_factor *= -1
+
     sampling_period_cms = filtered_magnetic_signal[0, 1] - filtered_magnetic_signal[0, 0]
     maximum_possible_twitch_frequency = 7  # pylint:disable=invalid-name # (Eli 9/1/20): I can't think of a shorter name to describe this concept fully # Hz
     minimum_required_samples_between_twitches = int(  # pylint:disable=invalid-name # (Eli 9/1/20): I can't think of a shorter name to describe this concept fully
@@ -165,7 +166,7 @@ def data_metrics(
 ) -> Tuple[
     Dict[int, Dict[UUID, Union[float, int]]],
     Dict[UUID, Dict[str, Union[float, int]]],
-    Dict[UUID, Dict[int, Dict[str, Union[float, int]]]]
+    Dict[UUID, Dict[int, Dict[str, Union[float, int]]]],
 ]:  # pylint:disable=too-many-locals # Eli (9/8/20): there are a lot of metrics to calculate that need local variables
     """Find all data metrics for individual twitches and averages.
 
@@ -190,7 +191,7 @@ def data_metrics(
     # each twitch has its own dictionary of metrics
     main_twitch_dict: Dict[int, Dict[UUID, Union[float, int]]] = dict()
     main_twitch_dict = {time_series[twitch_peak_indices[i]]: dict() for i in range(num_twitches)}
-    
+
     aggregate_dict: Dict[UUID, Dict[str, Union[float, int]]] = dict()
     aggregate_dict_by_width: Dict[UUID, Dict[int, Dict[str, Union[float, int]]]] = dict()
 
@@ -228,8 +229,8 @@ def data_metrics(
         or RELAXATION_VELOCITY_UUID in metrics_to_create
         or TIME_DIFFERENCE_UUID in metrics_to_create
     ):
-        widths, coordinates = calculate_twitch_widths(twitch_indices, filtered_data, round_to_int=rounded)   
-     
+        widths, coordinates = calculate_twitch_widths(twitch_indices, filtered_data, round_to_int=rounded)
+
     # compute twitch widths
     if WIDTH_UUID in metrics_to_create:
         _add_per_twitch_metrics(main_twitch_dict, WIDTH_UUID, widths)
@@ -253,7 +254,7 @@ def data_metrics(
     if TIME_DIFFERENCE_UUID in metrics_to_create and WIDTH_UUID in metrics_to_create:
 
         difference_times = calculate_twitch_time_diff(twitch_indices, filtered_data, coordinates)
-        _add_per_twitch_metrics(main_twitch_dict, TIME_DIFFERENCE_UUID, difference_times)    
+        _add_per_twitch_metrics(main_twitch_dict, TIME_DIFFERENCE_UUID, difference_times)
 
         for time_to_peak_uuid in [RELAXATION_TIME_UUID, CONTRACTION_TIME_UUID]:
 
@@ -266,7 +267,6 @@ def data_metrics(
                     iter_relaxation_stats_dict = create_statistics_dict(iter_list_difference_times)
                 difference_stats_dict[iter_percent] = iter_relaxation_stats_dict
             aggregate_dict_by_width[time_to_peak_uuid] = difference_stats_dict
-        
 
     # calculate twitch contraction/relaxation velocities
     if CONTRACTION_VELOCITY_UUID in metrics_to_create:
@@ -304,9 +304,7 @@ def data_metrics(
 
 
 def _add_per_twitch_metrics(
-    main_twitch_dict: Dict[Any, Any], 
-    metric_id: UUID, 
-    metrics: Union[NDArray[int], NDArray[float]]
+    main_twitch_dict: Dict[Any, Any], metric_id: UUID, metrics: Union[NDArray[int], NDArray[float]]
 ) -> None:
     """Add twitch-specific metrics to main dictionary.
 
@@ -357,13 +355,7 @@ def calculate_interval_irregularity(
 
 def calculate_twitch_velocity(
     twitch_indices: NDArray[int],
-    per_twitch_width_coordinates: List[
-        Dict[int, 
-            Dict[UUID, Tuple[Union[float, int], 
-                             Union[float, int]]
-                ]
-            ]
-        ],
+    per_twitch_width_coordinates: List[Dict[int, Dict[UUID, Tuple[Union[float, int], Union[float, int]]]]],
     is_contraction: bool,
 ) -> NDArray[float]:
     """Find the velocity for each twitch.
@@ -491,7 +483,7 @@ def find_twitch_indices(
                 SUBSEQUENT_PEAK_INDEX_UUID: peak_indices[itr_idx + 1],
                 SUBSEQUENT_VALLEY_INDEX_UUID: valley_indices[itr_idx if starts_with_peak else itr_idx + 1],
             }
-    
+
     return twitches
 
 
@@ -599,7 +591,7 @@ def calculate_twitch_widths(
     round_to_int: bool = True,
 ) -> Tuple[
     List[Dict[int, Dict[UUID, Union[float, int]]]],
-    List[Dict[int, Dict[UUID, Tuple[Union[float, int], Union[float, int]]]]]
+    List[Dict[int, Dict[UUID, Tuple[Union[float, int], Union[float, int]]]]],
 ]:
     """Determine twitch width between 10-90% down to the nearby valleys.
 
@@ -620,6 +612,7 @@ def calculate_twitch_widths(
 
     value_series = filtered_data[1, :]
     time_series = filtered_data[0, :]
+
     for iter_twitch_peak_idx, iter_twitch_indices_info in twitch_indices.items():
 
         iter_width_dict: Dict[int, Dict[UUID, Union[float, int]]] = dict()
@@ -638,6 +631,7 @@ def calculate_twitch_widths(
         falling_idx = iter_twitch_peak_idx + 1
 
         for iter_percent in TWITCH_WIDTH_PERCENTS:
+
             iter_percent_width_dict: Dict[UUID, Union[float, int]] = dict()
             iter_percent_coord_dict: Dict[UUID, Tuple[Union[float, int], Union[float, int]]] = dict()
 
@@ -657,7 +651,7 @@ def calculate_twitch_widths(
                 falling_threshold - subsequent_valley_value
             ):
                 falling_idx += 1
-            
+
             interpolated_rising_timepoint = interpolate_x_for_y_between_two_points(
                 rising_threshold,
                 time_series[rising_idx],
@@ -700,15 +694,9 @@ def calculate_twitch_widths(
 
 
 def calculate_twitch_time_diff(
-    twitch_indices: Dict[int, Dict[UUID, Optional[int]]], 
+    twitch_indices: Dict[int, Dict[UUID, Optional[int]]],
     filtered_data: NDArray[(2, Any), int],
-    per_twitch_width_coordinates: List[
-        Dict[int, 
-            Dict[UUID, Tuple[Union[float, int], 
-                             Union[float, int]]
-                ]
-            ]
-        ]
+    per_twitch_width_coordinates: List[Dict[int, Dict[UUID, Tuple[Union[float, int], Union[float, int]]]]],
 ) -> List[Dict[int, Dict[UUID, NDArray[float]]]]:
     """Calculate time from percent contraction / relaxation to twitch peak.
 
@@ -721,10 +709,7 @@ def calculate_twitch_time_diff(
         time_differences: a list of dictionaries where the first key is the percentage of the way down to the nearby valleys, the second key is a UUID representing either the relaxation or contraction time.  The final value is float indicating time from relaxation/contraction to peak
     """
     # dictionary of time differences for each peak
-    time_differences: List[
-                        Dict[int,
-                            Dict[UUID,
-                                NDArray[float]]]] = list()
+    time_differences: List[Dict[int, Dict[UUID, NDArray[float]]]] = list()
 
     time_series = filtered_data[0, :]
 
@@ -734,45 +719,37 @@ def calculate_twitch_time_diff(
         time_value = time_series[iter_twitch_peak_idx]
 
         # compile time differences for each peak
-        iter_twich_difference_dict: Dict[int, 
-                                        Dict[UUID, 
-                                            NDArray[float]]] = dict()
+        iter_twich_difference_dict: Dict[int, Dict[UUID, NDArray[float]]] = dict()
 
         for iter_percent in TWITCH_WIDTH_PERCENTS:
 
             iter_percent_coord_dict = per_twitch_width_coordinates[iter_twitch_idx][iter_percent]
-            iter_percent_difference_dict: Dict[UUID, NDArray[float]] =  dict()
+            iter_percent_difference_dict: Dict[UUID, NDArray[float]] = dict()
 
             # compute time difference for single twitch width
             for time_diff_uuid in [RELAXATION_TIME_UUID, CONTRACTION_TIME_UUID]:
 
-                is_contraction=(time_diff_uuid == CONTRACTION_TIME_UUID)
+                is_contraction = time_diff_uuid == CONTRACTION_TIME_UUID
                 if is_contraction:
-                    rising_time=iter_percent_coord_dict[WIDTH_RISING_COORDS_UUID][0]
+                    rising_time = iter_percent_coord_dict[WIDTH_RISING_COORDS_UUID][0]
                     difference = time_value - rising_time
                 else:
-                    falling_time=iter_percent_coord_dict[WIDTH_FALLING_COORDS_UUID][0]
+                    falling_time = iter_percent_coord_dict[WIDTH_FALLING_COORDS_UUID][0]
                     difference = falling_time - time_value
-                
+
                 iter_percent_difference_dict[time_diff_uuid] = difference
-            
+
             iter_twich_difference_dict[iter_percent] = iter_percent_difference_dict
-        
+
         time_differences.append(iter_twich_difference_dict)
-    
+
     return time_differences
 
 
 def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20): may be able to refactor before pull request
     twitch_indices: Dict[int, Dict[UUID, Optional[int]]],
     filtered_data: NDArray[(2, Any), int],
-    per_twitch_width_coordinates: List[
-        Dict[int, 
-            Dict[UUID, Tuple[Union[float, int], 
-                             Union[float, int]]
-                ]
-            ]
-        ],
+    per_twitch_width_coordinates: List[Dict[int, Dict[UUID, Tuple[Union[float, int], Union[float, int]]]]],
     round_to_int: bool = True,
 ) -> NDArray[float]:
     """Calculate the area under the curve (AUC) for twitches.
