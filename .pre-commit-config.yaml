@@ -115,7 +115,7 @@ repos:
     -   id: pylint-pass-with-displayed-warnings
         name: pylint-src
         args:
-        - --codes-to-allow=W0511
+        - --codes-to-allow=W0511,R0914,R0801
         - src
         - --rcfile=src/pylintrc
         - --ignore-patterns=.*~.*
