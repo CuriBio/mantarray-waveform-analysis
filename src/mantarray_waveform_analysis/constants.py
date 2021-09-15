@@ -9,7 +9,6 @@ TWITCH_FREQUENCY_UUID = uuid.UUID(
     "472d0707-ff87-4198-9374-c28900bb216c"
 )  # This is just the reciprocal of twitch period, but is pre-computed to make downstream pipelines simpler. Frequency is reported in Hz
 AMPLITUDE_UUID = uuid.UUID("89cf1105-a015-434f-b527-4169b9400e26")
-FRACTION_MAX_UUID = uuid.UUID("8fe142e2-2504-4c9e-b3dc-817b24c7447e")
 AUC_UUID = uuid.UUID("e7b9a6e4-c43d-4e8b-af7e-51742e252030")
 WIDTH_UUID = uuid.UUID("c4c60d55-017a-4783-9600-f19606de26f3")
 WIDTH_VALUE_UUID = uuid.UUID("05041f4e-c77d-42d9-a2ae-8902f912e9ac")
@@ -19,6 +18,8 @@ RELAXATION_VELOCITY_UUID = uuid.UUID("0fcc0dc3-f9aa-4f1b-91b3-e5b5924279a9")
 CONTRACTION_VELOCITY_UUID = uuid.UUID("73961e7c-17ec-42b0-b503-a23195ec249c")
 IRREGULARITY_INTERVAL_UUID = uuid.UUID("61046076-66b9-4b8b-bfec-1e00603743c0")
 
+# Kristian 9/15/21
+FRACTION_MAX_UUID = uuid.UUID("8fe142e2-2504-4c9e-b3dc-817b24c7447e")
 TIME_DIFFERENCE_UUID = uuid.UUID("1363817a-b1fb-468e-9f1c-ec54fce72dfe")
 RELAXATION_TIME_UUID = uuid.UUID("0ad56cd1-7bcc-4b57-8076-14366d7f3c6a")
 CONTRACTION_TIME_UUID = uuid.UUID("33b5b0a8-f197-46ef-a451-a254e530757b")
@@ -37,7 +38,6 @@ ALL_METRICS = frozenset(
         TIME_DIFFERENCE_UUID,
     ]
 )
-
 
 PRIOR_PEAK_INDEX_UUID = uuid.UUID("80df90dc-21f8-4cad-a164-89436909b30a")
 PRIOR_VALLEY_INDEX_UUID = uuid.UUID("72ba9466-c203-41b6-ac30-337b4a17a124")

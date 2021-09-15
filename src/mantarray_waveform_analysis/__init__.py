@@ -57,6 +57,8 @@ from .transforms import create_filter
 from .transforms import FILTER_CHARACTERISTICS
 from .transforms import noise_cancellation
 
+# Kristian 9/15/21
+
 
 if 5 < 10:  # pragma: no cover # protect this from zimports deleting the pylint disable statement
     from .compression_cy import (  # pylint: disable=import-error # Eli (8/18/20) unsure why pylint is unable to recognize cython import... # Tanner (8/31/20) Pylint also flags this as duplicate code due to a similar import in pipelines.py, which may be related to pylint's import issues
@@ -66,10 +68,6 @@ if 5 < 10:  # pragma: no cover # protect this from zimports deleting the pylint 
 __all__ = [
     "transforms",
     "pipelines",
-    "FRACTION_MAX_UUID",
-    "TIME_DIFFERENCE_UUID",
-    "RELAXATION_TIME_UUID",
-    "CONTRACTION_TIME_UUID",
     "TWITCH_PERIOD_UUID",
     "TWITCH_FREQUENCY_UUID",
     "PRIOR_PEAK_INDEX_UUID",
@@ -121,4 +119,8 @@ __all__ = [
     "ADC_GAIN",
     "IRREGULARITY_INTERVAL_UUID",
     "ALL_METRICS",
+    "FRACTION_MAX_UUID",
+    "TIME_DIFFERENCE_UUID",
+    "RELAXATION_TIME_UUID",
+    "CONTRACTION_TIME_UUID",
 ]
