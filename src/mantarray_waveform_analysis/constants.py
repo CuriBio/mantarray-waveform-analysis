@@ -9,6 +9,7 @@ TWITCH_FREQUENCY_UUID = uuid.UUID(
     "472d0707-ff87-4198-9374-c28900bb216c"
 )  # This is just the reciprocal of twitch period, but is pre-computed to make downstream pipelines simpler. Frequency is reported in Hz
 AMPLITUDE_UUID = uuid.UUID("89cf1105-a015-434f-b527-4169b9400e26")
+FRACTION_MAX_UUID = uuid.UUID("8fe142e2-2504-4c9e-b3dc-817b24c7447e")
 AUC_UUID = uuid.UUID("e7b9a6e4-c43d-4e8b-af7e-51742e252030")
 FRACTION_MAX_UUID = uuid.UUID("d9758590-9f0d-418d-8913-db3bec2be65f")
 WIDTH_UUID = uuid.UUID("c4c60d55-017a-4783-9600-f19606de26f3")

@@ -66,6 +66,10 @@ if 5 < 10:  # pragma: no cover # protect this from zimports deleting the pylint 
 __all__ = [
     "transforms",
     "pipelines",
+    "FRACTION_MAX_UUID",
+    "TIME_DIFFERENCE_UUID",
+    "RELAXATION_TIME_UUID",
+    "CONTRACTION_TIME_UUID",
     "TWITCH_PERIOD_UUID",
     "TWITCH_FREQUENCY_UUID",
     "PRIOR_PEAK_INDEX_UUID",
