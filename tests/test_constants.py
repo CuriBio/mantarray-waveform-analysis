@@ -99,7 +99,7 @@ def test_data_metric_uuids():
     assert PRIOR_PEAK_INDEX_UUID == uuid.UUID("80df90dc-21f8-4cad-a164-89436909b30a")
     assert PRIOR_VALLEY_INDEX_UUID == uuid.UUID("72ba9466-c203-41b6-ac30-337b4a17a124")
     assert SUBSEQUENT_PEAK_INDEX_UUID == uuid.UUID("7e37325b-6681-4623-b192-39f154350f36")
-    assert SUBSEQUENT_VALLEY_INDEX_UUID == uuid.UUID("fd47ba6b-ee4d-4674-9a89-56e0db7f3d97")
+    assert SUBSEQUENT_VALLEY_INDEX_UUID == uuid.UUID("f263e0d0-c55e-49b2-b5a6-93e9a7836be5")
     assert IRREGULARITY_INTERVAL_UUID == uuid.UUID("61046076-66b9-4b8b-bfec-1e00603743c0")
 
     assert ALL_METRICS == frozenset(
