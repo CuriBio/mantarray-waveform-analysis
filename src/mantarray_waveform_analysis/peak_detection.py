@@ -252,7 +252,7 @@ def data_metrics(
         or RELAXATION_VELOCITY_UUID in metrics_to_create
         or TIME_DIFFERENCE_UUID in metrics_to_create
     ):
-        widths, coordinates = calculate_twitch_widths(twitch_indices, filtered_data, round_to_int=rounded)
+        widths = calculate_twitch_widths(twitch_indices, filtered_data, round_to_int=rounded)
 
     # compute twitch widths
     if WIDTH_UUID in metrics_to_create:
