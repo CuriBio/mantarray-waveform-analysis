@@ -11,7 +11,9 @@ from .constants import BESSEL_LOWPASS_10_UUID
 from .constants import BESSEL_LOWPASS_30_UUID
 from .constants import BUTTERWORTH_LOWPASS_30_UUID
 from .constants import CENTIMILLISECONDS_PER_SECOND
+from .constants import CONTRACTION_TIME_UUID
 from .constants import CONTRACTION_VELOCITY_UUID
+from .constants import FRACTION_MAX_UUID
 from .constants import IRREGULARITY_INTERVAL_UUID
 from .constants import MIDSCALE_CODE
 from .constants import MILLI_TO_BASE_CONVERSION
@@ -24,9 +26,11 @@ from .constants import PRIOR_PEAK_INDEX_UUID
 from .constants import PRIOR_VALLEY_INDEX_UUID
 from .constants import RAW_TO_SIGNED_CONVERSION_VALUE
 from .constants import REFERENCE_VOLTAGE
+from .constants import RELAXATION_TIME_UUID
 from .constants import RELAXATION_VELOCITY_UUID
 from .constants import SUBSEQUENT_PEAK_INDEX_UUID
 from .constants import SUBSEQUENT_VALLEY_INDEX_UUID
+from .constants import TIME_DIFFERENCE_UUID
 from .constants import TWITCH_FREQUENCY_UUID
 from .constants import TWITCH_PERIOD_UUID
 from .constants import WIDTH_FALLING_COORDS_UUID
@@ -62,6 +66,10 @@ if 5 < 10:  # pragma: no cover # protect this from zimports deleting the pylint 
 __all__ = [
     "transforms",
     "pipelines",
+    "FRACTION_MAX_UUID",
+    "TIME_DIFFERENCE_UUID",
+    "RELAXATION_TIME_UUID",
+    "CONTRACTION_TIME_UUID",
     "TWITCH_PERIOD_UUID",
     "TWITCH_FREQUENCY_UUID",
     "PRIOR_PEAK_INDEX_UUID",
