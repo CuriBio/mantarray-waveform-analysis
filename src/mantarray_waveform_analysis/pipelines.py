@@ -58,20 +58,62 @@ class Pipeline:
         self._displacement: NDArray[(2, Any), np.float32]
         self._force: NDArray[(2, Any), np.float32]
         self._peak_detection_results: Tuple[List[int], List[int]]
-        self._magnetic_data_metrics: Tuple[
-            Dict[int, Dict[UUID, Union[float, int]]],
-            Dict[UUID, Dict[str, Union[float, int]]],
-            Dict[UUID, Dict[int, Dict[str, Union[float, int]]]],
+        self._magnetic_data_metrics: Tuple[  # pylint:disable=duplicate-code # Anna (1/7/21): long type definition causing failure
+            Dict[
+                int,
+                Dict[
+                    UUID,
+                    Union[
+                        Dict[int, Dict[UUID, Union[Tuple[int, int], int]]],
+                        Union[float, int],
+                    ],
+                ],
+            ],
+            Dict[
+                UUID,
+                Union[
+                    Dict[str, Union[float, int]],
+                    Dict[int, Dict[str, Union[float, int]]],
+                ],
+            ],
         ]
-        self._displacement_data_metrics: Tuple[
-            Dict[int, Dict[UUID, Union[float, int]]],
-            Dict[UUID, Dict[str, Union[float, int]]],
-            Dict[UUID, Dict[int, Dict[str, Union[float, int]]]],
+        self._displacement_data_metrics: Tuple[  # pylint:disable=duplicate-code # Anna (1/7/21): long type definition causing failure
+            Dict[
+                int,
+                Dict[
+                    UUID,
+                    Union[
+                        Dict[int, Dict[UUID, Union[Tuple[int, int], int]]],
+                        Union[float, int],
+                    ],
+                ],
+            ],
+            Dict[
+                UUID,
+                Union[
+                    Dict[str, Union[float, int]],
+                    Dict[int, Dict[str, Union[float, int]]],
+                ],
+            ],
         ]
-        self._force_data_metrics: Tuple[
-            Dict[int, Dict[UUID, Union[float, int]]],
-            Dict[UUID, Dict[str, Union[float, int]]],
-            Dict[UUID, Dict[int, Dict[str, Union[float, int]]]],
+        self._force_data_metrics: Tuple[  # pylint:disable=duplicate-code # Anna (1/7/21): long type definition causing failure
+            Dict[
+                int,
+                Dict[
+                    UUID,
+                    Union[
+                        Dict[int, Dict[UUID, Union[Tuple[int, int], int]]],
+                        Union[float, int],
+                    ],
+                ],
+            ],
+            Dict[
+                UUID,
+                Union[
+                    Dict[str, Union[float, int]],
+                    Dict[int, Dict[str, Union[float, int]]],
+                ],
+            ],
         ]
 
     def get_template(self) -> "PipelineTemplate":
@@ -183,10 +225,21 @@ class Pipeline:
     def get_magnetic_data_metrics(
         self,
         metrics_to_create: Iterable[UUID] = ALL_METRICS,
-    ) -> Tuple[
-        Dict[int, Dict[UUID, Union[float, int]]],
-        Dict[UUID, Dict[str, Union[float, int]]],
-        Dict[UUID, Dict[int, Dict[str, Union[float, int]]]],
+    ) -> Tuple[  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failure
+        Dict[
+            int,
+            Dict[
+                UUID,
+                Union[
+                    Dict[int, Dict[UUID, Union[Tuple[int, int], int]]],
+                    Union[float, int],
+                ],
+            ],
+        ],
+        Dict[
+            UUID,
+            Union[Dict[str, Union[float, int]], Dict[int, Dict[str, Union[float, int]]]],
+        ],
     ]:
         """Calculate data metrics on noise filtered magnetic data."""
         try:
@@ -203,10 +256,21 @@ class Pipeline:
     def get_displacement_data_metrics(
         self,
         metrics_to_create: Iterable[UUID] = ALL_METRICS,
-    ) -> Tuple[
-        Dict[int, Dict[UUID, Union[float, int]]],
-        Dict[UUID, Dict[str, Union[float, int]]],
-        Dict[UUID, Dict[int, Dict[str, Union[float, int]]]],
+    ) -> Tuple[  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failure
+        Dict[
+            int,
+            Dict[
+                UUID,
+                Union[
+                    Dict[int, Dict[UUID, Union[Tuple[int, int], int]]],
+                    Union[float, int],
+                ],
+            ],
+        ],
+        Dict[
+            UUID,
+            Union[Dict[str, Union[float, int]], Dict[int, Dict[str, Union[float, int]]]],
+        ],
     ]:
         """Calculate data metrics on displacement data."""
         try:
@@ -224,10 +288,21 @@ class Pipeline:
     def get_force_data_metrics(
         self,
         metrics_to_create: Iterable[UUID] = ALL_METRICS,
-    ) -> Tuple[
-        Dict[int, Dict[UUID, Union[float, int]]],
-        Dict[UUID, Dict[str, Union[float, int]]],
-        Dict[UUID, Dict[int, Dict[str, Union[float, int]]]],
+    ) -> Tuple[  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failure
+        Dict[
+            int,
+            Dict[
+                UUID,
+                Union[
+                    Dict[int, Dict[UUID, Union[Tuple[int, int], int]]],
+                    Union[float, int],
+                ],
+            ],
+        ],
+        Dict[
+            UUID,
+            Union[Dict[str, Union[float, int]], Dict[int, Dict[str, Union[float, int]]]],
+        ],
     ]:
         """Calculate data metrics on force data."""
         try:
