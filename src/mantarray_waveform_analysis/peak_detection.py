@@ -781,7 +781,6 @@ def calculate_twitch_widths(
             )
 
             iter_width_dict[iter_percent] = iter_percent_width_dict
-            iter_coord_dict[iter_percent] = iter_percent_coord_dict
 
         widths.append(iter_width_dict)
 
