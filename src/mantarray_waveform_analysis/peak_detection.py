@@ -128,7 +128,7 @@ def peak_detector(
 
 
 def create_statistics_dict(metric: NDArray[int], round_to_int: bool = True) -> Dict[str, Union[Float64, int]]:
-    """Calculate the average values of a specific metric.
+    """Calculate various statistics for a specific metric.
 
     Args:
         metric: a 1D array of integer values of a specific metric results
