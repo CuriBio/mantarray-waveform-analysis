@@ -134,7 +134,7 @@ def create_statistics_dict(metric: NDArray[int], round_to_int: bool = True) -> D
 
     Args:
         metric: a 1D array of integer values of a specific metric results
-
+ 
     Returns:
         a dictionary of the average statistics of that metric in which the metrics are the key and average statistics are the value
     """
@@ -180,9 +180,11 @@ def data_metrics(
     Args:
         peak_and_valley_indices: a tuple of integer value arrays representing the time indices of peaks and valleys within the data
         filtered_data: a 2D array of the time and voltage data after it has gone through noise cancellation
+        rounded: whether to round estimates to the nearest int
+        metrics_to_create: list of desired metrics
 
     Returns:
-        per_twitch_dict: a dictionary of individual peak metrics in which the twitch timepoint is accompanied by a dictionary in which the UUIDs for each twitch metric are the key and with its accompanying value as the value. For the Twitch Width metric UUID, another dictionary is stored in which the key is the percentage of the way down and the value is another dictionary in which the UUIDs for the rising coord, falling coord or width value are stored with the value as an int for the width value or a tuple of ints for the x/y coordinates
+        main_twitch_dict: a dictionary of individual peak metrics in which the twitch timepoint is accompanied by a dictionary in which the UUIDs for each twitch metric are the key and with its accompanying value as the value. For the Twitch Width metric UUID, another dictionary is stored in which the key is the percentage of the way down and the value is another dictionary in which the UUIDs for the rising coord, falling coord or width value are stored with the value as an int for the width value or a tuple of ints for the x/y coordinates
         aggregate_dict: a dictionary of entire metric statistics. Most metrics have the stats underneath the UUID, but for twitch widths, there is an additional dictionary where the percent of repolarization is the key
     """
     # create main dictionaries
@@ -228,10 +230,10 @@ def data_metrics(
         aggregate_dict[AMPLITUDE_UUID] = create_statistics_dict(amplitudes, round_to_int=rounded)
 
     # find fraction of max amplitude
+    # dependent on computing amplitudes
     if FRACTION_MAX_UUID in metrics_to_create and AMPLITUDE_UUID in metrics_to_create:
 
         amplitude_fraction_of_max: NDArray[float] = amplitudes / aggregate_dict[AMPLITUDE_UUID]["max"]
-
         _add_per_twitch_metrics(main_twitch_dict, FRACTION_MAX_UUID, amplitude_fraction_of_max)
         aggregate_dict[FRACTION_MAX_UUID] = create_statistics_dict(
             amplitude_fraction_of_max, round_to_int=False
@@ -242,8 +244,10 @@ def data_metrics(
         WIDTH_UUID in metrics_to_create
         or CONTRACTION_VELOCITY_UUID in metrics_to_create
         or RELAXATION_VELOCITY_UUID in metrics_to_create
+        or TIME_DIFFERENCE_UUID in metrics_to_create
     ):
         widths = calculate_twitch_widths(twitch_indices, filtered_data, round_to_int=rounded)
+
     if WIDTH_UUID in metrics_to_create:
         _add_per_twitch_metrics(main_twitch_dict, WIDTH_UUID, widths)
 
@@ -262,7 +266,7 @@ def data_metrics(
         aggregate_dict[WIDTH_UUID] = width_stats_dict
 
     # compute time-difference of each twitch-width to peak
-    if TIME_DIFFERENCE_UUID in metrics_to_create and WIDTH_UUID in metrics_to_create:
+    if TIME_DIFFERENCE_UUID in metrics_to_create:
 
         difference_times = calculate_twitch_time_diff(twitch_indices, filtered_data, widths)
         _add_per_twitch_metrics(main_twitch_dict, TIME_DIFFERENCE_UUID, difference_times)
@@ -286,6 +290,7 @@ def data_metrics(
         aggregate_dict[CONTRACTION_VELOCITY_UUID] = create_statistics_dict(
             contraction_velocity, round_to_int=False
         )
+        
     if RELAXATION_VELOCITY_UUID in metrics_to_create:
         relaxation_velocity = calculate_twitch_velocity(twitch_indices, widths, False)
         _add_per_twitch_metrics(main_twitch_dict, RELAXATION_VELOCITY_UUID, relaxation_velocity)
