@@ -134,7 +134,7 @@ def create_statistics_dict(metric: NDArray[int], round_to_int: bool = True) -> D
 
     Args:
         metric: a 1D array of integer values of a specific metric results
- 
+
     Returns:
         a dictionary of the average statistics of that metric in which the metrics are the key and average statistics are the value
     """
@@ -290,7 +290,7 @@ def data_metrics(
         aggregate_dict[CONTRACTION_VELOCITY_UUID] = create_statistics_dict(
             contraction_velocity, round_to_int=False
         )
-        
+
     if RELAXATION_VELOCITY_UUID in metrics_to_create:
         relaxation_velocity = calculate_twitch_velocity(twitch_indices, widths, False)
         _add_per_twitch_metrics(main_twitch_dict, RELAXATION_VELOCITY_UUID, relaxation_velocity)
