@@ -2,6 +2,7 @@
 """Setup configuration."""
 import os
 
+import numpy as np
 from setuptools import Extension
 from setuptools import find_packages
 from setuptools import setup
@@ -25,7 +26,7 @@ extensions = [
 
 if USE_CYTHON:
     # cythonizing compression_cy.pyx with kwarg annotate=True will help when optimizing the code by enabling generation of the html annotation file
-    extensions = cythonize(extensions, annotate=False)
+    extensions = cythonize(extensions, annotate=True)
 
 
 setup(
@@ -38,6 +39,7 @@ setup(
     license="MIT",
     packages=find_packages("src"),
     package_dir={"": "src"},
+    include_dirs=[np.get_include()],
     install_requires=[
         "numpy>=1.20.1",
         "scipy>=1.6.1",

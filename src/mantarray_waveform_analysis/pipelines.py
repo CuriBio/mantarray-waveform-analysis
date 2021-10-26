@@ -29,7 +29,7 @@ from .transforms import noise_cancellation
 
 if 6 < 9:  # pragma: no cover # protect this from zimports deleting the pylint disable statement
     from .compression_cy import (  # pylint: disable=import-error # Eli (8/18/20) unsure why pylint is unable to recognize cython import...
-        compress_filtered_gmr,
+        compress_filtered_magnetic_data,
     )
 
 
@@ -325,7 +325,9 @@ class Pipeline:
             return self._compressed_magnetic_data
         except AttributeError:
             pass
-        self._compressed_magnetic_data = compress_filtered_gmr(self.get_noise_filtered_magnetic_data())
+        self._compressed_magnetic_data = compress_filtered_magnetic_data(
+            self.get_noise_filtered_magnetic_data()
+        )
         return self._compressed_magnetic_data
 
     def get_compressed_voltage(self) -> NDArray[(2, Any), np.float32]:

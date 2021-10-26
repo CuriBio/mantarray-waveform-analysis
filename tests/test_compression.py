@@ -4,7 +4,7 @@ import time
 
 from mantarray_waveform_analysis import AMPLITUDE_UUID
 from mantarray_waveform_analysis import AUC_UUID
-from mantarray_waveform_analysis import compress_filtered_gmr
+from mantarray_waveform_analysis import compress_filtered_magnetic_data
 from mantarray_waveform_analysis import peak_detection
 from mantarray_waveform_analysis import peak_detector
 from mantarray_waveform_analysis import TWITCH_PERIOD_UUID
@@ -47,30 +47,32 @@ __fixtures__ = (
 def test_compression__removes_all_except_first_and_last_points_of_flat_horizontal_line():
     expected = np.array([[0, 99], [10, 10]], dtype=np.int32)
     flat_data = np.array([list(range(100)), [10 for _ in range(100)]], dtype=np.int32)
-    actual = compress_filtered_gmr(flat_data)
+    actual = compress_filtered_magnetic_data(flat_data)
     np.testing.assert_equal(actual, expected)
 
 
 def test_compression_performance(new_A1):
     # data creation, noise cancellation, peak detection
-    #  expected time:                        10416666.666666666
-    # started at                            663155597.9
-    # after stopping linear regression:      82693642.5
-    #                                        39733980.4
-    # after switching to numpy sum:          45458017.3
+    #  expected time:                        10416666
+    # started at                            663155597
+    # after stopping linear regression:      82693642
+    #                                        39733980
+    # after switching to numpy sum:          45458017
     # cythonize original rsquared code:      75517946
     #                                        35390130
     # fully converting rsquared to cython:    2518059
     # adding cpdef to rsquared:               1723097
     # better C typing:                         190731
-    # linetrace=False:                         181949.9
+    # linetrace=False:                         181949
+    # switch dtype to int64                    197158
+    # better numpy                             166147
 
     pipeline, _ = new_A1
     filtered_data = pipeline.get_noise_filtered_gmr()
     starting_time = time.perf_counter_ns()
     num_iters = 15
     for _ in range(num_iters):
-        compress_filtered_gmr(filtered_data)
+        compress_filtered_magnetic_data(filtered_data)
 
     ending_time = time.perf_counter_ns()
     ns_per_iter = (ending_time - starting_time) / num_iters
@@ -94,7 +96,7 @@ def _get_info_for_compression(well_fixture, file_prefix, pipeline_template_with_
     original_num_samples = filtered_data.shape[1]
 
     # compress the data
-    compressed_data = compress_filtered_gmr(filtered_data)
+    compressed_data = compress_filtered_magnetic_data(filtered_data)
     new_num_samples = compressed_data.shape[1]
     compressed_peak_and_valley_indices = peak_detector(compressed_data, twitches_point_up=False)
     original_peak_and_valley_indices = peak_detector(filtered_data, twitches_point_up=False)

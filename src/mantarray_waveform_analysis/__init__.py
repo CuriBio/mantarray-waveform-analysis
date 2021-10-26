@@ -62,7 +62,7 @@ from .transforms import noise_cancellation
 
 if 5 < 10:  # pragma: no cover # protect this from zimports deleting the pylint disable statement
     from .compression_cy import (  # pylint: disable=import-error # Eli (8/18/20) unsure why pylint is unable to recognize cython import... # Tanner (8/31/20) Pylint also flags this as duplicate code due to a similar import in pipelines.py, which may be related to pylint's import issues
-        compress_filtered_gmr,
+        compress_filtered_magnetic_data,
     )
 
 __all__ = [
@@ -96,7 +96,7 @@ __all__ = [
     "BESSEL_BANDPASS_UUID",
     "BESSEL_LOWPASS_10_UUID",
     "FILTER_CHARACTERISTICS",
-    "compress_filtered_gmr",
+    "compress_filtered_magnetic_data",
     "calculate_voltage_from_gmr",
     "calculate_displacement_from_voltage",
     "PipelineTemplate",

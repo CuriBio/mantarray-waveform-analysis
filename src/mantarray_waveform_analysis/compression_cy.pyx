@@ -2,25 +2,28 @@
 # Tanner (9/1/20): Make sure to set `linetrace=False` except when profiling cython code or creating annotation file. All performance tests should be timed without line tracing enabled. Cython files in this package can easily be recompiled with `pip install -e .`
 # cython: linetrace=False
 # Eli (8/18/20) ... not sure why cython doesn't default to compiling with Python 3...but apparently this is explicitly needed https://github.com/cython/cython/issues/2299
-"""Compressions arrays of Mantarray GMR data ."""
+"""Compressions arrays of Mantarray magnetic data ."""
 from typing import Any
+from typing import Union
 
 from nptyping import NDArray
 import numpy as np
+cimport numpy as np
+np.import_array()
 
 cdef float R_SQUARE_CUTOFF = 0.94
 
-cpdef float rsquared(int[:] x_values, int[:] y_values):
+cpdef float rsquared(long[:] x_values, long[:] y_values):
     """Return R^2 where x and y are array-like.
     Instead of doing a full linear regression, the compression process drops all points in between the first and the last, so R^2 residuals are calculated based off of the line between the first and last points.
-    Typically the time and filtered GMR readings are supplied as the x and y axis values respectively.
+    Typically the time and filtered magnetic readings are supplied as the x and y axis values respectively.
     Args:
         x_values: 1D array of int values representing time
-        y_values: 1D array of int values representing filtered GMR
+        y_values: 1D array of int values representing filtered magnetic
     Returns:
         the R^2 value of the given dataset
     """
-    cdef int x_0, x_1, y_0, y_1
+    cdef long x_0, x_1, y_0, y_1
     cdef float slope, intercept, ss_res, ss_tot, y_bar
 
 
@@ -32,7 +35,7 @@ cpdef float rsquared(int[:] x_values, int[:] y_values):
     intercept = -slope * x_1 + y_1
 
     # based on https://stackoverflow.com/questions/893657/how-do-i-calculate-r-squared-using-python-and-numpy
-    cdef int y_sum, num_values, i
+    cdef long y_sum, num_values, i
     y_sum=0
     num_values=y_values.shape[0]
     ss_res=0
@@ -50,61 +53,51 @@ cpdef float rsquared(int[:] x_values, int[:] y_values):
     return 1 - ss_res / ss_tot
 
 
-def compress_filtered_gmr(int[:,:] data) -> NDArray[(2, Any), int]:
+def compress_filtered_magnetic_data(data: NDArray[(2, Any), Union[long, int]]) -> NDArray[(2, Any), long]:
     """Compress the data to allow for better plotting in the desktop app.
 
     Args:
-        data: a 2D array of GMR data after noise filtering
+        data: a 2D array of magnetic data after noise filtering
 
     Returns:
         a 2D array containing slightly less points than the original data
     """
-    # split time and GMR readings into individual arrays
-    cdef int[:] time = data[0, :]
-    cdef int[:] filtered_gmr = data[1, :]
-    cdef int time_len = len(time)
+    # split time and magnetic readings into individual arrays
+    cdef long[:, :] data_view = data.astype(np.int64)
+    cdef int time_len = len(data_view[0])
 
     # create a boolean array of indicies that will be kept
-    what_to_keep = [True] * time_len
+    what_to_keep = np.array([True] * time_len, dtype=bool)
+    cdef np.uint8_t[:] what_to_keep_view = np.frombuffer(what_to_keep, dtype=np.uint8)
 
-    # loop through values in time and filtered_gmr to determine what to compress
+    # loop through values in time and filtered_magnetic to determine what to compress
     cdef int left_idx, right_idx
-    cdef int[:] subset_time
-    cdef int[:] subset_filtered_gmr
+    cdef long[:, :] subset
 
     left_idx = 0
     while left_idx < time_len - 2:
         right_idx = left_idx + 3  # create an initial subset of length 3
 
-        subset_time = time[left_idx:right_idx]
-        subset_filtered_gmr = filtered_gmr[left_idx:right_idx]
+        subset = data_view[:, left_idx:right_idx]
 
         # calculate r_squared value of the initial length 3 subset
-        r_squared = rsquared(subset_time, subset_filtered_gmr)
+        r_squared = rsquared(subset[0], subset[1])
 
         if r_squared > R_SQUARE_CUTOFF:
             while r_squared > R_SQUARE_CUTOFF and right_idx < time_len:
-                what_to_keep[right_idx - 2] = False
+                what_to_keep_view[right_idx - 2] = False
                 # add another point into the subset
                 right_idx += 1
-                subset_time = time[left_idx:right_idx]
-                subset_filtered_gmr = filtered_gmr[left_idx:right_idx]
+                subset = data_view[:, left_idx:right_idx]
 
                 # re-calculate the new r_squared
-                r_squared = rsquared(subset_time, subset_filtered_gmr)
+                r_squared = rsquared(subset[0], subset[1])
             if r_squared > R_SQUARE_CUTOFF and right_idx == time_len:
-                what_to_keep[right_idx - 2] = False
+                what_to_keep_view[right_idx - 2] = False
 
             left_idx = right_idx - 1
 
         else:
             left_idx += 1
 
-    # compress the arrays
-    compressed_time = np.compress(what_to_keep, time)
-    compressed_filtered_gmr = np.compress(what_to_keep, filtered_gmr)
-
-    # combine the arrays back into proper format
-    compressed_data = np.array([compressed_time, compressed_filtered_gmr], dtype=np.int32)
-
-    return compressed_data
+    return np.array([np.compress(what_to_keep, data_view[0]), np.compress(what_to_keep, data_view[1])], np.int64)
