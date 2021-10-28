@@ -2,7 +2,6 @@
 import os
 
 from mantarray_waveform_analysis import BUTTERWORTH_LOWPASS_30_UUID
-from mantarray_waveform_analysis import CENTIMILLISECONDS_PER_SECOND
 import pytest
 
 from .fixtures_utils import _run_peak_detection

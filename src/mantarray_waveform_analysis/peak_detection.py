@@ -19,11 +19,11 @@ from scipy import signal
 from .constants import ALL_METRICS
 from .constants import AMPLITUDE_UUID
 from .constants import AUC_UUID
-from .constants import MICRO_TO_BASE_CONVERSION
 from .constants import CONTRACTION_TIME_UUID
 from .constants import CONTRACTION_VELOCITY_UUID
 from .constants import FRACTION_MAX_UUID
 from .constants import IRREGULARITY_INTERVAL_UUID
+from .constants import MICRO_TO_BASE_CONVERSION
 from .constants import MIN_NUMBER_PEAKS
 from .constants import MIN_NUMBER_VALLEYS
 from .constants import PRIOR_PEAK_INDEX_UUID
@@ -53,7 +53,7 @@ def peak_detector(
     filtered_magnetic_signal: NDArray[(2, Any), int],
     twitches_point_up: bool = True,
     is_magnetic_data: bool = True,
-    sampling_period_us: Optional[int] = None
+    sampling_period_us: Optional[int] = None,
 ) -> Tuple[List[int], List[int]]:
     """Locates peaks and valleys and returns the indices.
 
@@ -80,13 +80,12 @@ def peak_detector(
         sampling_period_us = filtered_magnetic_signal[0, 1] - filtered_magnetic_signal[0, 0]
 
     max_possible_twitch_freq = 7
-    min_required_samples_between_twitches = int(  # pylint:disable=invalid-name # (Eli 9/1/20): I can't think of a shorter name to describe this concept fully
+    min_required_samples_between_twitches = int(
         round(
             (1 / max_possible_twitch_freq) * MICRO_TO_BASE_CONVERSION / sampling_period_us,
             0,
         ),
     )
-    print(sampling_period_us, min_required_samples_between_twitches)
 
     # find required height of peaks
     max_height = np.max(magnetic_signal)

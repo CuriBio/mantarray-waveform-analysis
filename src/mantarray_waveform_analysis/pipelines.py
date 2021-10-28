@@ -385,7 +385,7 @@ class PipelineTemplate:  # pylint: disable=too-few-public-methods # This is a si
 
     Args:
         noise_filter_uuid: The UUID corresponding to the filter settings that should be used when computationally filtering noise in the data.
-        tissue_sampling_period: the sampling period for the tissues, in centimilliseconds
+        tissue_sampling_period: the sampling period for the tissues, in microseconds
     """
 
     tissue_sampling_period: int = attr.ib()
