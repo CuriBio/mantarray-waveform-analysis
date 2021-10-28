@@ -168,13 +168,16 @@ def test_create_filter__bessel_bandpass__returns_correct_coefficients(
 ):
     expected_sos = np.array(expected_sos, dtype=float)
 
-    actual_sos = create_filter(filter_uuid, sampling_period_centimilliseconds)
+    actual_sos = create_filter(filter_uuid, sampling_period_centimilliseconds * 10)
     np.testing.assert_array_almost_equal(actual_sos, expected_sos)
 
 
 def test_apply_noise_filtering__bessel_bandpass(raw_generic_well_a1, bessel_lowpass_10_for_100hz):
     # confirm pre-condition
     assert raw_generic_well_a1[1, 5] == -124293
+
+    # convert time points to µs
+    raw_generic_well_a1[0] *= 10
 
     filtered_gmr = apply_noise_filtering(raw_generic_well_a1, bessel_lowpass_10_for_100hz)
     assert isinstance(filtered_gmr, NDArray[(2, Any), Int[32]])

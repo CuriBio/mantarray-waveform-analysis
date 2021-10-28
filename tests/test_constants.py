@@ -32,7 +32,7 @@ from mantarray_waveform_analysis import SUBSEQUENT_PEAK_INDEX_UUID
 from mantarray_waveform_analysis import SUBSEQUENT_VALLEY_INDEX_UUID
 from mantarray_waveform_analysis import TIME_DIFFERENCE_UUID
 from mantarray_waveform_analysis import TWITCH_FREQUENCY_UUID
-from mantarray_waveform_analysis import TWITCH_PERIOD_UUID
+from mantarray_waveform_analysis import TWITCH_PERIOD_UUID,MICRO_TO_BASE_CONVERSION
 from mantarray_waveform_analysis import WIDTH_FALLING_COORDS_UUID
 from mantarray_waveform_analysis import WIDTH_RISING_COORDS_UUID
 from mantarray_waveform_analysis import WIDTH_UUID
@@ -42,6 +42,7 @@ from mantarray_waveform_analysis import WIDTH_VALUE_UUID
 def test_misc_constants():
     assert CENTIMILLISECONDS_PER_SECOND == 100000
     assert MILLI_TO_BASE_CONVERSION == 1000
+    assert MICRO_TO_BASE_CONVERSION == 1000000
 
 
 def test_filter_uuids():

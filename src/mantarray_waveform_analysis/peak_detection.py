@@ -19,7 +19,7 @@ from scipy import signal
 from .constants import ALL_METRICS
 from .constants import AMPLITUDE_UUID
 from .constants import AUC_UUID
-from .constants import CENTIMILLISECONDS_PER_SECOND
+from .constants import MICRO_TO_BASE_CONVERSION
 from .constants import CONTRACTION_TIME_UUID
 from .constants import CONTRACTION_VELOCITY_UUID
 from .constants import FRACTION_MAX_UUID
@@ -43,8 +43,6 @@ from .exceptions import TooFewPeaksDetectedError
 from .exceptions import TwoPeaksInARowError
 from .exceptions import TwoValleysInARowError
 
-# Kristian 9/15/21
-
 
 TWITCH_WIDTH_PERCENTS = range(10, 95, 5)
 TWITCH_WIDTH_INDEX_OF_CONTRACTION_VELOCITY_START = TWITCH_WIDTH_PERCENTS.index(10)
@@ -55,17 +53,18 @@ def peak_detector(
     filtered_magnetic_signal: NDArray[(2, Any), int],
     twitches_point_up: bool = True,
     is_magnetic_data: bool = True,
+    sampling_period_us: Optional[int] = None
 ) -> Tuple[List[int], List[int]]:
     """Locates peaks and valleys and returns the indices.
 
     Args:
-        noise_free_data: a 2D array of the time and voltage data after it has gone through noise cancellation
-        sampling_rate: an integer value of the sampling rate of the data in Hz
+        filtered_magnetic_signal: a 2D array of the magnetic signal vs time data after it has gone through noise cancellation. It is assumed that the time values are in microseconds
         twitches_point_up: whether in the incoming data stream the biological twitches are pointing up (in the positive direction) or down
-        data: a 2D array of the original time and voltage before noise cancellation
+        is_magnetic_data: whether the incoming data stream is magnetic data or not
+        sampling_period: Optional value indicating the period that magnetic data was sampled at. If not given, the sampling period will be calculated using the difference of the first two time indices
 
     Returns:
-        A tuple of the indices of the peaks and valleys
+        A tuple containing a list of the indices of the peaks and a list of the indices of valleys
     """
     magnetic_signal: NDArray[int] = filtered_magnetic_signal[1, :]
     if is_magnetic_data:
@@ -76,14 +75,18 @@ def peak_detector(
     if not twitches_point_up:
         peak_invertor_factor *= -1
         valley_invertor_factor *= -1
-    sampling_period_cms = filtered_magnetic_signal[0, 1] - filtered_magnetic_signal[0, 0]
-    maximum_possible_twitch_frequency = 7  # pylint:disable=invalid-name # (Eli 9/1/20): I can't think of a shorter name to describe this concept fully # Hz
-    minimum_required_samples_between_twitches = int(  # pylint:disable=invalid-name # (Eli 9/1/20): I can't think of a shorter name to describe this concept fully
+
+    if sampling_period_us is None:
+        sampling_period_us = filtered_magnetic_signal[0, 1] - filtered_magnetic_signal[0, 0]
+
+    max_possible_twitch_freq = 7
+    min_required_samples_between_twitches = int(  # pylint:disable=invalid-name # (Eli 9/1/20): I can't think of a shorter name to describe this concept fully
         round(
-            (1 / maximum_possible_twitch_frequency) * CENTIMILLISECONDS_PER_SECOND / sampling_period_cms,
+            (1 / max_possible_twitch_freq) * MICRO_TO_BASE_CONVERSION / sampling_period_us,
             0,
-        )
+        ),
     )
+    print(sampling_period_us, min_required_samples_between_twitches)
 
     # find required height of peaks
     max_height = np.max(magnetic_signal)
@@ -92,14 +95,14 @@ def peak_detector(
     # find peaks and valleys
     peak_indices, _ = signal.find_peaks(
         magnetic_signal * peak_invertor_factor,
-        width=minimum_required_samples_between_twitches / 2,
-        distance=minimum_required_samples_between_twitches,
+        width=min_required_samples_between_twitches / 2,
+        distance=min_required_samples_between_twitches,
         prominence=max_prominence / 4,
     )
     valley_indices, properties = signal.find_peaks(
         magnetic_signal * valley_invertor_factor,
-        width=minimum_required_samples_between_twitches / 2,
-        distance=minimum_required_samples_between_twitches,
+        width=min_required_samples_between_twitches / 2,
+        distance=min_required_samples_between_twitches,
         prominence=max_prominence / 4,
     )
     left_ips = properties["left_ips"]
@@ -219,7 +222,7 @@ def data_metrics(
 
     # find twitch frequencies
     if TWITCH_FREQUENCY_UUID in metrics_to_create:
-        twitch_frequencies = 1 / (combined_twitch_periods.astype(float) / CENTIMILLISECONDS_PER_SECOND)
+        twitch_frequencies = 1 / (combined_twitch_periods.astype(float) / MICRO_TO_BASE_CONVERSION)
         _add_per_twitch_metrics(main_twitch_dict, TWITCH_FREQUENCY_UUID, twitch_frequencies)
         aggregate_dict[TWITCH_FREQUENCY_UUID] = create_statistics_dict(twitch_frequencies, round_to_int=False)
 

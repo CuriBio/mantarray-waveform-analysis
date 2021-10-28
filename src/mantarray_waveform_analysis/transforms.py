@@ -15,7 +15,7 @@ from .constants import BESSEL_BANDPASS_UUID
 from .constants import BESSEL_LOWPASS_10_UUID
 from .constants import BESSEL_LOWPASS_30_UUID
 from .constants import BUTTERWORTH_LOWPASS_30_UUID
-from .constants import CENTIMILLISECONDS_PER_SECOND
+from .constants import MICRO_TO_BASE_CONVERSION
 from .constants import MILLI_TO_BASE_CONVERSION
 from .constants import MILLIMETERS_PER_MILLITESLA
 from .constants import MILLIVOLTS_PER_MILLITESLA
@@ -44,18 +44,18 @@ FILTER_CHARACTERISTICS: Dict[uuid.UUID, Dict[str, Union[str, float, int]]] = {
 
 def create_filter(
     filter_uuid: uuid.UUID,
-    sample_period_centimilliseconds: int,
+    sample_period_microseconds: int,
 ) -> NDArray[(Any, Any), float]:
     """Create a filter to apply to data streams.
 
     Args:
         filter_uuid: a UUID of an already accepted and approved filter
-        sample_period_centimilliseconds: the sampling period for the data stream you want to apply the filter to
+        sample_period_microseconds: the sampling period for the data stream you want to apply the filter to
 
     Returns:
         The scipy 'b' and 'a' vectors to use in scipy.signal.filtfilt
     """
-    sampling_frequency_hz = 1 / (sample_period_centimilliseconds / CENTIMILLISECONDS_PER_SECOND)
+    sampling_frequency_hz = 1 / (sample_period_microseconds / MICRO_TO_BASE_CONVERSION)
     nyquist_frequency_limit = sampling_frequency_hz / 2
 
     if filter_uuid not in FILTER_CHARACTERISTICS:

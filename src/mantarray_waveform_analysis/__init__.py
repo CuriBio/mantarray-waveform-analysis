@@ -29,7 +29,7 @@ from .constants import REFERENCE_VOLTAGE
 from .constants import RELAXATION_TIME_UUID
 from .constants import RELAXATION_VELOCITY_UUID
 from .constants import SUBSEQUENT_PEAK_INDEX_UUID
-from .constants import SUBSEQUENT_VALLEY_INDEX_UUID
+from .constants import SUBSEQUENT_VALLEY_INDEX_UUID,MICRO_TO_BASE_CONVERSION
 from .constants import TIME_DIFFERENCE_UUID
 from .constants import TWITCH_FREQUENCY_UUID
 from .constants import TWITCH_PERIOD_UUID
@@ -123,4 +123,5 @@ __all__ = [
     "TIME_DIFFERENCE_UUID",
     "RELAXATION_TIME_UUID",
     "CONTRACTION_TIME_UUID",
+    "MICRO_TO_BASE_CONVERSION"
 ]
