@@ -15,6 +15,7 @@ from .constants import CONTRACTION_TIME_UUID
 from .constants import CONTRACTION_VELOCITY_UUID
 from .constants import FRACTION_MAX_UUID
 from .constants import IRREGULARITY_INTERVAL_UUID
+from .constants import MICRO_TO_BASE_CONVERSION
 from .constants import MIDSCALE_CODE
 from .constants import MILLI_TO_BASE_CONVERSION
 from .constants import MILLIMETERS_PER_MILLITESLA
@@ -29,7 +30,7 @@ from .constants import REFERENCE_VOLTAGE
 from .constants import RELAXATION_TIME_UUID
 from .constants import RELAXATION_VELOCITY_UUID
 from .constants import SUBSEQUENT_PEAK_INDEX_UUID
-from .constants import SUBSEQUENT_VALLEY_INDEX_UUID,MICRO_TO_BASE_CONVERSION
+from .constants import SUBSEQUENT_VALLEY_INDEX_UUID
 from .constants import TIME_DIFFERENCE_UUID
 from .constants import TWITCH_FREQUENCY_UUID
 from .constants import TWITCH_PERIOD_UUID
@@ -39,6 +40,7 @@ from .constants import WIDTH_UUID
 from .constants import WIDTH_VALUE_UUID
 from .exceptions import DataAlreadyLoadedInPipelineError
 from .exceptions import FilterCreationNotImplementedError
+from .exceptions import PeakDetectionError
 from .exceptions import TooFewPeaksDetectedError
 from .exceptions import TwoPeaksInARowError
 from .exceptions import TwoValleysInARowError
@@ -123,5 +125,6 @@ __all__ = [
     "TIME_DIFFERENCE_UUID",
     "RELAXATION_TIME_UUID",
     "CONTRACTION_TIME_UUID",
-    "MICRO_TO_BASE_CONVERSION"
+    "MICRO_TO_BASE_CONVERSION",
+    "PeakDetectionError",
 ]

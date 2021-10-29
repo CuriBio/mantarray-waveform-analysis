@@ -2,8 +2,8 @@
 """Fixtures for testing the transforms."""
 
 from mantarray_waveform_analysis import BESSEL_LOWPASS_10_UUID
-from mantarray_waveform_analysis import MICRO_TO_BASE_CONVERSION
 from mantarray_waveform_analysis import create_filter
+from mantarray_waveform_analysis import MICRO_TO_BASE_CONVERSION
 import pytest
 
 

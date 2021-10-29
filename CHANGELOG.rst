@@ -2,6 +2,24 @@ Changelog for Mantarray Waveform Analysis
 =========================================
 
 
+1.2.0 (2021-xx-xx)
+------------------
+
+- Updated all analysis to require units of time in microseconds.
+
+
+1.1.1 (2021-xx-xx)
+------------------
+
+- TODO
+
+
+1.1.0 (2021-xx-xx)
+------------------
+
+- TODO
+
+
 1.0.1 (2021-07-15)
 ------------------
 

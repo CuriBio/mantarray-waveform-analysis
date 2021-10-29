@@ -7,7 +7,8 @@ from typing import Tuple
 
 from mantarray_file_manager import WellFile
 from mantarray_waveform_analysis import BESSEL_LOWPASS_30_UUID
-from mantarray_waveform_analysis import CENTIMILLISECONDS_PER_SECOND,MICRO_TO_BASE_CONVERSION
+from mantarray_waveform_analysis import CENTIMILLISECONDS_PER_SECOND
+from mantarray_waveform_analysis import MICRO_TO_BASE_CONVERSION
 from mantarray_waveform_analysis import peak_detection
 from mantarray_waveform_analysis import peak_detector
 from mantarray_waveform_analysis import PipelineTemplate
