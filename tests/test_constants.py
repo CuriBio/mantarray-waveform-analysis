@@ -30,7 +30,7 @@ from mantarray_waveform_analysis import RELAXATION_TIME_UUID
 from mantarray_waveform_analysis import RELAXATION_VELOCITY_UUID
 from mantarray_waveform_analysis import SUBSEQUENT_PEAK_INDEX_UUID
 from mantarray_waveform_analysis import SUBSEQUENT_VALLEY_INDEX_UUID
-from mantarray_waveform_analysis import TIME_DIFFERENCE_UUID
+from mantarray_waveform_analysis import TIME_VALUE_UUID
 from mantarray_waveform_analysis import TWITCH_FREQUENCY_UUID
 from mantarray_waveform_analysis import TWITCH_PERIOD_UUID
 from mantarray_waveform_analysis import WIDTH_FALLING_COORDS_UUID
@@ -96,9 +96,9 @@ def test_data_metric_uuids():
     assert IRREGULARITY_INTERVAL_UUID == uuid.UUID("61046076-66b9-4b8b-bfec-1e00603743c0")
 
     assert FRACTION_MAX_UUID == uuid.UUID("8fe142e2-2504-4c9e-b3dc-817b24c7447e")
-    assert TIME_DIFFERENCE_UUID == uuid.UUID("1363817a-b1fb-468e-9f1c-ec54fce72dfe")
     assert RELAXATION_TIME_UUID == uuid.UUID("0ad56cd1-7bcc-4b57-8076-14366d7f3c6a")
     assert CONTRACTION_TIME_UUID == uuid.UUID("33b5b0a8-f197-46ef-a451-a254e530757b")
+    assert TIME_VALUE_UUID == uuid.UUID("32f5ce6b-e311-4434-8a2a-c2b6bbd81ee6")
 
     assert ALL_METRICS == frozenset(
         [
@@ -111,7 +111,6 @@ def test_data_metric_uuids():
             CONTRACTION_VELOCITY_UUID,
             RELAXATION_VELOCITY_UUID,
             IRREGULARITY_INTERVAL_UUID,
-            TIME_DIFFERENCE_UUID,
         ]
     )
 

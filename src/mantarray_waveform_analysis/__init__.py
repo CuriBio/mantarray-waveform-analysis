@@ -30,7 +30,7 @@ from .constants import RELAXATION_TIME_UUID
 from .constants import RELAXATION_VELOCITY_UUID
 from .constants import SUBSEQUENT_PEAK_INDEX_UUID
 from .constants import SUBSEQUENT_VALLEY_INDEX_UUID
-from .constants import TIME_DIFFERENCE_UUID
+from .constants import TIME_VALUE_UUID
 from .constants import TWITCH_FREQUENCY_UUID
 from .constants import TWITCH_PERIOD_UUID
 from .constants import WIDTH_FALLING_COORDS_UUID
@@ -56,8 +56,6 @@ from .transforms import calculate_voltage_from_gmr
 from .transforms import create_filter
 from .transforms import FILTER_CHARACTERISTICS
 from .transforms import noise_cancellation
-
-# Kristian 9/15/21
 
 
 if 5 < 10:  # pragma: no cover # protect this from zimports deleting the pylint disable statement
@@ -120,7 +118,7 @@ __all__ = [
     "IRREGULARITY_INTERVAL_UUID",
     "ALL_METRICS",
     "FRACTION_MAX_UUID",
-    "TIME_DIFFERENCE_UUID",
     "RELAXATION_TIME_UUID",
     "CONTRACTION_TIME_UUID",
+    "TIME_VALUE_UUID",
 ]
