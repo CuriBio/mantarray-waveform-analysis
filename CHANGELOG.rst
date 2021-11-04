@@ -2,22 +2,32 @@ Changelog for Mantarray Waveform Analysis
 =========================================
 
 
-1.2.0 (2021-xx-xx)
+1.2.0 (2021-11-05)
 ------------------
 
 - Updated all analysis to require units of time in microseconds.
 
 
-1.1.1 (2021-xx-xx)
+1.1.1 (2021-09-30)
 ------------------
 
-- TODO
+- Fixed new metrics from previous release.
 
 
-1.1.0 (2021-xx-xx)
+1.1.0 (2021-08-31)
 ------------------
 
-- TODO
+- Added the following metrics:
+
+  - Ratio of amplitude of each peak to the that of the largest peak.
+  - Time from X% width to peak.
+  - Time from peak to X% width.
+
+
+1.0.3 (2021-07-21)
+------------------
+
+- Added ability to invert peak detection for magnetic data.
 
 
 1.0.1 (2021-07-15)
