@@ -4,8 +4,8 @@
 # Eli (8/18/20) ... not sure why cython doesn't default to compiling with Python 3...but apparently this is explicitly needed https://github.com/cython/cython/issues/2299
 """Compressions arrays of Mantarray magnetic data ."""
 from typing import Any
-from typing import Union
 
+from libc.stdint cimport int64_t
 from nptyping import NDArray
 import numpy as np
 cimport numpy as np
@@ -13,7 +13,7 @@ np.import_array()
 
 cdef float R_SQUARE_CUTOFF = 0.94
 
-cpdef float rsquared(long[:] x_values, long[:] y_values):
+cpdef float rsquared(int64_t[:] x_values, int64_t[:] y_values):
     """Return R^2 where x and y are array-like.
     Instead of doing a full linear regression, the compression process drops all points in between the first and the last, so R^2 residuals are calculated based off of the line between the first and last points.
     Typically the time and filtered magnetic readings are supplied as the x and y axis values respectively.
@@ -23,7 +23,7 @@ cpdef float rsquared(long[:] x_values, long[:] y_values):
     Returns:
         the R^2 value of the given dataset
     """
-    cdef long x_0, x_1, y_0, y_1
+    cdef int64_t x_0, x_1, y_0, y_1
     cdef float slope, intercept, ss_res, ss_tot, y_bar
 
 
@@ -35,7 +35,7 @@ cpdef float rsquared(long[:] x_values, long[:] y_values):
     intercept = -slope * x_1 + y_1
 
     # based on https://stackoverflow.com/questions/893657/how-do-i-calculate-r-squared-using-python-and-numpy
-    cdef long y_sum, num_values, i
+    cdef int64_t y_sum, num_values, i
     y_sum=0
     num_values=y_values.shape[0]
     ss_res=0
@@ -53,7 +53,7 @@ cpdef float rsquared(long[:] x_values, long[:] y_values):
     return 1 - ss_res / ss_tot
 
 
-def compress_filtered_magnetic_data(data: NDArray[(2, Any), Union[long, int]]) -> NDArray[(2, Any), long]:
+def compress_filtered_magnetic_data(data: NDArray[(2, Any), int]) -> NDArray[(2, Any), int]:
     """Compress the data to allow for better plotting in the desktop app.
 
     Args:
@@ -63,7 +63,7 @@ def compress_filtered_magnetic_data(data: NDArray[(2, Any), Union[long, int]]) -
         a 2D array containing slightly less points than the original data
     """
     # split time and magnetic readings into individual arrays
-    cdef long[:, :] data_view = data.astype(np.int64)
+    cdef int64_t[:, :] data_view = data.astype(np.int64)
     cdef int time_len = len(data_view[0])
 
     # create a boolean array of indicies that will be kept
@@ -72,7 +72,7 @@ def compress_filtered_magnetic_data(data: NDArray[(2, Any), Union[long, int]]) -
 
     # loop through values in time and filtered_magnetic to determine what to compress
     cdef int left_idx, right_idx
-    cdef long[:, :] subset
+    cdef int64_t[:, :] subset
 
     left_idx = 0
     while left_idx < time_len - 2:
