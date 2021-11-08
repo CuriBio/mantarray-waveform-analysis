@@ -60,3 +60,4 @@ tests/pngs/*.png
 # Cython
 *.so
 *.c
+*.html

@@ -15,6 +15,7 @@ from mantarray_waveform_analysis import CONTRACTION_VELOCITY_UUID
 from mantarray_waveform_analysis import FILTER_CHARACTERISTICS
 from mantarray_waveform_analysis import FRACTION_MAX_UUID
 from mantarray_waveform_analysis import IRREGULARITY_INTERVAL_UUID
+from mantarray_waveform_analysis import MICRO_TO_BASE_CONVERSION
 from mantarray_waveform_analysis import MIDSCALE_CODE
 from mantarray_waveform_analysis import MILLI_TO_BASE_CONVERSION
 from mantarray_waveform_analysis import MILLIMETERS_PER_MILLITESLA
@@ -42,6 +43,7 @@ from mantarray_waveform_analysis import WIDTH_VALUE_UUID
 def test_misc_constants():
     assert CENTIMILLISECONDS_PER_SECOND == 100000
     assert MILLI_TO_BASE_CONVERSION == 1000
+    assert MICRO_TO_BASE_CONVERSION == 1000000
 
 
 def test_filter_uuids():

@@ -2,6 +2,7 @@
 """Setup configuration."""
 import os
 
+import numpy as np
 from setuptools import Extension
 from setuptools import find_packages
 from setuptools import setup
@@ -30,7 +31,7 @@ if USE_CYTHON:
 
 setup(
     name="mantarray_waveform_analysis",
-    version="1.1.1",
+    version="1.2.0",
     description="Tools for analyzing waveforms produced by a Mantarray Instrument",
     url="https://github.com/CuriBio/mantarray-waveform-analysis",
     author="Curi Bio",
@@ -38,6 +39,7 @@ setup(
     license="MIT",
     packages=find_packages("src"),
     package_dir={"": "src"},
+    include_dirs=[np.get_include()],
     install_requires=[
         "numpy>=1.20.1",
         "scipy>=1.6.1",

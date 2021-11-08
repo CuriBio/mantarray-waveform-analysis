@@ -2,7 +2,6 @@
 import os
 
 from mantarray_waveform_analysis import BUTTERWORTH_LOWPASS_30_UUID
-from mantarray_waveform_analysis import CENTIMILLISECONDS_PER_SECOND
 import pytest
 
 from .fixtures_utils import _run_peak_detection
@@ -29,7 +28,7 @@ def fixture_noisy_data_B1():
         os.path.join("noisy_data", "MA20001025__2020_09_21_163232__B1.h5"),
         sampling_rate_construct=625,
         flip_data=True,
-        time_scaling_factor=CENTIMILLISECONDS_PER_SECOND,
+        time_scaling_factor=10,
         x_range=(0, 21),
     )
 
@@ -40,7 +39,7 @@ def fixture_MA20123123__2020_10_13_173812__B6():
         os.path.join("two_valley_error", "MA20123123__2020_10_13_173812__B6.h5"),
         sampling_rate_construct=625,
         flip_data=True,
-        time_scaling_factor=CENTIMILLISECONDS_PER_SECOND,
+        time_scaling_factor=10,
         noise_filter_uuid=BUTTERWORTH_LOWPASS_30_UUID,
     )
 
@@ -51,7 +50,7 @@ def fixture_MA20123123__2020_10_13_234733__A1():
         os.path.join("two_valley_error", "MA20123123__2020_10_13_234733__A1.h5"),
         sampling_rate_construct=625,
         flip_data=True,
-        time_scaling_factor=CENTIMILLISECONDS_PER_SECOND,
+        time_scaling_factor=10,
         noise_filter_uuid=BUTTERWORTH_LOWPASS_30_UUID,
     )
 
@@ -65,7 +64,7 @@ def fixture_MA202000030__2020_12_11_233215__D4():
         ),
         sampling_rate_construct=625,
         flip_data=True,
-        time_scaling_factor=CENTIMILLISECONDS_PER_SECOND,
+        time_scaling_factor=10,
         noise_filter_uuid=BUTTERWORTH_LOWPASS_30_UUID,
     )
 
@@ -79,7 +78,7 @@ def fixture_MA202000127__2021_03_26_174059__A3():
         ),
         sampling_rate_construct=625,
         flip_data=True,
-        time_scaling_factor=CENTIMILLISECONDS_PER_SECOND,
+        time_scaling_factor=10,
         noise_filter_uuid=BUTTERWORTH_LOWPASS_30_UUID,
     )
 
@@ -93,7 +92,7 @@ def fixture_MA202000127__2021_04_20_212922__A3():
         ),
         sampling_rate_construct=625,
         flip_data=True,
-        time_scaling_factor=CENTIMILLISECONDS_PER_SECOND,
+        time_scaling_factor=10,
         noise_filter_uuid=BUTTERWORTH_LOWPASS_30_UUID,
     )
 
@@ -107,6 +106,6 @@ def fixture_MA20123456__2020_08_17_145752__A1():
         ),
         sampling_rate_construct=625,
         flip_data=True,
-        time_scaling_factor=CENTIMILLISECONDS_PER_SECOND,
+        time_scaling_factor=10,
         noise_filter_uuid=BUTTERWORTH_LOWPASS_30_UUID,
     )

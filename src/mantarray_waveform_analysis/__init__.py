@@ -15,6 +15,7 @@ from .constants import CONTRACTION_TIME_UUID
 from .constants import CONTRACTION_VELOCITY_UUID
 from .constants import FRACTION_MAX_UUID
 from .constants import IRREGULARITY_INTERVAL_UUID
+from .constants import MICRO_TO_BASE_CONVERSION
 from .constants import MIDSCALE_CODE
 from .constants import MILLI_TO_BASE_CONVERSION
 from .constants import MILLIMETERS_PER_MILLITESLA
@@ -39,6 +40,7 @@ from .constants import WIDTH_UUID
 from .constants import WIDTH_VALUE_UUID
 from .exceptions import DataAlreadyLoadedInPipelineError
 from .exceptions import FilterCreationNotImplementedError
+from .exceptions import PeakDetectionError
 from .exceptions import TooFewPeaksDetectedError
 from .exceptions import TwoPeaksInARowError
 from .exceptions import TwoValleysInARowError
@@ -62,7 +64,7 @@ from .transforms import noise_cancellation
 
 if 5 < 10:  # pragma: no cover # protect this from zimports deleting the pylint disable statement
     from .compression_cy import (  # pylint: disable=import-error # Eli (8/18/20) unsure why pylint is unable to recognize cython import... # Tanner (8/31/20) Pylint also flags this as duplicate code due to a similar import in pipelines.py, which may be related to pylint's import issues
-        compress_filtered_gmr,
+        compress_filtered_magnetic_data,
     )
 
 __all__ = [
@@ -96,7 +98,7 @@ __all__ = [
     "BESSEL_BANDPASS_UUID",
     "BESSEL_LOWPASS_10_UUID",
     "FILTER_CHARACTERISTICS",
-    "compress_filtered_gmr",
+    "compress_filtered_magnetic_data",
     "calculate_voltage_from_gmr",
     "calculate_displacement_from_voltage",
     "PipelineTemplate",
@@ -123,4 +125,6 @@ __all__ = [
     "TIME_DIFFERENCE_UUID",
     "RELAXATION_TIME_UUID",
     "CONTRACTION_TIME_UUID",
+    "MICRO_TO_BASE_CONVERSION",
+    "PeakDetectionError",
 ]
