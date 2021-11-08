@@ -19,11 +19,11 @@ from scipy import signal
 from .constants import ALL_METRICS
 from .constants import AMPLITUDE_UUID
 from .constants import AUC_UUID
-from .constants import CENTIMILLISECONDS_PER_SECOND
 from .constants import CONTRACTION_TIME_UUID
 from .constants import CONTRACTION_VELOCITY_UUID
 from .constants import FRACTION_MAX_UUID
 from .constants import IRREGULARITY_INTERVAL_UUID
+from .constants import MICRO_TO_BASE_CONVERSION
 from .constants import MIN_NUMBER_PEAKS
 from .constants import MIN_NUMBER_VALLEYS
 from .constants import PRIOR_PEAK_INDEX_UUID
@@ -43,8 +43,6 @@ from .exceptions import TooFewPeaksDetectedError
 from .exceptions import TwoPeaksInARowError
 from .exceptions import TwoValleysInARowError
 
-# Kristian 9/15/21
-
 
 TWITCH_WIDTH_PERCENTS = range(10, 95, 5)
 TWITCH_WIDTH_INDEX_OF_CONTRACTION_VELOCITY_START = TWITCH_WIDTH_PERCENTS.index(10)
@@ -59,13 +57,13 @@ def peak_detector(
     """Locates peaks and valleys and returns the indices.
 
     Args:
-        noise_free_data: a 2D array of the time and voltage data after it has gone through noise cancellation
-        sampling_rate: an integer value of the sampling rate of the data in Hz
+        filtered_magnetic_signal: a 2D array of the magnetic signal vs time data after it has gone through noise cancellation. It is assumed that the time values are in microseconds
         twitches_point_up: whether in the incoming data stream the biological twitches are pointing up (in the positive direction) or down
-        data: a 2D array of the original time and voltage before noise cancellation
+        is_magnetic_data: whether the incoming data stream is magnetic data or not
+        sampling_period: Optional value indicating the period that magnetic data was sampled at. If not given, the sampling period will be calculated using the difference of the first two time indices
 
     Returns:
-        A tuple of the indices of the peaks and valleys
+        A tuple containing a list of the indices of the peaks and a list of the indices of valleys
     """
     magnetic_signal: NDArray[int] = filtered_magnetic_signal[1, :]
     if is_magnetic_data:
@@ -76,13 +74,15 @@ def peak_detector(
     if not twitches_point_up:
         peak_invertor_factor *= -1
         valley_invertor_factor *= -1
-    sampling_period_cms = filtered_magnetic_signal[0, 1] - filtered_magnetic_signal[0, 0]
-    maximum_possible_twitch_frequency = 7  # pylint:disable=invalid-name # (Eli 9/1/20): I can't think of a shorter name to describe this concept fully # Hz
-    minimum_required_samples_between_twitches = int(  # pylint:disable=invalid-name # (Eli 9/1/20): I can't think of a shorter name to describe this concept fully
+
+    sampling_period_us = filtered_magnetic_signal[0, 1] - filtered_magnetic_signal[0, 0]
+
+    max_possible_twitch_freq = 7
+    min_required_samples_between_twitches = int(  # pylint:disable=invalid-name # (Eli 9/1/20): I can't think of a shorter name to describe this concept fully
         round(
-            (1 / maximum_possible_twitch_frequency) * CENTIMILLISECONDS_PER_SECOND / sampling_period_cms,
+            (1 / max_possible_twitch_freq) * MICRO_TO_BASE_CONVERSION / sampling_period_us,
             0,
-        )
+        ),
     )
 
     # find required height of peaks
@@ -92,26 +92,26 @@ def peak_detector(
     # find peaks and valleys
     peak_indices, _ = signal.find_peaks(
         magnetic_signal * peak_invertor_factor,
-        width=minimum_required_samples_between_twitches / 2,
-        distance=minimum_required_samples_between_twitches,
+        width=min_required_samples_between_twitches / 2,
+        distance=min_required_samples_between_twitches,
         prominence=max_prominence / 4,
     )
     valley_indices, properties = signal.find_peaks(
         magnetic_signal * valley_invertor_factor,
-        width=minimum_required_samples_between_twitches / 2,
-        distance=minimum_required_samples_between_twitches,
+        width=min_required_samples_between_twitches / 2,
+        distance=min_required_samples_between_twitches,
         prominence=max_prominence / 4,
     )
     left_ips = properties["left_ips"]
     right_ips = properties["right_ips"]
 
-    # TODO Tanner (11/3/20): move this loop to find_twitch_indices
     # Patches error in B6 file for when two valleys are found in a single valley. If this is true left_bases, right_bases, prominences, and raw magnetic sensor data will also be equivalent to their previous value. This if statement indicates that the valley should be disregarded if the interpolated values on left and right intersection points of a horizontal line at the an evaluation height are equivalent. This would mean that the left and right sides of the peak and its neighbor peak align, indicating that it just one peak rather than two.
     # https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.peak_widths.html#scipy.signal.peak_widths
 
+    # Tanner (10/28/21): be careful modifying any of this while loop, it is currently not unit tested
     i = 1
     while i < len(valley_indices):
-        if left_ips[i] == left_ips[i - 1] and right_ips[i] == right_ips[i - 1]:
+        if left_ips[i] == left_ips[i - 1] and right_ips[i] == right_ips[i - 1]:  # pragma: no cover
             valley_idx = valley_indices[i]
             valley_idx_last = valley_indices[i - 1]
 
@@ -120,9 +120,9 @@ def peak_detector(
                 left_ips = np.delete(left_ips, i)
                 right_ips = np.delete(right_ips, i)
             else:  # pragma: no cover # (Anna 3/31/21): we don't have a case as of yet in which the first peak is higher than the second however know that it is possible and therefore aren't worried about code coverage in this case.
-                valley_indices = np.delete(valley_indices, i - 1)  # pragma: no cover
-                left_ips = np.delete(left_ips, i - 1)  # pragma: no cover
-                right_ips = np.delete(right_ips, i - 1)  # pragma: no cover
+                valley_indices = np.delete(valley_indices, i - 1)
+                left_ips = np.delete(left_ips, i - 1)
+                right_ips = np.delete(right_ips, i - 1)
         else:
             i += 1
 
@@ -140,17 +140,14 @@ def create_statistics_dict(metric: NDArray[int], round_to_int: bool = True) -> D
     """
     dictionary: Dict[str, Union[Float64, int]] = dict()
     dictionary["n"] = len(metric)
-    if len(metric) > 0:
-        dictionary["mean"] = np.mean(metric)
-        dictionary["std"] = np.std(metric)
-        dictionary["min"] = np.min(metric)
-        dictionary["max"] = np.max(metric)
-    else:
-        dictionary["mean"] = None
-        dictionary["std"] = None
-        dictionary["min"] = None
-        dictionary["max"] = None
+    if len(metric) == 0:
+        dictionary.update({key: None for key in ("mean", "std", "min", "max")})
+        return dictionary
 
+    dictionary["mean"] = np.mean(metric)
+    dictionary["std"] = np.std(metric)
+    dictionary["min"] = np.min(metric)
+    dictionary["max"] = np.max(metric)
     if round_to_int:
         for iter_key in ("mean", "std", "min", "max"):
             dictionary[iter_key] = int(round(dictionary[iter_key]))
@@ -162,19 +159,8 @@ def data_metrics(
     filtered_data: NDArray[(2, Any), int],
     rounded: bool = True,
     metrics_to_create: Iterable[UUID] = ALL_METRICS,
-) -> Tuple[
-    Dict[
-        int,
-        Dict[
-            UUID,  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failure
-            Any,
-        ],  # pylint: disable=duplicate-code # Anna (1/7/21): long type definition causing failure
-    ],
-    Dict[
-        UUID,
-        Any,
-    ],
-]:  # pylint:disable=too-many-locals # Eli (9/8/20): there are a lot of metrics to calculate that need local variables
+) -> Tuple[Dict[int, Dict[UUID, Any]], Dict[UUID, Any]]:
+    # pylint:disable=too-many-locals # Eli (9/8/20): there are a lot of metrics to calculate that need local variables
     """Find all data metrics for individual twitches and averages.
 
     Args:
@@ -188,17 +174,8 @@ def data_metrics(
         aggregate_dict: a dictionary of entire metric statistics. Most metrics have the stats underneath the UUID, but for twitch widths, there is an additional dictionary where the percent of repolarization is the key
     """
     # create main dictionaries
-    main_twitch_dict: Dict[
-        int,
-        Dict[
-            UUID,
-            Any,
-        ],
-    ] = dict()
-    aggregate_dict: Dict[
-        UUID,
-        Any,
-    ] = dict()
+    main_twitch_dict: Dict[int, Dict[UUID, Any]] = dict()
+    aggregate_dict: Dict[UUID, Any] = dict()
 
     # get values needed for metrics creation
     peak_indices, _ = peak_and_valley_indices
@@ -219,7 +196,7 @@ def data_metrics(
 
     # find twitch frequencies
     if TWITCH_FREQUENCY_UUID in metrics_to_create:
-        twitch_frequencies = 1 / (combined_twitch_periods.astype(float) / CENTIMILLISECONDS_PER_SECOND)
+        twitch_frequencies = 1 / (combined_twitch_periods.astype(float) / MICRO_TO_BASE_CONVERSION)
         _add_per_twitch_metrics(main_twitch_dict, TWITCH_FREQUENCY_UUID, twitch_frequencies)
         aggregate_dict[TWITCH_FREQUENCY_UUID] = create_statistics_dict(twitch_frequencies, round_to_int=False)
 
@@ -267,12 +244,9 @@ def data_metrics(
 
     # compute time-difference of each twitch-width to peak
     if TIME_DIFFERENCE_UUID in metrics_to_create:
-
         difference_times = calculate_twitch_time_diff(twitch_indices, filtered_data, widths)
         _add_per_twitch_metrics(main_twitch_dict, TIME_DIFFERENCE_UUID, difference_times)
-
         for time_to_peak_uuid in [RELAXATION_TIME_UUID, CONTRACTION_TIME_UUID]:
-
             difference_stats_dict: Dict[int, Dict[str, Union[float, int]]] = dict()
             for iter_percent in TWITCH_WIDTH_PERCENTS:
                 iter_list_difference_times: List[Union[float, int]] = []
@@ -467,15 +441,11 @@ def find_twitch_indices(
     while peak_idx < len(peak_indices) and valley_idx < len(valley_indices):
         if prev_feature_is_peak:
             if valley_indices[valley_idx] > peak_indices[peak_idx]:
-                raise TwoPeaksInARowError(
-                    (peak_indices[peak_idx - 1], peak_indices[peak_idx]),
-                )
+                raise TwoPeaksInARowError((peak_indices[peak_idx - 1], peak_indices[peak_idx]))
             valley_idx += 1
         else:
             if valley_indices[valley_idx] < peak_indices[peak_idx]:
-                raise TwoValleysInARowError(
-                    (valley_indices[valley_idx - 1], valley_indices[valley_idx]),
-                )
+                raise TwoValleysInARowError((valley_indices[valley_idx - 1], valley_indices[valley_idx]))
             peak_idx += 1
         prev_feature_is_peak = not prev_feature_is_peak
     if peak_idx < len(peak_indices) - 1:
@@ -483,16 +453,13 @@ def find_twitch_indices(
             (peak_indices[peak_idx], peak_indices[peak_idx + 1]),
         )
     if valley_idx < len(valley_indices) - 1:
-        raise TwoValleysInARowError(
-            (valley_indices[valley_idx], valley_indices[valley_idx + 1]),
-        )
+        raise TwoValleysInARowError((valley_indices[valley_idx], valley_indices[valley_idx + 1]))
 
     # compile dict of twitch information
     for itr_idx, itr_peak_index in enumerate(peak_indices):
         if itr_idx < peak_indices.shape[0] - 1:  # last peak
             if itr_idx == 0 and starts_with_peak:
                 continue
-
             twitches[itr_peak_index] = {
                 PRIOR_PEAK_INDEX_UUID: None if itr_idx == 0 else peak_indices[itr_idx - 1],
                 PRIOR_VALLEY_INDEX_UUID: valley_indices[itr_idx - 1 if starts_with_peak else itr_idx],
@@ -561,7 +528,9 @@ def calculate_amplitudes(
         prior_amplitude = amplitude_series[iter_twitch_indices_info[PRIOR_VALLEY_INDEX_UUID]]
         subsequent_amplitude = amplitude_series[iter_twitch_indices_info[SUBSEQUENT_VALLEY_INDEX_UUID]]
         amplitude_value = ((peak_amplitude - prior_amplitude) + (peak_amplitude - subsequent_amplitude)) / 2
-        if round_to_int:
+        if (
+            round_to_int
+        ):  # pragma: no cover  # Tanner (10/28/21): currently no tests that cover this branch but it could be still called in Pulse3D
             amplitude_value = int(round(amplitude_value, 0))
 
         amplitudes.append(abs(amplitude_value))
@@ -722,7 +691,9 @@ def calculate_twitch_widths(
                 value_series[falling_idx - 1],
             )
             width_val = interpolated_falling_timepoint - interpolated_rising_timepoint
-            if round_to_int:
+            if (
+                round_to_int
+            ):  # pragma: no cover  # Tanner (10/28/21): currently no tests that cover this branch but it could be still called in Pulse3D
                 width_val = int(round(width_val, 0))
                 interpolated_falling_timepoint = int(round(interpolated_falling_timepoint, 0))
                 interpolated_rising_timepoint = int(round(interpolated_rising_timepoint, 0))
@@ -866,7 +837,9 @@ def calculate_area_under_curve(  # pylint:disable=too-many-locals # Eli (9/1/20)
             rising_coords,
             falling_coords,
         )
-        if round_to_int:
+        if (
+            round_to_int
+        ):  # pragma: no cover  # Tanner (10/28/21): currently no tests that cover this branch but it could be still called in Pulse3D
             auc_total = int(round(auc_total, 0))
         auc_per_twitch.append(auc_total)
 

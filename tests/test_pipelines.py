@@ -145,7 +145,7 @@ def test_Pipeline__get_sensitivity_calibrated_reference_gmr__calls_correct_metho
         ),
         (
             "qed",
-            "compress_filtered_gmr",
+            "compress_filtered_magnetic_data",
             lambda the_pipeline: the_pipeline.get_compressed_magnetic_data(),
             [lambda the_pipeline: the_pipeline.get_noise_filtered_magnetic_data()],
             "applying compression",

@@ -16,7 +16,7 @@ __fixtures__ = [
 
 @pytest.fixture(scope="function", name="generic_pipeline_template")
 def fixture_generic_pipeline_template():
-    template = PipelineTemplate(noise_filter_uuid=BESSEL_LOWPASS_10_UUID, tissue_sampling_period=1000)
+    template = PipelineTemplate(noise_filter_uuid=BESSEL_LOWPASS_10_UUID, tissue_sampling_period=10000)
     yield template
 
 
