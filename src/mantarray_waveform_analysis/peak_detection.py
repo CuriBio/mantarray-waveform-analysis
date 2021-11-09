@@ -16,6 +16,7 @@ from scipy import signal
 from .constants import ALL_METRICS
 from .constants import AMPLITUDE_UUID
 from .constants import AUC_UUID
+from .constants import BASELINE_TO_PEAK_UUID
 from .constants import CENTIMILLISECONDS_PER_SECOND
 from .constants import CONTRACTION_TIME_UUID
 from .constants import CONTRACTION_VELOCITY_UUID
@@ -23,6 +24,7 @@ from .constants import FRACTION_MAX_UUID
 from .constants import IRREGULARITY_INTERVAL_UUID
 from .constants import MIN_NUMBER_PEAKS
 from .constants import MIN_NUMBER_VALLEYS
+from .constants import PEAK_TO_BASELINE_UUID
 from .constants import PRIOR_PEAK_INDEX_UUID
 from .constants import PRIOR_VALLEY_INDEX_UUID
 from .constants import RELAXATION_TIME_UUID
@@ -42,6 +44,7 @@ from .metrics import TwitchFractionAmplitude
 from .metrics import TwitchFrequency
 from .metrics import TwitchIrregularity
 from .metrics import TwitchPeakTime
+from .metrics import TwitchPeakToBaseline
 from .metrics import TwitchPeriod
 from .metrics import TwitchVelocity
 from .metrics import TwitchWidth
@@ -194,10 +197,12 @@ def data_metrics(
     metric_mapper = {
         AMPLITUDE_UUID: TwitchAmplitude(rounded=rounded),
         AUC_UUID: TwitchAUC(rounded=rounded),
+        BASELINE_TO_PEAK_UUID: TwitchPeakToBaseline(rounded=rounded, is_contraction=True),
         CONTRACTION_TIME_UUID: TwitchPeakTime(rounded=rounded, is_contraction=True),
         CONTRACTION_VELOCITY_UUID: TwitchVelocity(rounded=rounded, is_contraction=True),
         FRACTION_MAX_UUID: TwitchFractionAmplitude(rounded=rounded),
         IRREGULARITY_INTERVAL_UUID: TwitchIrregularity(rounded=rounded),
+        PEAK_TO_BASELINE_UUID: TwitchPeakToBaseline(rounded=rounded, is_contraction=False),
         RELAXATION_TIME_UUID: TwitchPeakTime(rounded=rounded, is_contraction=False),
         RELAXATION_VELOCITY_UUID: TwitchVelocity(rounded=rounded, is_contraction=False),
         TWITCH_FREQUENCY_UUID: TwitchFrequency(rounded=rounded),

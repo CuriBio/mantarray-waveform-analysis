@@ -20,10 +20,15 @@ IRREGULARITY_INTERVAL_UUID = uuid.UUID("61046076-66b9-4b8b-bfec-1e00603743c0")
 
 # Kristian 9/15/21
 FRACTION_MAX_UUID = uuid.UUID("8fe142e2-2504-4c9e-b3dc-817b24c7447e")
+
+# Kristian 10/29/21: for contraction to % width, or peak to % relaxation
+TIME_VALUE_UUID = uuid.UUID("32f5ce6b-e311-4434-8a2a-c2b6bbd81ee6")
 RELAXATION_TIME_UUID = uuid.UUID("0ad56cd1-7bcc-4b57-8076-14366d7f3c6a")
 CONTRACTION_TIME_UUID = uuid.UUID("33b5b0a8-f197-46ef-a451-a254e530757b")
-# Kristian 10/29/21
-TIME_VALUE_UUID = uuid.UUID("32f5ce6b-e311-4434-8a2a-c2b6bbd81ee6")
+
+# Kristian 11/9/21: full contraction or full relaxation metrics
+BASELINE_TO_PEAK_UUID = uuid.UUID("03ce2d30-3580-4129-9913-2fc2e35eddb7")
+PEAK_TO_BASELINE_UUID = uuid.UUID("1ac2589d-4713-41c0-8dd0-1e6c98600e37")
 
 ALL_METRICS = frozenset(
     [
@@ -36,6 +41,8 @@ ALL_METRICS = frozenset(
         CONTRACTION_VELOCITY_UUID,
         RELAXATION_VELOCITY_UUID,
         IRREGULARITY_INTERVAL_UUID,
+        BASELINE_TO_PEAK_UUID,
+        PEAK_TO_BASELINE_UUID,
     ]
 )
 

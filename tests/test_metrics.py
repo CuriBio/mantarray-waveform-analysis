@@ -12,11 +12,13 @@ import pytest
 
 from .fixtures_metrics import fixture_generate_twitch_amplitude
 from .fixtures_metrics import fixture_generate_twitch_auc
+from .fixtures_metrics import fixture_generate_twitch_baseline_to_peak
 from .fixtures_metrics import fixture_generate_twitch_fraction_amplitude
 from .fixtures_metrics import fixture_generate_twitch_frequency
 from .fixtures_metrics import fixture_generate_twitch_irregularity
 from .fixtures_metrics import fixture_generate_twitch_peak_time_contraction
 from .fixtures_metrics import fixture_generate_twitch_peak_time_relaxation
+from .fixtures_metrics import fixture_generate_twitch_peak_to_baseline
 from .fixtures_metrics import fixture_generate_twitch_period
 from .fixtures_metrics import fixture_generate_twitch_velocity_contraction
 from .fixtures_metrics import fixture_generate_twitch_velocity_relaxation
@@ -34,6 +36,8 @@ __fixtures__ = [
     fixture_generate_twitch_fraction_amplitude,
     fixture_generate_twitch_frequency,
     fixture_generate_twitch_irregularity,
+    fixture_generate_twitch_baseline_to_peak,
+    fixture_generate_twitch_peak_to_baseline,
     fixture_generate_twitch_peak_time_contraction,
     fixture_generate_twitch_peak_time_relaxation,
     fixture_generate_twitch_period,
@@ -170,7 +174,7 @@ def test_metrics__TwitchPeakTime(
 
     for i in range(len(percents) - 1):
         assert (
-            contractions[0][percents[i]][TIME_VALUE_UUID] < contractions[0][percents[i + 1]][TIME_VALUE_UUID]
+            contractions[0][percents[i]][TIME_VALUE_UUID] > contractions[0][percents[i + 1]][TIME_VALUE_UUID]
         )
 
     for i in range(len(percents) - 1):
@@ -179,6 +183,42 @@ def test_metrics__TwitchPeakTime(
     # regression
     assert np.all(contractions == generate_twitch_peak_time_contraction)
     assert np.all(relaxations == generate_twitch_peak_time_relaxation)
+
+
+def test_metrics__TwitchPeakToBaseline_is_contraction(
+    generic_well_features, generate_twitch_baseline_to_peak
+):
+
+    [filtered_data, peak_and_valley_indices, twitch_indices] = generic_well_features
+    PARAMS = {
+        "peak_and_valley_indices": peak_and_valley_indices,
+        "filtered_data": filtered_data,
+        "twitch_indices": twitch_indices,
+    }
+
+    metric = metrics.TwitchPeakToBaseline(rounded=False, is_contraction=True)
+    estimate = metric.fit(**PARAMS)
+
+    assert np.all(estimate > 0)
+    # regression
+    assert np.all(estimate == generate_twitch_baseline_to_peak)
+
+
+def test_metrics__TwitchPeakToBaseline_is_relaxation(generic_well_features, generate_twitch_peak_to_baseline):
+
+    [filtered_data, peak_and_valley_indices, twitch_indices] = generic_well_features
+    PARAMS = {
+        "peak_and_valley_indices": peak_and_valley_indices,
+        "filtered_data": filtered_data,
+        "twitch_indices": twitch_indices,
+    }
+
+    metric = metrics.TwitchPeakToBaseline(rounded=False, is_contraction=False)
+    estimate = metric.fit(**PARAMS)
+
+    assert np.all(estimate > 0)
+    # regression
+    assert np.all(estimate == generate_twitch_peak_to_baseline)
 
 
 def test_metrics__TwitchPeriod(generic_well_features, generate_twitch_period):

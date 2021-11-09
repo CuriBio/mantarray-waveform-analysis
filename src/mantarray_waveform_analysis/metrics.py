@@ -895,10 +895,10 @@ class TwitchPeakTime(BaseMetric):
         time_series = filtered_data[0, :]
 
         # iterate over each twitch
-        for iter_twitch_idx, iter_twitch_peak_idx in enumerate(twitch_indices.keys()):
+        for i, (iter_twitch_idx, iter_twitch_info) in enumerate(twitch_indices.items()):
 
-            # get twitch value and time
-            time_value = time_series[iter_twitch_peak_idx]
+            peak_time_value = time_series[iter_twitch_idx]
+            prior_valley_time_value = time_series[iter_twitch_info[PRIOR_VALLEY_INDEX_UUID]]
 
             # compile time differences for each peak
             iter_twich_difference_dict: Dict[int, Dict[UUID, NDArray[float]]] = dict()
@@ -908,10 +908,13 @@ class TwitchPeakTime(BaseMetric):
 
                 iter_percent_difference_dict: Dict[UUID, NDArray[float]] = dict()
 
-                iter_percent_coord_dict = per_twitch_widths[iter_twitch_idx][iter_percent]
+                iter_percent_coord_dict = per_twitch_widths[i][iter_percent]
                 width_percent_time = iter_percent_coord_dict[coord_type][0]
 
-                difference = (1 if is_contraction else -1) * (time_value - width_percent_time)
+                if is_contraction:
+                    difference = width_percent_time - prior_valley_time_value
+                else:
+                    difference = width_percent_time - peak_time_value
 
                 iter_percent_difference_dict[TIME_VALUE_UUID] = difference
                 iter_twich_difference_dict[iter_percent] = iter_percent_difference_dict
@@ -919,6 +922,53 @@ class TwitchPeakTime(BaseMetric):
             time_differences.append(iter_twich_difference_dict)
 
         return time_differences
+
+
+class TwitchPeakToBaseline(BaseMetric):
+    """Calculate full contraction or full relaxation time."""
+
+    def __init__(
+        self,
+        rounded: bool = False,
+        is_contraction: bool = True,
+        twitch_width_percents: List[int] = None,
+        **kwargs: Dict[str, Any],
+    ):
+        super().__init__(rounded=rounded, **kwargs)
+
+        self.is_contraction = is_contraction
+
+    def fit(
+        self,
+        peak_and_valley_indices: Tuple[NDArray[int], NDArray[int]],
+        filtered_data: NDArray[(2, Any), int],
+        twitch_indices: NDArray[int],
+        **kwargs: Dict[str, Any],
+    ) -> NDArray[Float64]:
+
+        num_twitches = len(twitch_indices)
+        full_differences: NDArray[Float64] = np.zeros(
+            (num_twitches),
+        )
+
+        time_series = filtered_data[0, :]
+
+        for i, (iter_twitch_idx, iter_twitch_info) in enumerate(twitch_indices.items()):
+            peak_time = time_series[iter_twitch_idx]
+            prior_valley_time = time_series[iter_twitch_info[PRIOR_VALLEY_INDEX_UUID]]
+            subsequent_valley_time = time_series[iter_twitch_info[SUBSEQUENT_VALLEY_INDEX_UUID]]
+
+            if self.is_contraction:
+                time_difference = peak_time - prior_valley_time
+            else:
+                time_difference = subsequent_valley_time - peak_time
+
+            if self.rounded:
+                time_difference = int(np.round(time_difference))
+
+            full_differences[i] = time_difference
+
+        return full_differences
 
 
 def interpolate_x_for_y_between_two_points(  # pylint:disable=invalid-name # (Eli 9/1/20: I can't think of a shorter name to describe this concept fully)

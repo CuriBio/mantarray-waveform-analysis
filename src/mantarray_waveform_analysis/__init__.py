@@ -6,6 +6,7 @@ from .constants import ADC_GAIN
 from .constants import ALL_METRICS
 from .constants import AMPLITUDE_UUID
 from .constants import AUC_UUID
+from .constants import BASELINE_TO_PEAK_UUID
 from .constants import BESSEL_BANDPASS_UUID
 from .constants import BESSEL_LOWPASS_10_UUID
 from .constants import BESSEL_LOWPASS_30_UUID
@@ -22,6 +23,7 @@ from .constants import MILLIVOLTS_PER_MILLITESLA
 from .constants import MIN_NUMBER_PEAKS
 from .constants import MIN_NUMBER_VALLEYS
 from .constants import NEWTONS_PER_MILLIMETER
+from .constants import PEAK_TO_BASELINE_UUID
 from .constants import PRIOR_PEAK_INDEX_UUID
 from .constants import PRIOR_VALLEY_INDEX_UUID
 from .constants import RAW_TO_SIGNED_CONVERSION_VALUE
@@ -121,4 +123,6 @@ __all__ = [
     "RELAXATION_TIME_UUID",
     "CONTRACTION_TIME_UUID",
     "TIME_VALUE_UUID",
+    "BASELINE_TO_PEAK_UUID",
+    "PEAK_TO_BASELINE_UUID",
 ]

@@ -87,10 +87,24 @@ def fixture_generate_twitch_peak_time_relaxation():
         return pickle.load(f, fix_imports=True)
 
 
+@pytest.fixture(scope="session", name="generate_twitch_peak_to_baseline")
+def fixture_generate_twitch_peak_to_baseline():
+    """For regression tests on twitch full relaxation time."""
+    with open(os.path.join(PATH_TO_DATASETS, "metrics", "twitch_peak_to_baseline.pkl"), "rb") as f:
+        return pickle.load(f, fix_imports=True)
+
+
 @pytest.fixture(scope="session", name="generate_twitch_peak_time_contraction")
 def fixture_generate_twitch_peak_time_contraction():
     """For regression tests on twitch time-to-peak (contraction)."""
     with open(os.path.join(PATH_TO_DATASETS, "metrics", "twitch_peak_time_contraction.pkl"), "rb") as f:
+        return pickle.load(f, fix_imports=True)
+
+
+@pytest.fixture(scope="session", name="generate_twitch_baseline_to_peak")
+def fixture_generate_twitch_baseline_to_peak():
+    """For regression tests on twitch full contraction time."""
+    with open(os.path.join(PATH_TO_DATASETS, "metrics", "twitch_baseline_to_peak.pkl"), "rb") as f:
         return pickle.load(f, fix_imports=True)
 
 
