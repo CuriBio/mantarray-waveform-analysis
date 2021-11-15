@@ -1,6 +1,9 @@
 Changelog for Mantarray Waveform Analysis
 =========================================
 
+1.3.0 (2021-11-15)
+------------------
+- Refactor metrics code
 
 1.2.0 (2021-11-05)
 ------------------
