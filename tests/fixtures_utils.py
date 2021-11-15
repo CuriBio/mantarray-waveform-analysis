@@ -184,14 +184,14 @@ def assert_percent_diff(actual, expected, threshold=0.0006):
     assert percent_diff < threshold
 
 
-@pytest.fixture(scope="session", name="raw_generic_well_a1")
+@pytest.fixture(scope="function", name="raw_generic_well_a1")
 def fixture_raw_generic_well_a1():
     time, gmr = _load_file_tsv(os.path.join(PATH_TO_DATASETS, "new_A1_tsv.tsv"))
     raw_gmr_data = create_numpy_array_of_raw_gmr_from_python_arrays(time, gmr)
     return raw_gmr_data
 
 
-@pytest.fixture(scope="session", name="raw_generic_well_a2")
+@pytest.fixture(scope="function", name="raw_generic_well_a2")
 def fixture_raw_generic_well_a2():
     time, gmr = _load_file_tsv(os.path.join(PATH_TO_DATASETS, "new_A2_tsv.tsv"))
     raw_gmr_data = create_numpy_array_of_raw_gmr_from_python_arrays(time, gmr)

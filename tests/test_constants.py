@@ -5,6 +5,7 @@ from mantarray_waveform_analysis import ADC_GAIN
 from mantarray_waveform_analysis import ALL_METRICS
 from mantarray_waveform_analysis import AMPLITUDE_UUID
 from mantarray_waveform_analysis import AUC_UUID
+from mantarray_waveform_analysis import BASELINE_TO_PEAK_UUID
 from mantarray_waveform_analysis import BESSEL_BANDPASS_UUID
 from mantarray_waveform_analysis import BESSEL_LOWPASS_10_UUID
 from mantarray_waveform_analysis import BESSEL_LOWPASS_30_UUID
@@ -23,6 +24,7 @@ from mantarray_waveform_analysis import MILLIVOLTS_PER_MILLITESLA
 from mantarray_waveform_analysis import MIN_NUMBER_PEAKS
 from mantarray_waveform_analysis import MIN_NUMBER_VALLEYS
 from mantarray_waveform_analysis import NEWTONS_PER_MILLIMETER
+from mantarray_waveform_analysis import PEAK_TO_BASELINE_UUID
 from mantarray_waveform_analysis import PRIOR_PEAK_INDEX_UUID
 from mantarray_waveform_analysis import PRIOR_VALLEY_INDEX_UUID
 from mantarray_waveform_analysis import RAW_TO_SIGNED_CONVERSION_VALUE
@@ -31,7 +33,7 @@ from mantarray_waveform_analysis import RELAXATION_TIME_UUID
 from mantarray_waveform_analysis import RELAXATION_VELOCITY_UUID
 from mantarray_waveform_analysis import SUBSEQUENT_PEAK_INDEX_UUID
 from mantarray_waveform_analysis import SUBSEQUENT_VALLEY_INDEX_UUID
-from mantarray_waveform_analysis import TIME_DIFFERENCE_UUID
+from mantarray_waveform_analysis import TIME_VALUE_UUID
 from mantarray_waveform_analysis import TWITCH_FREQUENCY_UUID
 from mantarray_waveform_analysis import TWITCH_PERIOD_UUID
 from mantarray_waveform_analysis import WIDTH_FALLING_COORDS_UUID
@@ -98,9 +100,11 @@ def test_data_metric_uuids():
     assert IRREGULARITY_INTERVAL_UUID == uuid.UUID("61046076-66b9-4b8b-bfec-1e00603743c0")
 
     assert FRACTION_MAX_UUID == uuid.UUID("8fe142e2-2504-4c9e-b3dc-817b24c7447e")
-    assert TIME_DIFFERENCE_UUID == uuid.UUID("1363817a-b1fb-468e-9f1c-ec54fce72dfe")
     assert RELAXATION_TIME_UUID == uuid.UUID("0ad56cd1-7bcc-4b57-8076-14366d7f3c6a")
     assert CONTRACTION_TIME_UUID == uuid.UUID("33b5b0a8-f197-46ef-a451-a254e530757b")
+    assert TIME_VALUE_UUID == uuid.UUID("32f5ce6b-e311-4434-8a2a-c2b6bbd81ee6")
+    assert BASELINE_TO_PEAK_UUID == uuid.UUID("03ce2d30-3580-4129-9913-2fc2e35eddb7")
+    assert PEAK_TO_BASELINE_UUID == uuid.UUID("1ac2589d-4713-41c0-8dd0-1e6c98600e37")
 
     assert ALL_METRICS == frozenset(
         [
@@ -113,7 +117,8 @@ def test_data_metric_uuids():
             CONTRACTION_VELOCITY_UUID,
             RELAXATION_VELOCITY_UUID,
             IRREGULARITY_INTERVAL_UUID,
-            TIME_DIFFERENCE_UUID,
+            BASELINE_TO_PEAK_UUID,
+            PEAK_TO_BASELINE_UUID,
         ]
     )
 

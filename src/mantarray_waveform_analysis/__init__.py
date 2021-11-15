@@ -6,6 +6,7 @@ from .constants import ADC_GAIN
 from .constants import ALL_METRICS
 from .constants import AMPLITUDE_UUID
 from .constants import AUC_UUID
+from .constants import BASELINE_TO_PEAK_UUID
 from .constants import BESSEL_BANDPASS_UUID
 from .constants import BESSEL_LOWPASS_10_UUID
 from .constants import BESSEL_LOWPASS_30_UUID
@@ -23,6 +24,7 @@ from .constants import MILLIVOLTS_PER_MILLITESLA
 from .constants import MIN_NUMBER_PEAKS
 from .constants import MIN_NUMBER_VALLEYS
 from .constants import NEWTONS_PER_MILLIMETER
+from .constants import PEAK_TO_BASELINE_UUID
 from .constants import PRIOR_PEAK_INDEX_UUID
 from .constants import PRIOR_VALLEY_INDEX_UUID
 from .constants import RAW_TO_SIGNED_CONVERSION_VALUE
@@ -31,7 +33,7 @@ from .constants import RELAXATION_TIME_UUID
 from .constants import RELAXATION_VELOCITY_UUID
 from .constants import SUBSEQUENT_PEAK_INDEX_UUID
 from .constants import SUBSEQUENT_VALLEY_INDEX_UUID
-from .constants import TIME_DIFFERENCE_UUID
+from .constants import TIME_VALUE_UUID
 from .constants import TWITCH_FREQUENCY_UUID
 from .constants import TWITCH_PERIOD_UUID
 from .constants import WIDTH_FALLING_COORDS_UUID
@@ -58,8 +60,6 @@ from .transforms import calculate_voltage_from_gmr
 from .transforms import create_filter
 from .transforms import FILTER_CHARACTERISTICS
 from .transforms import noise_cancellation
-
-# Kristian 9/15/21
 
 
 if 5 < 10:  # pragma: no cover # protect this from zimports deleting the pylint disable statement
@@ -122,9 +122,11 @@ __all__ = [
     "IRREGULARITY_INTERVAL_UUID",
     "ALL_METRICS",
     "FRACTION_MAX_UUID",
-    "TIME_DIFFERENCE_UUID",
     "RELAXATION_TIME_UUID",
     "CONTRACTION_TIME_UUID",
     "MICRO_TO_BASE_CONVERSION",
     "PeakDetectionError",
+    "TIME_VALUE_UUID",
+    "BASELINE_TO_PEAK_UUID",
+    "PEAK_TO_BASELINE_UUID",
 ]
