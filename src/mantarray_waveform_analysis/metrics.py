@@ -931,7 +931,7 @@ class TwitchPeakToBaseline(BaseMetric):
         self,
         rounded: bool = False,
         is_contraction: bool = True,
-        twitch_width_percents: List[int] = None,
+        # twitch_width_percents: List[int] = None,
         **kwargs: Dict[str, Any],
     ):
         super().__init__(rounded=rounded, **kwargs)

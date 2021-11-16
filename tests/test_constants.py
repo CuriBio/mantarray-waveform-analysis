@@ -119,9 +119,10 @@ def test_data_metric_uuids():
             IRREGULARITY_INTERVAL_UUID,
             BASELINE_TO_PEAK_UUID,
             PEAK_TO_BASELINE_UUID,
+            RELAXATION_TIME_UUID,
+            CONTRACTION_TIME_UUID,
         ]
     )
-
 
 def test_gmr_conversion_factors():
     assert MIDSCALE_CODE == 8388608

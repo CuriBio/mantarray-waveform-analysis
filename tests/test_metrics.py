@@ -26,6 +26,8 @@ from .fixtures_metrics import fixture_generate_twitch_width
 from .fixtures_metrics import fixture_generic_well_features
 from .fixtures_utils import fixture_raw_generic_well_a1
 from .fixtures_utils import fixture_raw_generic_well_a2
+from .fixtures_utils import fixture_sample_tissue_reading
+from .fixtures_utils import fixture_sample_reference_reading
 
 __fixtures__ = [
     fixture_raw_generic_well_a1,
@@ -44,6 +46,8 @@ __fixtures__ = [
     fixture_generate_twitch_velocity_contraction,
     fixture_generate_twitch_velocity_relaxation,
     fixture_generate_twitch_width,
+    fixture_sample_tissue_reading,
+    fixture_sample_reference_reading,
 ]
 
 

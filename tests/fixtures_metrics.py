@@ -2,16 +2,25 @@
 """Fixtures for testing the metrics."""
 import os
 import pickle
+import pytest
 
 from mantarray_waveform_analysis import peak_detection
 from mantarray_waveform_analysis import PipelineTemplate
-import pytest
+from mantarray_waveform_analysis import MICRO_TO_BASE_CONVERSION
+
 from stdlib_utils import get_current_file_abs_directory
 
 from .fixtures_utils import fixture_raw_generic_well_a1
 from .fixtures_utils import fixture_raw_generic_well_a2
+from .fixtures_utils import fixture_sample_tissue_reading
+from .fixtures_utils import fixture_sample_reference_reading
 
-__fixtures__ = [fixture_raw_generic_well_a1, fixture_raw_generic_well_a2]
+__fixtures__ = [
+    fixture_raw_generic_well_a1,
+    fixture_raw_generic_well_a2,
+    fixture_sample_reference_reading,
+    fixture_sample_tissue_reading
+]
 
 PATH_OF_CURRENT_FILE = get_current_file_abs_directory()
 PATH_TO_DATASETS = os.path.join(PATH_OF_CURRENT_FILE, "datasets")
@@ -111,7 +120,7 @@ def fixture_generate_twitch_baseline_to_peak():
 @pytest.fixture(scope="function", name="generic_well_features")
 def fixture_generic_well_features(raw_generic_well_a1, raw_generic_well_a2):
     """Load peak/valley indices, filtered data, and twitch indices."""
-    no_filter_pipeline_template = PipelineTemplate(tissue_sampling_period=1000)
+    no_filter_pipeline_template = PipelineTemplate(tissue_sampling_period=1)
     pipeline = no_filter_pipeline_template.create_pipeline()
     pipeline.load_raw_magnetic_data(raw_generic_well_a1, raw_generic_well_a2)
 

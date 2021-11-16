@@ -17,7 +17,6 @@ from mantarray_waveform_analysis import TWITCH_FREQUENCY_UUID
 from mantarray_waveform_analysis import TWITCH_PERIOD_UUID
 from mantarray_waveform_analysis import TwoPeaksInARowError
 from mantarray_waveform_analysis import TwoValleysInARowError
-from mantarray_waveform_analysis.peak_detection import create_statistics_dict
 import numpy as np
 import pytest
 
@@ -58,16 +57,6 @@ def test_peak_detection__analyzes_data_correctly_when_twitches_point_down():
     num_valleys = len(non_flipped_valleys)
     for idx in range(num_valleys):
         assert non_flipped_valleys[idx] == flipped_valleys[idx], idx
-
-
-def test_create_statistics_dict__handles_empty_input_array():
-    assert create_statistics_dict(np.array([])) == {
-        "n": 0,
-        "mean": None,
-        "std": None,
-        "min": None,
-        "max": None,
-    }
 
 
 def test_find_twitch_indices__raises_error_if_less_than_3_peaks_given():
