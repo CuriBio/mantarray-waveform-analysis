@@ -49,6 +49,7 @@ from .exceptions import TooFewPeaksDetectedError
 from .exceptions import TwoPeaksInARowError
 from .exceptions import TwoValleysInARowError
 from .exceptions import UnrecognizedFilterUuidError
+from .exceptions import UnsupportedTransformationError
 from .peak_detection import find_twitch_indices
 from .peak_detection import peak_detector
 from .pipelines import Pipeline
@@ -139,4 +140,5 @@ __all__ = [
     "GAUSS_PER_MILLITESLA",
     "calculate_magnetic_flux_density_from_memsic",
     "calculate_displacement_from_magnetic_flux_density",
+    "UnsupportedTransformationError",
 ]

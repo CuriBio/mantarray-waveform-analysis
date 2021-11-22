@@ -177,7 +177,7 @@ def apply_noise_filtering(
     return filtered_data
 
 
-def calculate_magnetic_flux_density_from_memsic(
+def calculate_magnetic_flux_density_from_memsic(  # pylint: disable=invalid-name  # Tanner (11/22/21): Can't think of a shorter name that is better
     memsic_data: NDArray[(2, Any), int],
 ) -> NDArray[(2, Any), np.float64]:
     """Convert raw data from memsic sensor into magnetic flux density.
@@ -243,7 +243,7 @@ def calculate_displacement_from_voltage(
     return calculate_displacement_from_magnetic_flux_density(magnetic_flux_data)
 
 
-def calculate_magnetic_flux_density_from_voltage(
+def calculate_magnetic_flux_density_from_voltage(  # pylint: disable=invalid-name  # Tanner (11/22/21): Can't think of a shorter name that is better
     voltage_data: NDArray[(2, Any), np.float64],
 ) -> NDArray[(2, Any), np.float64]:
     """Convert voltage to displacement.
@@ -266,7 +266,7 @@ def calculate_magnetic_flux_density_from_voltage(
     return np.vstack((time, sample_in_milliteslas)).astype(np.float64)
 
 
-def calculate_displacement_from_magnetic_flux_density(
+def calculate_displacement_from_magnetic_flux_density(  # pylint: disable=invalid-name  # Tanner (11/22/21): Can't think of a shorter name that is better
     magnetic_flux_data: NDArray[(2, Any), np.float64],
 ) -> NDArray[(2, Any), np.float64]:
     """Convert magnetic flux density to displacement.

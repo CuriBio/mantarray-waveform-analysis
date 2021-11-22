@@ -43,3 +43,7 @@ class TwoPeaksInARowError(TwoFeaturesInARowError):
 
 class TooFewPeaksDetectedError(PeakDetectionError):
     pass
+
+
+class UnsupportedTransformationError(Exception):
+    pass

@@ -2,26 +2,35 @@
 from unittest.mock import ANY
 
 from mantarray_waveform_analysis import BESSEL_LOWPASS_10_UUID
+from mantarray_waveform_analysis import calculate_displacement_from_magnetic_flux_density
+from mantarray_waveform_analysis import calculate_magnetic_flux_density_from_memsic
 from mantarray_waveform_analysis import DataAlreadyLoadedInPipelineError
 from mantarray_waveform_analysis import Pipeline
 from mantarray_waveform_analysis import pipelines
 from mantarray_waveform_analysis import PipelineTemplate
+from mantarray_waveform_analysis import UnsupportedTransformationError
 import numpy as np
 import pytest
 from scipy import signal
 
-from .fixtures_pipelines import fixture_generic_pipeline
-from .fixtures_pipelines import fixture_generic_pipeline_template
-from .fixtures_pipelines import fixture_loaded_generic_pipeline
+from .fixtures_pipelines import fixture_generic_beta_1_pipeline
+from .fixtures_pipelines import fixture_generic_beta_1_pipeline_template
+from .fixtures_pipelines import fixture_generic_beta_2_pipeline
+from .fixtures_pipelines import fixture_generic_beta_2_pipeline_template
+from .fixtures_pipelines import fixture_loaded_generic_beta_1_pipeline
+from .fixtures_pipelines import fixture_loaded_generic_beta_2_pipeline
 from .fixtures_utils import fixture_raw_generic_well_a1
 from .fixtures_utils import fixture_raw_generic_well_a2
 
 __fixtures__ = [
     fixture_raw_generic_well_a1,
     fixture_raw_generic_well_a2,
-    fixture_generic_pipeline,
-    fixture_loaded_generic_pipeline,
-    fixture_generic_pipeline_template,
+    fixture_generic_beta_1_pipeline,
+    fixture_generic_beta_2_pipeline,
+    fixture_loaded_generic_beta_1_pipeline,
+    fixture_loaded_generic_beta_2_pipeline,
+    fixture_generic_beta_1_pipeline_template,
+    fixture_generic_beta_2_pipeline_template,
 ]
 
 
@@ -34,38 +43,40 @@ def test_PipelineTemeplate__create_pipeline__creates_pipeline_linked_to_template
 
 
 def test_PipelineTemplate__get_filter_coefficients__calls_create_filter_with_expected_signature(
-    mocker, generic_pipeline_template
+    mocker, generic_beta_1_pipeline_template
 ):
     expected_return = "0832"
     mocked_create_filter = mocker.patch.object(
         pipelines, "create_filter", autospec=True, return_value=expected_return
     )
-    actual_coefficients = generic_pipeline_template.get_filter_coefficients()
+    actual_coefficients = generic_beta_1_pipeline_template.get_filter_coefficients()
     mocked_create_filter.assert_called_once_with(
-        generic_pipeline_template.noise_filter_uuid,
-        generic_pipeline_template.tissue_sampling_period,
+        generic_beta_1_pipeline_template.noise_filter_uuid,
+        generic_beta_1_pipeline_template.tissue_sampling_period,
     )
     assert actual_coefficients == expected_return
 
 
 def test_Pipeline__load_raw_gmr_data__sets_data(
-    loaded_generic_pipeline, raw_generic_well_a1, raw_generic_well_a2
+    loaded_generic_beta_1_pipeline, raw_generic_well_a1, raw_generic_well_a2
 ):
-    np.testing.assert_array_equal(loaded_generic_pipeline.get_raw_tissue_magnetic_data(), raw_generic_well_a1)
     np.testing.assert_array_equal(
-        loaded_generic_pipeline.get_raw_reference_magnetic_data(), raw_generic_well_a2
+        loaded_generic_beta_1_pipeline.get_raw_tissue_magnetic_data(), raw_generic_well_a1
+    )
+    np.testing.assert_array_equal(
+        loaded_generic_beta_1_pipeline.get_raw_reference_magnetic_data(), raw_generic_well_a2
     )
 
 
 def test_Pipeline__load_raw_gmr_data__raises_error_if_data_already_loaded(
-    loaded_generic_pipeline, raw_generic_well_a1, raw_generic_well_a2
+    loaded_generic_beta_1_pipeline, raw_generic_well_a1, raw_generic_well_a2
 ):
     with pytest.raises(DataAlreadyLoadedInPipelineError):
-        loaded_generic_pipeline.load_raw_magnetic_data(raw_generic_well_a1, raw_generic_well_a2)
+        loaded_generic_beta_1_pipeline.load_raw_magnetic_data(raw_generic_well_a1, raw_generic_well_a2)
 
 
 def test_Pipeline__get_sensitivity_calibrated_tissue_gmr__calls_correct_methods_to_calibrate__but_does_not_call_again_repeatedly(
-    mocker, loaded_generic_pipeline, raw_generic_well_a1
+    mocker, loaded_generic_beta_1_pipeline, raw_generic_well_a1
 ):
     expected_return = "blah"
     mocked_apply_sensitivity_calibration = mocker.patch.object(
@@ -74,20 +85,20 @@ def test_Pipeline__get_sensitivity_calibrated_tissue_gmr__calls_correct_methods_
         autospec=True,
         return_value=expected_return,
     )
-    calibrated_tissue = loaded_generic_pipeline.get_sensitivity_calibrated_tissue_gmr()
+    calibrated_tissue = loaded_generic_beta_1_pipeline.get_sensitivity_calibrated_tissue_gmr()
     # Eli (7/6/20): NumPy arrays don't play well with assert_called_once_with, so asserting things separately
     assert mocked_apply_sensitivity_calibration.call_count == 1
     actual_array_arg = mocked_apply_sensitivity_calibration.call_args_list[0][0][0]
     np.testing.assert_array_equal(actual_array_arg, raw_generic_well_a1)
     assert calibrated_tissue == expected_return
 
-    actual_return_2 = loaded_generic_pipeline.get_sensitivity_calibrated_tissue_gmr()
+    actual_return_2 = loaded_generic_beta_1_pipeline.get_sensitivity_calibrated_tissue_gmr()
     assert mocked_apply_sensitivity_calibration.call_count == 1
     assert actual_return_2 == expected_return
 
 
 def test_Pipeline__get_sensitivity_calibrated_reference_gmr__calls_correct_methods_to_calibrate__but_does_not_call_again_repeatedly(
-    mocker, loaded_generic_pipeline, raw_generic_well_a2
+    mocker, loaded_generic_beta_1_pipeline, raw_generic_well_a2
 ):
     expected_return = "wow"
     mocked_apply_sensitivity_calibration = mocker.patch.object(
@@ -96,14 +107,14 @@ def test_Pipeline__get_sensitivity_calibrated_reference_gmr__calls_correct_metho
         autospec=True,
         return_value=expected_return,
     )
-    calibrated_reference = loaded_generic_pipeline.get_sensitivity_calibrated_reference_gmr()
+    calibrated_reference = loaded_generic_beta_1_pipeline.get_sensitivity_calibrated_reference_gmr()
     # Eli (7/6/20): NumPy arrays don't play well with assert_called_once_with, so asserting things separately
     assert mocked_apply_sensitivity_calibration.call_count == 1
     actual_array_arg = mocked_apply_sensitivity_calibration.call_args_list[0][0][0]
     np.testing.assert_array_equal(actual_array_arg, raw_generic_well_a2)
     assert calibrated_reference == expected_return
 
-    actual_return_2 = loaded_generic_pipeline.get_sensitivity_calibrated_reference_gmr()
+    actual_return_2 = loaded_generic_beta_1_pipeline.get_sensitivity_calibrated_reference_gmr()
     assert mocked_apply_sensitivity_calibration.call_count == 1
     assert actual_return_2 == expected_return
 
@@ -238,7 +249,7 @@ def test_Pipeline__get_data_type__calls_correct_methods_to_perform_action__but_d
     list_of_lambdas_to_get_call_args,
     test_description2,
     mocker,
-    loaded_generic_pipeline,
+    loaded_generic_beta_1_pipeline,
 ):
 
     mocked_function_under_test = mocker.patch.object(
@@ -247,11 +258,11 @@ def test_Pipeline__get_data_type__calls_correct_methods_to_perform_action__but_d
         autospec=True,
         return_value=expected_return,
     )
-    actual_return_1 = lambda_of_method_under_test(loaded_generic_pipeline)
+    actual_return_1 = lambda_of_method_under_test(loaded_generic_beta_1_pipeline)
     # Eli (7/6/20): NumPy arrays don't play well with assert_called_once_with, so asserting things separately
     assert mocked_function_under_test.call_count == 1
     actual_array_arg = mocked_function_under_test.call_args_list[0][0][0]
-    expected_array_arg = list_of_lambdas_to_get_call_args[0](loaded_generic_pipeline)
+    expected_array_arg = list_of_lambdas_to_get_call_args[0](loaded_generic_beta_1_pipeline)
     if isinstance(expected_array_arg, np.ndarray):
         np.testing.assert_array_equal(
             actual_array_arg,
@@ -261,7 +272,7 @@ def test_Pipeline__get_data_type__calls_correct_methods_to_perform_action__but_d
         assert actual_array_arg == expected_array_arg
     if len(list_of_lambdas_to_get_call_args) == 2:
         actual_array_arg = mocked_function_under_test.call_args_list[0][0][1]
-        expected_array_arg = list_of_lambdas_to_get_call_args[1](loaded_generic_pipeline)
+        expected_array_arg = list_of_lambdas_to_get_call_args[1](loaded_generic_beta_1_pipeline)
         if isinstance(expected_array_arg, np.ndarray):
             np.testing.assert_array_equal(
                 actual_array_arg,
@@ -272,24 +283,24 @@ def test_Pipeline__get_data_type__calls_correct_methods_to_perform_action__but_d
 
     assert actual_return_1 == expected_return
 
-    actual_return_2 = lambda_of_method_under_test(loaded_generic_pipeline)
+    actual_return_2 = lambda_of_method_under_test(loaded_generic_beta_1_pipeline)
     assert mocked_function_under_test.call_count == 1
     assert actual_return_2 == expected_return
 
 
 def test_Pipeline__get_noise_filtered_gmr__creates_and_uses_filter_supplied_by_template(
-    mocker, loaded_generic_pipeline, generic_pipeline_template
+    mocker, loaded_generic_beta_1_pipeline, generic_beta_1_pipeline_template
 ):
     mocked_function_under_test = mocker.patch.object(
         pipelines,
         "apply_noise_filtering",
         autospec=True,
     )
-    loaded_generic_pipeline.get_noise_filtered_magnetic_data()
+    loaded_generic_beta_1_pipeline.get_noise_filtered_magnetic_data()
     # Eli (7/6/20): NumPy arrays don't play well with assert_called_once_with, so asserting things separately
     assert mocked_function_under_test.call_count == 1
     actual_filter_array = mocked_function_under_test.call_args_list[0][0][1]
-    expected_filter_array = generic_pipeline_template.get_filter_coefficients()
+    expected_filter_array = generic_beta_1_pipeline_template.get_filter_coefficients()
     np.testing.assert_array_equal(actual_filter_array, expected_filter_array)
 
 
@@ -305,13 +316,13 @@ def test_Pipeline__get_noise_filtered_gmr__returns_same_data_if_no_filter_define
 
 
 def test_Pipeline__get_filter_coefficients__does_not_repeatedly_generate_new_filters_each_time(
-    mocker, generic_pipeline_template
+    mocker, generic_beta_1_pipeline_template
 ):
     spied_bessel = mocker.spy(signal, "bessel")
-    original_coefficients = generic_pipeline_template.get_filter_coefficients()
+    original_coefficients = generic_beta_1_pipeline_template.get_filter_coefficients()
     assert spied_bessel.call_count == 1  # confirm pre-condition
 
-    new_coefficients = generic_pipeline_template.get_filter_coefficients()
+    new_coefficients = generic_beta_1_pipeline_template.get_filter_coefficients()
     assert spied_bessel.call_count == 1
     assert new_coefficients is original_coefficients
 
@@ -347,3 +358,41 @@ def test_Pipeline__get_peak_detection_info__passes_force_data_parameter_when_fal
     mocked_peak_detection = mocker.patch.object(pipelines, "peak_detector", autospec=True)
     pipeline.get_peak_detection_results()
     mocked_peak_detection.assert_called_once_with(ANY, twitches_point_up=False, is_magnetic_data=False)
+
+
+def test_Pipeline__get_voltage__raises_error_if_not_beta_1_data(loaded_generic_beta_2_pipeline):
+    with pytest.raises(UnsupportedTransformationError):
+        loaded_generic_beta_2_pipeline.get_voltage()
+
+
+def test_Pipeline__get_compressed_voltage__raises_error_if_not_beta_1_data(loaded_generic_beta_2_pipeline):
+    with pytest.raises(UnsupportedTransformationError):
+        loaded_generic_beta_2_pipeline.get_compressed_voltage()
+
+
+def test_Pipeline_beta_2_data__get_displacement__returns_correct_values(
+    generic_beta_2_pipeline, raw_generic_well_a1, mocker
+):
+    spied_get = mocker.spy(generic_beta_2_pipeline, "get_noise_filtered_magnetic_data")
+
+    generic_beta_2_pipeline.load_raw_magnetic_data(raw_generic_well_a1, np.zeros(raw_generic_well_a1.shape))
+    actual = generic_beta_2_pipeline.get_displacement()
+
+    expected_data = calculate_displacement_from_magnetic_flux_density(
+        calculate_magnetic_flux_density_from_memsic(spied_get.spy_return)
+    )
+    np.testing.assert_array_almost_equal(actual, expected_data)
+
+
+def test_Pipeline_beta_2_data__get_compressed_displacement__returns_correct_values(
+    generic_beta_2_pipeline, raw_generic_well_a1, mocker
+):
+    spied_get = mocker.spy(generic_beta_2_pipeline, "get_compressed_magnetic_data")
+
+    generic_beta_2_pipeline.load_raw_magnetic_data(raw_generic_well_a1, np.zeros(raw_generic_well_a1.shape))
+    actual = generic_beta_2_pipeline.get_compressed_displacement()
+
+    expected_data = calculate_displacement_from_magnetic_flux_density(
+        calculate_magnetic_flux_density_from_memsic(spied_get.spy_return)
+    )
+    np.testing.assert_array_almost_equal(actual, expected_data)

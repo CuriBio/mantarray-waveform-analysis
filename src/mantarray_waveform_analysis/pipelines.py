@@ -15,13 +15,16 @@ import numpy as np
 
 from .constants import ALL_METRICS
 from .exceptions import DataAlreadyLoadedInPipelineError
+from .exceptions import UnsupportedTransformationError
 from .peak_detection import data_metrics
 from .peak_detection import peak_detector
 from .transforms import apply_empty_plate_calibration
 from .transforms import apply_noise_filtering
 from .transforms import apply_sensitivity_calibration
+from .transforms import calculate_displacement_from_magnetic_flux_density
 from .transforms import calculate_displacement_from_voltage
 from .transforms import calculate_force_from_displacement
+from .transforms import calculate_magnetic_flux_density_from_memsic
 from .transforms import calculate_voltage_from_gmr
 from .transforms import create_filter
 from .transforms import noise_cancellation
@@ -331,6 +334,8 @@ class Pipeline:
         return self._compressed_magnetic_data
 
     def get_compressed_voltage(self) -> NDArray[(2, Any), np.float64]:
+        if not self._pipeline_template.is_beta_1_data:
+            raise UnsupportedTransformationError("Voltage cannot be calculated from this input data")
         try:
             return self._compressed_voltage
         except AttributeError:
@@ -339,11 +344,20 @@ class Pipeline:
         return self._compressed_voltage
 
     def get_compressed_displacement(self) -> NDArray[(2, Any), np.float64]:
+        """Calculate displacement correctly based on data type."""
         try:
             return self._compressed_displacement
         except AttributeError:
             pass
-        self._compressed_displacement = calculate_displacement_from_voltage(self.get_compressed_voltage())
+        if self._pipeline_template.is_beta_1_data:
+            self._compressed_displacement = calculate_displacement_from_voltage(self.get_compressed_voltage())
+        else:
+            compressed_magnetic_flux_data = calculate_magnetic_flux_density_from_memsic(
+                self.get_compressed_magnetic_data()
+            )
+            self._compressed_displacement = calculate_displacement_from_magnetic_flux_density(
+                compressed_magnetic_flux_data
+            )
         return self._compressed_displacement
 
     def get_compressed_force(self) -> NDArray[(2, Any), np.float64]:
@@ -355,6 +369,8 @@ class Pipeline:
         return self._compressed_force
 
     def get_voltage(self) -> NDArray[(2, Any), np.float64]:
+        if not self._pipeline_template.is_beta_1_data:
+            raise UnsupportedTransformationError("Voltage cannot be calculated from this input data")
         try:
             return self._voltage
         except AttributeError:
@@ -363,11 +379,18 @@ class Pipeline:
         return self._voltage
 
     def get_displacement(self) -> NDArray[(2, Any), np.float64]:
+        """Calculate displacement correctly based on data type."""
         try:
             return self._displacement
         except AttributeError:
             pass
-        self._displacement = calculate_displacement_from_voltage(self.get_voltage())
+        if self._pipeline_template.is_beta_1_data:
+            self._displacement = calculate_displacement_from_voltage(self.get_voltage())
+        else:
+            magnetic_flux_data = calculate_magnetic_flux_density_from_memsic(
+                self.get_noise_filtered_magnetic_data()
+            )
+            self._displacement = calculate_displacement_from_magnetic_flux_density(magnetic_flux_data)
         return self._displacement
 
     def get_force(self) -> NDArray[(2, Any), np.float64]:
@@ -390,6 +413,7 @@ class PipelineTemplate:  # pylint: disable=too-few-public-methods # This is a si
 
     tissue_sampling_period: int = attr.ib()
     noise_filter_uuid: Optional[UUID] = attr.ib(default=None)
+    is_beta_1_data: bool = attr.ib(default=False)
     is_force_data: bool = attr.ib(default=True)
     is_magnetic_data: bool = attr.ib(default=True)
     magnetic_twitches_point_up: bool
