@@ -2,6 +2,14 @@ Changelog for Mantarray Waveform Analysis
 =========================================
 
 
+1.3.0 (2021-11-22)
+------------------
+
+- Added ability to specify Beta 1/2 mode in ``PipelineTemplate`` and
+  and added ability to convert Beta 2 raw memsic data to displacement
+- Updated all float32 outputs to float64
+
+
 1.2.0 (2021-11-05)
 ------------------
 

@@ -344,7 +344,7 @@ class Pipeline:
         return self._compressed_voltage
 
     def get_compressed_displacement(self) -> NDArray[(2, Any), np.float64]:
-        """Calculate displacement correctly based on data type."""
+        """Calculate compressed displacement correctly based on data type."""
         try:
             return self._compressed_displacement
         except AttributeError:
