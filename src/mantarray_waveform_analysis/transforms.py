@@ -203,7 +203,7 @@ def calculate_voltage_from_gmr(
     gmr_data: NDArray[(2, Any), int],
     reference_voltage: Union[float, int] = REFERENCE_VOLTAGE,
     adc_gain: int = ADC_GAIN,
-) -> NDArray[(2, Any), np.float32]:
+) -> NDArray[(2, Any), np.float64]:
     """Convert 'signed' 24-bit values from an ADC to measured voltage.
 
     Should only be used for Beta 1 data
@@ -219,15 +219,15 @@ def calculate_voltage_from_gmr(
         A 2D array of time vs Voltage
     """
     millivolts_per_lsb = 1000 * reference_voltage / RAW_TO_SIGNED_CONVERSION_VALUE
-    sample_in_millivolts = gmr_data[1, :].astype(np.float32) * millivolts_per_lsb * (1 / adc_gain)
+    sample_in_millivolts = gmr_data[1, :].astype(np.float64) * millivolts_per_lsb * (1 / adc_gain)
     sample_in_volts = sample_in_millivolts / MILLI_TO_BASE_CONVERSION
-    return np.vstack((gmr_data[0, :].astype(np.float32), sample_in_volts))
+    return np.vstack((gmr_data[0, :].astype(np.float64), sample_in_volts))
 
 
 # TODO split this into two separate functions. Also rename
 def calculate_displacement_from_voltage(
-    voltage_data: NDArray[(2, Any), np.float32],
-) -> NDArray[(2, Any), np.float32]:
+    voltage_data: NDArray[(2, Any), np.float64],
+) -> NDArray[(2, Any), np.float64]:
     """Convert voltage to displacement.
 
     Should only be used for Beta 1 data
@@ -250,12 +250,12 @@ def calculate_displacement_from_voltage(
     sample_in_millimeters = sample_in_milliteslas * MILLIMETERS_PER_MILLITESLA
     sample_in_meters = sample_in_millimeters / MILLI_TO_BASE_CONVERSION
 
-    return np.vstack((time, sample_in_meters)).astype(np.float32)
+    return np.vstack((time, sample_in_meters)).astype(np.float64)
 
 
 def calculate_force_from_displacement(
-    displacement_data: NDArray[(2, Any), np.float32],
-) -> NDArray[(2, Any), np.float32]:
+    displacement_data: NDArray[(2, Any), np.float64],
+) -> NDArray[(2, Any), np.float64]:
     """Convert displacement to force.
 
     Conversion values were obtained 03/09/2021 by Kevin Grey
@@ -272,4 +272,4 @@ def calculate_force_from_displacement(
     # calculate force
     sample_in_newtons = sample_in_millimeters * NEWTONS_PER_MILLIMETER
 
-    return np.vstack((time, sample_in_newtons)).astype(np.float32)
+    return np.vstack((time, sample_in_newtons)).astype(np.float64)

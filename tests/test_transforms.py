@@ -176,15 +176,15 @@ def test_calculate_voltage_from_gmr__returns_correct_values():
     # confirm original data was not modified
     np.testing.assert_array_equal(test_data, original_test_data)
 
-    assert isinstance(actual_converted_data, NDArray[(2, Any), np.float32])
+    assert isinstance(actual_converted_data, NDArray[(2, Any), np.float64])
 
     expected_first_val = (
         test_data[1, 0] * 1000 * REFERENCE_VOLTAGE / RAW_TO_SIGNED_CONVERSION_VALUE / ADC_GAIN
     )
     expected_last_val = test_data[1, 2] * 1000 * REFERENCE_VOLTAGE / RAW_TO_SIGNED_CONVERSION_VALUE / ADC_GAIN
 
-    expected_first_val = (expected_first_val / MILLI_TO_BASE_CONVERSION).astype(np.float32)
-    expected_last_val = (expected_last_val / MILLI_TO_BASE_CONVERSION).astype(np.float32)
+    expected_first_val = (expected_first_val / MILLI_TO_BASE_CONVERSION).astype(np.float64)
+    expected_last_val = (expected_last_val / MILLI_TO_BASE_CONVERSION).astype(np.float64)
 
     expected_data = [expected_first_val, 0, expected_last_val]
 
@@ -219,14 +219,14 @@ def test_calculate_displacement_from_voltage():
     # confirm original data was not modified
     np.testing.assert_array_equal(test_data, original_test_data)
 
-    assert isinstance(actual_converted_data, NDArray[(2, Any), np.float32])
+    assert isinstance(actual_converted_data, NDArray[(2, Any), np.float64])
 
     # converting test voltage to expected displacements
     expected_first_val = (test_data[1, 0] * MILLIMETERS_PER_MILLITESLA / MILLIVOLTS_PER_MILLITESLA).astype(
-        np.float32
+        np.float64
     )
     expected_last_val = (test_data[1, 2] * MILLIMETERS_PER_MILLITESLA / MILLIVOLTS_PER_MILLITESLA).astype(
-        np.float32
+        np.float64
     )
 
     expected_data = [expected_first_val, 0, expected_last_val]
@@ -244,14 +244,14 @@ def test_calculate_force_from_displacement():
     # confirm original data was not modified
     np.testing.assert_array_equal(test_data, original_test_data)
 
-    assert isinstance(actual_converted_data, NDArray[(2, Any), np.float32])
+    assert isinstance(actual_converted_data, NDArray[(2, Any), np.float64])
 
     # converting test displacement to expected force
     expected_first_val = (test_data[1, 0] * NEWTONS_PER_MILLIMETER * MILLI_TO_BASE_CONVERSION).astype(
-        np.float32
+        np.float64
     )
     expected_last_val = (test_data[1, 2] * NEWTONS_PER_MILLIMETER * MILLI_TO_BASE_CONVERSION).astype(
-        np.float32
+        np.float64
     )
 
     expected_data = [expected_first_val, 0, expected_last_val]

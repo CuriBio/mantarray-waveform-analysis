@@ -51,12 +51,12 @@ class Pipeline:
         self._fully_calibrated_magnetic_data: NDArray[(2, Any), int]
         self._noise_filtered_magnetic_data: NDArray[(2, Any), int]
         self._compressed_magnetic_data: NDArray[(2, Any), int]
-        self._compressed_voltage: NDArray[(2, Any), np.float32]
-        self._compressed_displacement: NDArray[(2, Any), np.float32]
-        self._compressed_force: NDArray[(2, Any), np.float32]
-        self._voltage: NDArray[(2, Any), np.float32]
-        self._displacement: NDArray[(2, Any), np.float32]
-        self._force: NDArray[(2, Any), np.float32]
+        self._compressed_voltage: NDArray[(2, Any), np.float64]
+        self._compressed_displacement: NDArray[(2, Any), np.float64]
+        self._compressed_force: NDArray[(2, Any), np.float64]
+        self._voltage: NDArray[(2, Any), np.float64]
+        self._displacement: NDArray[(2, Any), np.float64]
+        self._force: NDArray[(2, Any), np.float64]
         self._peak_detection_results: Tuple[List[int], List[int]]
         self._magnetic_data_metrics: Tuple[  # pylint:disable=duplicate-code # Anna (1/7/21): long type definition causing failure
             Dict[
@@ -330,7 +330,7 @@ class Pipeline:
         )
         return self._compressed_magnetic_data
 
-    def get_compressed_voltage(self) -> NDArray[(2, Any), np.float32]:
+    def get_compressed_voltage(self) -> NDArray[(2, Any), np.float64]:
         try:
             return self._compressed_voltage
         except AttributeError:
@@ -338,7 +338,7 @@ class Pipeline:
         self._compressed_voltage = calculate_voltage_from_gmr(self.get_compressed_gmr())
         return self._compressed_voltage
 
-    def get_compressed_displacement(self) -> NDArray[(2, Any), np.float32]:
+    def get_compressed_displacement(self) -> NDArray[(2, Any), np.float64]:
         try:
             return self._compressed_displacement
         except AttributeError:
@@ -346,7 +346,7 @@ class Pipeline:
         self._compressed_displacement = calculate_displacement_from_voltage(self.get_compressed_voltage())
         return self._compressed_displacement
 
-    def get_compressed_force(self) -> NDArray[(2, Any), np.float32]:
+    def get_compressed_force(self) -> NDArray[(2, Any), np.float64]:
         try:
             return self._compressed_force
         except AttributeError:
@@ -354,7 +354,7 @@ class Pipeline:
         self._compressed_force = calculate_force_from_displacement(self.get_compressed_displacement())
         return self._compressed_force
 
-    def get_voltage(self) -> NDArray[(2, Any), np.float32]:
+    def get_voltage(self) -> NDArray[(2, Any), np.float64]:
         try:
             return self._voltage
         except AttributeError:
@@ -362,7 +362,7 @@ class Pipeline:
         self._voltage = calculate_voltage_from_gmr(self.get_noise_filtered_gmr())
         return self._voltage
 
-    def get_displacement(self) -> NDArray[(2, Any), np.float32]:
+    def get_displacement(self) -> NDArray[(2, Any), np.float64]:
         try:
             return self._displacement
         except AttributeError:
@@ -370,7 +370,7 @@ class Pipeline:
         self._displacement = calculate_displacement_from_voltage(self.get_voltage())
         return self._displacement
 
-    def get_force(self) -> NDArray[(2, Any), np.float32]:
+    def get_force(self) -> NDArray[(2, Any), np.float64]:
         try:
             return self._force
         except AttributeError:
