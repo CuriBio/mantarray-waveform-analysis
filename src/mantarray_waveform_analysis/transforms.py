@@ -15,6 +15,10 @@ from .constants import BESSEL_BANDPASS_UUID
 from .constants import BESSEL_LOWPASS_10_UUID
 from .constants import BESSEL_LOWPASS_30_UUID
 from .constants import BUTTERWORTH_LOWPASS_30_UUID
+from .constants import GAUSS_PER_MILLITESLA
+from .constants import MEMSIC_CENTER_OFFSET
+from .constants import MEMSIC_FULL_SCALE
+from .constants import MEMSIC_MSB
 from .constants import MICRO_TO_BASE_CONVERSION
 from .constants import MILLI_TO_BASE_CONVERSION
 from .constants import MILLIMETERS_PER_MILLITESLA
@@ -173,12 +177,36 @@ def apply_noise_filtering(
     return filtered_data
 
 
+def calculate_magnetic_flux_density_from_memsic(
+    memsic_data: NDArray[(2, Any), int],
+) -> NDArray[(2, Any), np.float64]:
+    """Convert raw data from memsic sensor into magnetic flux density.
+
+    Conversion values are valid as of 11/19/2021
+
+    Args:
+        memsic_data: A 2D array of raw memsic signal vs time
+
+    Returns:
+        A 2D array of magnetic field strength vs time
+    """
+    samples_in_milliteslas = (
+        (memsic_data[1, :].astype(np.int64) - MEMSIC_CENTER_OFFSET)
+        * MEMSIC_FULL_SCALE
+        / MEMSIC_MSB
+        / GAUSS_PER_MILLITESLA
+    )
+    return np.vstack((memsic_data[0, :].astype(np.float64), samples_in_milliteslas)).astype(np.float64)
+
+
 def calculate_voltage_from_gmr(
     gmr_data: NDArray[(2, Any), int],
     reference_voltage: Union[float, int] = REFERENCE_VOLTAGE,
     adc_gain: int = ADC_GAIN,
 ) -> NDArray[(2, Any), np.float32]:
     """Convert 'signed' 24-bit values from an ADC to measured voltage.
+
+    Should only be used for Beta 1 data
 
     Conversion values were obtained 03/09/2021 by Kevin Grey
 
@@ -196,10 +224,13 @@ def calculate_voltage_from_gmr(
     return np.vstack((gmr_data[0, :].astype(np.float32), sample_in_volts))
 
 
+# TODO split this into two separate functions. Also rename
 def calculate_displacement_from_voltage(
     voltage_data: NDArray[(2, Any), np.float32],
 ) -> NDArray[(2, Any), np.float32]:
     """Convert voltage to displacement.
+
+    Should only be used for Beta 1 data
 
     Conversion values were obtained 03/09/2021 by Kevin Grey
 

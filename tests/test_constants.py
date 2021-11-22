@@ -14,7 +14,11 @@ from mantarray_waveform_analysis import CONTRACTION_TIME_UUID
 from mantarray_waveform_analysis import CONTRACTION_VELOCITY_UUID
 from mantarray_waveform_analysis import FILTER_CHARACTERISTICS
 from mantarray_waveform_analysis import FRACTION_MAX_UUID
+from mantarray_waveform_analysis import GAUSS_PER_MILLITESLA
 from mantarray_waveform_analysis import IRREGULARITY_INTERVAL_UUID
+from mantarray_waveform_analysis import MEMSIC_CENTER_OFFSET
+from mantarray_waveform_analysis import MEMSIC_FULL_SCALE
+from mantarray_waveform_analysis import MEMSIC_MSB
 from mantarray_waveform_analysis import MICRO_TO_BASE_CONVERSION
 from mantarray_waveform_analysis import MIDSCALE_CODE
 from mantarray_waveform_analysis import MILLI_TO_BASE_CONVERSION
@@ -118,14 +122,24 @@ def test_data_metric_uuids():
     )
 
 
-def test_gmr_conversion_factors():
-    assert MIDSCALE_CODE == 8388608
-    assert RAW_TO_SIGNED_CONVERSION_VALUE == 2 ** 23
-    assert MILLIVOLTS_PER_MILLITESLA == 1073.6
+def test_generic_magnetic_field_to_force_conversion_factors():
     assert MILLIMETERS_PER_MILLITESLA == 23.25
     assert NEWTONS_PER_MILLIMETER == 0.000159
+
+
+def test_beta_1_gmr_conversion_factors():
+    assert MILLIVOLTS_PER_MILLITESLA == 1073.6
+    assert MIDSCALE_CODE == 8388608
+    assert RAW_TO_SIGNED_CONVERSION_VALUE == 2 ** 23
     assert REFERENCE_VOLTAGE == 2.5
     assert ADC_GAIN == 2
+
+
+def test_beta_2_memsic_conversion_factors():
+    assert MEMSIC_CENTER_OFFSET == 2 ** 15
+    assert MEMSIC_MSB == 2 ** 16
+    assert MEMSIC_FULL_SCALE == 16
+    assert GAUSS_PER_MILLITESLA == 10
 
 
 def test_peak_detection_vals():

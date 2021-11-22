@@ -14,7 +14,11 @@ from .constants import CENTIMILLISECONDS_PER_SECOND
 from .constants import CONTRACTION_TIME_UUID
 from .constants import CONTRACTION_VELOCITY_UUID
 from .constants import FRACTION_MAX_UUID
+from .constants import GAUSS_PER_MILLITESLA
 from .constants import IRREGULARITY_INTERVAL_UUID
+from .constants import MEMSIC_CENTER_OFFSET
+from .constants import MEMSIC_FULL_SCALE
+from .constants import MEMSIC_MSB
 from .constants import MICRO_TO_BASE_CONVERSION
 from .constants import MIDSCALE_CODE
 from .constants import MILLI_TO_BASE_CONVERSION
@@ -54,6 +58,7 @@ from .transforms import apply_noise_filtering
 from .transforms import apply_sensitivity_calibration
 from .transforms import calculate_displacement_from_voltage
 from .transforms import calculate_force_from_displacement
+from .transforms import calculate_magnetic_flux_density_from_memsic
 from .transforms import calculate_voltage_from_gmr
 from .transforms import create_filter
 from .transforms import FILTER_CHARACTERISTICS
@@ -127,4 +132,9 @@ __all__ = [
     "CONTRACTION_TIME_UUID",
     "MICRO_TO_BASE_CONVERSION",
     "PeakDetectionError",
+    "MEMSIC_CENTER_OFFSET",
+    "MEMSIC_MSB",
+    "MEMSIC_FULL_SCALE",
+    "GAUSS_PER_MILLITESLA",
+    "calculate_magnetic_flux_density_from_memsic",
 ]

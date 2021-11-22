@@ -13,10 +13,12 @@ from mantarray_waveform_analysis import BESSEL_LOWPASS_30_UUID
 from mantarray_waveform_analysis import BUTTERWORTH_LOWPASS_30_UUID
 from mantarray_waveform_analysis import calculate_displacement_from_voltage
 from mantarray_waveform_analysis import calculate_force_from_displacement
+from mantarray_waveform_analysis import calculate_magnetic_flux_density_from_memsic
 from mantarray_waveform_analysis import calculate_voltage_from_gmr
 from mantarray_waveform_analysis import create_filter
 from mantarray_waveform_analysis import FILTER_CHARACTERISTICS
 from mantarray_waveform_analysis import FilterCreationNotImplementedError
+from mantarray_waveform_analysis import MEMSIC_CENTER_OFFSET
 from mantarray_waveform_analysis import MIDSCALE_CODE
 from mantarray_waveform_analysis import MILLI_TO_BASE_CONVERSION
 from mantarray_waveform_analysis import MILLIMETERS_PER_MILLITESLA
@@ -55,6 +57,7 @@ def test_noise_cancellation(raw_generic_well_a1):
 def test_apply_empty_plate_calibration(raw_generic_well_a1):
     fully_calibrated_gmr = apply_empty_plate_calibration(raw_generic_well_a1)
     assert isinstance(fully_calibrated_gmr, NDArray[(2, Any), Int[32]])
+
     # more assertions will be added when empty plate calibration is better understood
 
 
@@ -96,38 +99,10 @@ def test_create_filter__raises_error_for_code_missing_to_generate_filter(mocker)
             BESSEL_BANDPASS_UUID,
             250,
             [
-                [
-                    2.89771627e-05,
-                    5.79543254e-05,
-                    2.89771627e-05,
-                    1,
-                    -1.73792987e00,
-                    7.56492551e-01,
-                ],
-                [
-                    1,
-                    2,
-                    1,
-                    1,
-                    -1.79217579e00,
-                    8.16847162e-01,
-                ],
-                [
-                    1,
-                    -2,
-                    1,
-                    1,
-                    -1.99675894e00,
-                    9.96761815e-01,
-                ],
-                [
-                    1,
-                    -2,
-                    1,
-                    1,
-                    -1.99816395e00,
-                    9.98166184e-01,
-                ],
+                [2.89771627e-05, 5.79543254e-05, 2.89771627e-05, 1, -1.73792987e00, 7.56492551e-01],
+                [1, 2, 1, 1, -1.79217579e00, 8.16847162e-01],
+                [1, -2, 1, 1, -1.99675894e00, 9.96761815e-01],
+                [1, -2, 1, 1, -1.99816395e00, 9.98166184e-01],
             ],
             "bessel bandpass at 400 Hz / 250 cms sampling, 0.1 Hz and 10 Hz cutoffs",
         ),
@@ -214,6 +189,24 @@ def test_calculate_voltage_from_gmr__returns_correct_values():
     expected_data = [expected_first_val, 0, expected_last_val]
 
     np.testing.assert_almost_equal(actual_converted_data[1, :], expected_data, decimal=0)
+
+
+def test_calculate_magnetic_flux_density_from_memsic__returns_correct_values():
+    test_raw_samples = np.array([0, MEMSIC_CENTER_OFFSET, 0xFFFF], dtype=np.uint16)
+    test_data = np.vstack((np.zeros(3), test_raw_samples)).astype(np.uint64)
+    original_test_data = copy.deepcopy(test_data)
+
+    actual_converted_data = calculate_magnetic_flux_density_from_memsic(test_data)
+    assert actual_converted_data.shape == (2, len(test_raw_samples))
+    assert actual_converted_data.dtype == np.float64
+
+    # confirm original data was not modified
+    np.testing.assert_array_equal(test_data, original_test_data)
+
+    # Tanner (11/19/21): this value is defined in documentation of the Beta 2 memsic sensors
+    max_abs_memsic_range = 0.8
+    expected_data = [-max_abs_memsic_range, 0, max_abs_memsic_range]
+    np.testing.assert_almost_equal(actual_converted_data[1], expected_data, decimal=1)
 
 
 def test_calculate_displacement_from_voltage():
