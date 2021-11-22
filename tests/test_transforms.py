@@ -11,6 +11,7 @@ from mantarray_waveform_analysis import BESSEL_BANDPASS_UUID
 from mantarray_waveform_analysis import BESSEL_LOWPASS_10_UUID
 from mantarray_waveform_analysis import BESSEL_LOWPASS_30_UUID
 from mantarray_waveform_analysis import BUTTERWORTH_LOWPASS_30_UUID
+from mantarray_waveform_analysis import calculate_displacement_from_magnetic_flux_density
 from mantarray_waveform_analysis import calculate_displacement_from_voltage
 from mantarray_waveform_analysis import calculate_force_from_displacement
 from mantarray_waveform_analysis import calculate_magnetic_flux_density_from_memsic
@@ -205,8 +206,25 @@ def test_calculate_magnetic_flux_density_from_memsic__returns_correct_values():
 
     # Tanner (11/19/21): this value is defined in documentation of the Beta 2 memsic sensors
     max_abs_memsic_range = 0.8
+
     expected_data = [-max_abs_memsic_range, 0, max_abs_memsic_range]
     np.testing.assert_almost_equal(actual_converted_data[1], expected_data, decimal=1)
+
+
+def test_calculate_displacement_from_magnetic_flux_density__returns_correct_values():
+    test_raw_samples = np.array([-0.8, 0, 0.8], dtype=np.float64)
+    test_data = np.vstack((np.zeros(3), test_raw_samples)).astype(np.float64)
+    original_test_data = copy.deepcopy(test_data)
+
+    actual_converted_data = calculate_displacement_from_magnetic_flux_density(test_data)
+    assert actual_converted_data.shape == (2, len(test_raw_samples))
+    assert actual_converted_data.dtype == np.float64
+
+    # confirm original data was not modified
+    np.testing.assert_array_equal(test_data, original_test_data)
+
+    expected_data = [-0.0186, 0.0, 0.0186]
+    np.testing.assert_almost_equal(actual_converted_data[1], expected_data, decimal=4)
 
 
 def test_calculate_displacement_from_voltage():

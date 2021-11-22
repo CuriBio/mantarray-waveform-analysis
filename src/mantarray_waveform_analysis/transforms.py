@@ -188,7 +188,7 @@ def calculate_magnetic_flux_density_from_memsic(
         memsic_data: A 2D array of raw memsic signal vs time
 
     Returns:
-        A 2D array of magnetic field strength vs time
+        A 2D array of magnetic flux density vs time
     """
     samples_in_milliteslas = (
         (memsic_data[1, :].astype(np.int64) - MEMSIC_CENTER_OFFSET)
@@ -224,7 +224,6 @@ def calculate_voltage_from_gmr(
     return np.vstack((gmr_data[0, :].astype(np.float64), sample_in_volts))
 
 
-# TODO split this into two separate functions. Also rename
 def calculate_displacement_from_voltage(
     voltage_data: NDArray[(2, Any), np.float64],
 ) -> NDArray[(2, Any), np.float64]:
@@ -238,13 +237,51 @@ def calculate_displacement_from_voltage(
         voltage_data: time and Voltage numpy array. Typically coming from calculate_voltage_from_gmr
 
     Returns:
-        A 2D array of time vs Displacement (meters)
+        A 2D array of Displacement (meters) vs time
+    """
+    magnetic_flux_data = calculate_magnetic_flux_density_from_voltage(voltage_data)
+    return calculate_displacement_from_magnetic_flux_density(magnetic_flux_data)
+
+
+def calculate_magnetic_flux_density_from_voltage(
+    voltage_data: NDArray[(2, Any), np.float64],
+) -> NDArray[(2, Any), np.float64]:
+    """Convert voltage to displacement.
+
+    Should only be used for Beta 1 data
+
+    Conversion values were obtained 03/09/2021 by Kevin Grey
+
+    Args:
+        voltage_data: time and Voltage numpy array. Typically coming from calculate_voltage_from_gmr
+
+    Returns:
+        A 2D array of magnetic flux density (mT) vs time
     """
     sample_in_millivolts = voltage_data[1, :] * MILLI_TO_BASE_CONVERSION
     time = voltage_data[0, :]
 
     # calculate magnetic flux density
     sample_in_milliteslas = sample_in_millivolts / MILLIVOLTS_PER_MILLITESLA
+    return np.vstack((time, sample_in_milliteslas)).astype(np.float64)
+
+
+def calculate_displacement_from_magnetic_flux_density(
+    magnetic_flux_data: NDArray[(2, Any), np.float64],
+) -> NDArray[(2, Any), np.float64]:
+    """Convert magnetic flux density to displacement.
+
+    Conversion values were obtained 03/09/2021 by Kevin Grey
+
+    Args:
+        magnetic_flux_data: time and mangetic flux density numpy array.
+        Typically coming from either calculate_magnetic_flux_density_from_voltage or calculate_magnetic_flux_density_from_memsic
+
+    Returns:
+        A 2D array of time vs Displacement (meters)
+    """
+    sample_in_milliteslas = magnetic_flux_data[1, :]
+    time = magnetic_flux_data[0, :]
 
     # calculate displacement
     sample_in_millimeters = sample_in_milliteslas * MILLIMETERS_PER_MILLITESLA
@@ -261,7 +298,7 @@ def calculate_force_from_displacement(
     Conversion values were obtained 03/09/2021 by Kevin Grey
 
     Args:
-        displacement_data: time and Displacement numpy array. Typically coming from calculate_displacement_from_voltage
+        displacement_data: time and Displacement numpy array. Typically coming from calculate_displacement_from_magnetic_flux_density
 
     Returns:
         A 2D array of time vs Force (Newtons)

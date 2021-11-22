@@ -56,6 +56,7 @@ from .pipelines import PipelineTemplate
 from .transforms import apply_empty_plate_calibration
 from .transforms import apply_noise_filtering
 from .transforms import apply_sensitivity_calibration
+from .transforms import calculate_displacement_from_magnetic_flux_density
 from .transforms import calculate_displacement_from_voltage
 from .transforms import calculate_force_from_displacement
 from .transforms import calculate_magnetic_flux_density_from_memsic
@@ -137,4 +138,5 @@ __all__ = [
     "MEMSIC_FULL_SCALE",
     "GAUSS_PER_MILLITESLA",
     "calculate_magnetic_flux_density_from_memsic",
+    "calculate_displacement_from_magnetic_flux_density",
 ]
