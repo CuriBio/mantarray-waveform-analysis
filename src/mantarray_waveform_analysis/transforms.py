@@ -246,7 +246,7 @@ def calculate_displacement_from_voltage(
 def calculate_magnetic_flux_density_from_voltage(  # pylint: disable=invalid-name  # Tanner (11/22/21): Can't think of a shorter name that is better
     voltage_data: NDArray[(2, Any), np.float64],
 ) -> NDArray[(2, Any), np.float64]:
-    """Convert voltage to displacement.
+    """Convert voltage to magnetic flux density.
 
     Should only be used for Beta 1 data
 
