@@ -61,3 +61,6 @@ tests/pngs/*.png
 *.so
 *.c
 *.html
+
+# MacOS
+*.DS_Store

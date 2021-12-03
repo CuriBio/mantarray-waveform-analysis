@@ -41,10 +41,11 @@ setup(
     package_dir={"": "src"},
     include_dirs=[np.get_include()],
     install_requires=[
-        "numpy>=1.20.1",
+        "numpy==1.20.2",
         "scipy>=1.6.1",
         "nptyping>=1.4.0",
         "attrs>=20.3.0",
+        "numba>=0.54.1"
     ],
     zip_safe=False,
     include_package_data=True,

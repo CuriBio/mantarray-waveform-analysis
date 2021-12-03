@@ -2,6 +2,7 @@
 """Docstring."""
 from . import pipelines
 from . import transforms
+from . import magnet_finding
 from .constants import ADC_GAIN
 from .constants import ALL_METRICS
 from .constants import AMPLITUDE_UUID
@@ -141,4 +142,5 @@ __all__ = [
     "calculate_magnetic_flux_density_from_memsic",
     "calculate_displacement_from_magnetic_flux_density",
     "UnsupportedTransformationError",
+    "magnet_finding"
 ]
