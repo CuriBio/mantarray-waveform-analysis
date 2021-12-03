@@ -25,6 +25,8 @@ TODO_CONST_2 = 4 * np.pi
 # Kevin (12/1/21): Used for calculating magnet's dipole moment
 MAGNET_VOLUME = np.pi * (.75 / 2.0) ** 2
 
+NUM_PARAMS = 6
+
 
 @njit()
 def meas_field(
@@ -58,17 +60,17 @@ def meas_field(
         # Kevin (12/1/21): compute distance vector from origin to moment
         r = -np.asarray([xpos[magnet], ypos[magnet], zpos[magnet]]) + manta
         # Kevin (12/1/21): Calculate the euclidian distance from the magnet to a given sensor
-        rAbs = np.sqrt(np.sum(r ** 2, axis=1))
+        r_abs = np.sqrt(np.sum(r ** 2, axis=1))
         # Kevin (12/1/21): simulate fields at sensors using dipole model for each magnet
         for field in range(0, len(r)):
-            fields[field] += 3 * r[field] * np.dot(moment_vectors, r[field]) / rAbs[field] ** 5 - moment_vectors / rAbs[field] ** 3
+            fields[field] += 3 * r[field] * np.dot(moment_vectors, r[field]) / r_abs[field] ** 5 - moment_vectors / r_abs[field] ** 3
     # Kevin (12/1/21): Reshaping to match the format of the data coming off the mantarray
     return fields.reshape((1, 3 * len(r)))[0] / TODO_CONST_2
 
 
-def objective_function_ls(pos, Bmeas, manta, num_active_module_ids):
+def objective_function_ls(pos, b_meas, manta, num_active_module_ids):
     """Cost function to be minimized by the least squares."""
-    pos = pos.reshape(6, num_active_module_ids)
+    pos = pos.reshape(NUM_PARAMS, num_active_module_ids)
     x = pos[0]
     y = pos[1]
     z = pos[2]
@@ -76,8 +78,8 @@ def objective_function_ls(pos, Bmeas, manta, num_active_module_ids):
     phi = pos[4]
     remn = pos[5]
 
-    Bcalc = meas_field(x, y, z, theta, phi, remn, manta, num_active_module_ids)
-    return Bcalc - Bmeas
+    b_calc = meas_field(x, y, z, theta, phi, remn, manta, num_active_module_ids)
+    return b_calc - b_meas
 
 
 def get_positions(data):
@@ -87,8 +89,9 @@ def get_positions(data):
     Data should be the difference of the data with plate on the instrument and empty plate calibration data
     Assumes 3 active sensors for each well, that all active wells have magnets, and that all magnets have the well beneath them active
     """
-    numSensors = 3
-    numAxes = 3
+    # Tanner (12/3/21): hardcoding these for now. Could be made constants if appropriate
+    num_sensors = 3
+    num_axes = 3
 
     # TODO Tanner (12/2/21): The final length of these should be known, so could try to init them as arrays
     xpos_est = []
@@ -110,7 +113,10 @@ def get_positions(data):
     # for the purpose of offsetting the values in triad by the correct well spacing
     triad = SENSOR_DISTANCES_FROM_CENTER_POINT.copy()
     manta = triad + active_module_ids[0] // WELLS_PER_ROW * WELL_VERTICAL_SPACING + (active_module_ids[0] % WELLS_PER_ROW) * WELL_HORIZONTAL_SPACING
-    for array in range(1, num_active_module_ids): # Compute sensor positions under each well -- probably not necessary to do each call  # TODO: why?: The values in "triad" and "manta" relate to layout of the board itself -- they don't change at all so long as the board doesn't
+    for array in range(1, num_active_module_ids):
+        # Kevin (12/1/21):  Compute sensor positions under each well.
+        # Probably not necessary to do each call. The values in "triad" and "manta" relate to layout of the board itself
+        # They don't change at all so long as the board doesn't
         manta = np.append(manta, triad + active_module_ids[array] // WELLS_PER_ROW * WELL_VERTICAL_SPACING + (active_module_ids[array] % WELLS_PER_ROW) * WELL_HORIZONTAL_SPACING, axis=0)
 
     # Kevin (12/1/21): run meas_field with some dummy values so numba compiles it. There needs to be some delay before it's called again for it to compile
@@ -121,36 +127,36 @@ def get_positions(data):
     initial_guess_values = {"X": 0, "Y" : 1, "Z": -5, "THETA": 95,  "PHI": 0, "REMN": -575}
     # Kevin (12/1/21): Each magnet has its own positional coordinates and other characteristics depending on where it's located in the consumable. Every magnet
     # position is referenced with respect to the center of the array beneath well A1, so the positions need to be adjusted to account for that, e.g. the magnet in
-    # A2 has the x/y coordinate (19.5, 0), so guess is processed in the below loop to produce that value. x0 contains the guesses for each magnet at each position
-    x0 = []
+    # A2 has the x/y coordinate (19.5, 0), so guess is processed in the below loop to produce that value. prev_est contains the guesses for each magnet at each position
+    prev_est = []
     for param, guess in initial_guess_values.items():
         for module_id in active_module_ids:
             if param == "X":
-                x0.append(guess + 19.5 * (module_id % WELLS_PER_ROW))
+                prev_est.append(guess + 19.5 * (module_id % WELLS_PER_ROW))
             elif param == "Y":
-                x0.append(guess - 19.5 * (module_id // WELLS_PER_ROW))
+                prev_est.append(guess - 19.5 * (module_id // WELLS_PER_ROW))
             else:
-                x0.append(guess)
+                prev_est.append(guess)
 
     # Kevin (12/1/21): Run the algorithm on each time index. The algorithm uses its previous outputs as its initial guess for all datapoints but the first one
     for i in range(0, data.shape[-1]):
         print("###", i)
 
         # Kevin (12/1/21): This sorts the data from processData into something that the algorithm can operate on; it shouldn't be necessary if you combine this method and processData
-        Bmeas = np.empty(num_active_module_ids * 9)
+        b_meas = np.empty(num_active_module_ids * 9)
         for mi_idx, module_id in enumerate(active_module_ids):
             # Kevin (12/1/21): rearrange sensor readings as a 1d vector
-            Bmeas[mi_idx * 9 : (mi_idx + 1) * 9] = data[module_id, :, :, i].reshape((1, numSensors * numAxes))
+            b_meas[mi_idx * 9 : (mi_idx + 1) * 9] = data[module_id, :, :, i].reshape((1, num_sensors * num_axes))
 
         res = least_squares(
             objective_function_ls,
-            x0,
-            args=(Bmeas, manta, num_active_module_ids),
+            prev_est,
+            args=(b_meas, manta, num_active_module_ids),
             method='trf',
             ftol=1e-2
         )
 
-        outputs = np.asarray(res.x).reshape(6, num_active_module_ids)
+        outputs = np.asarray(res.x).reshape(NUM_PARAMS, num_active_module_ids)
         xpos_est.append(outputs[0])
         ypos_est.append(outputs[1])
         zpos_est.append(outputs[2])
@@ -159,7 +165,7 @@ def get_positions(data):
         remn_est.append(outputs[5])
 
         # Tanner (12/2/21): set the start point for next loop to the result of this loop
-        x0 = np.asarray(res.x)
+        prev_est = np.asarray(res.x)
 
     # Kevin (12/1/21): I've gotten some strange results from downsampling; I'm not sure why that is necessarily, could be aliasing,
     # could be that the guesses for successive runs need to be really close together to get good accuracy.

@@ -65,6 +65,7 @@ def test_100_pts():
 
 
 def load_h5_files_as_array(recording_name):
+    # TODO Tanner (12/3/21): This should be in src
     plate_data_array = None
     for module_id in range(1, 25):
         file_path = f"tests/datasets/magnet_finding/{recording_name}/{recording_name}__module_{module_id}.h5"
