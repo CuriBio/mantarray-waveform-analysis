@@ -23,6 +23,11 @@ TIME_OFFSETS = "time_offsets"
 
 
 def test_100_pts():
+    # Cloud9 test times:
+    # start:                                              32.98s
+    # move "manta" calculation out of meas_field:         27.17s
+
+
     print("\n")
 
     loaded_data = load_h5_files_as_array("Durability_Test_11162021_data_90min")
