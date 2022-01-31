@@ -17,7 +17,7 @@ pytest-pylint==0.18.0
 zest.releaser[recommended]==6.22.1
 matplotlib==3.4.1
 h5py==3.2.1
-Cython==0.29.22
+Cython==0.29.27
 mantarray-file-manager==0.5.1
 stdlib-utils==0.4.4
 
